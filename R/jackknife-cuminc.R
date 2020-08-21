@@ -1,3 +1,16 @@
+#' Compute jackknife pseudo-observations of the survival function
+#'
+#' @param object A survfit object, with a single event (no competing risks)
+#' @param times Times at which the survival is computed, must be length 1
+#' @param mr Model response, the result of a call to Surv, or a matrix with two columns: "time" (observed follow up time) and "status" (0 = censored, 1 = event)
+#' @return A vector of jackknifed estimates of survival at time times
+#' @export
+#' @examples
+#'
+#' sfit.surv <- survival::survfit(survival::Surv(time, status) ~ 1, data = colon)
+#' mrs <- with(colon, survival::Surv(time, status))
+#' jackests <- jackknife.survival2(sfit.surv, times = 1000, mrs)
+
 
 jackknife.survival2 <- function(object,times,mr){
     stopifnot(length(times) == 1)
@@ -14,6 +27,21 @@ jackknife.survival2 <- function(object,times,mr){
     Jk <- Jk[order(event.time.order)]
     Jk
 }
+
+#' Compute jackknife pseudo-observations of the cause-specific cumulative incidence for competing risks
+#'
+#' @param object A survfit object, with competing events
+#' @param times Times at which the cumulative incidence is computed, must be length 1
+#' @param cause Value indicating for which cause the cumulative incidence is to be computed, it must match one of the values available in object (see example)
+#' @param mr Model response, the result of a call to Surv, or a matrix with two columns: "time" (observed follow up time) and "status" (0 = censored, 1, ..., k = event types)
+#' @return A vector of jackknifed estimates of the cause-specific cumulative incidence at time times
+#' @export
+#' @examples
+#'
+#' sfit.cuminc <- survival::survfit(survival::Surv(time, event) ~ 1, data = colon)
+#' mrs <- with(colon, survival::Surv(time, status))
+#' jackests <- jackknife.survival2(sfit.surv, times = 1000, mrs)
+
 
 jackknife.competing.risks2 <- function(object,times,cause,mr){
 
@@ -50,8 +78,7 @@ leaveOneOut.survival2 <- function(object,times,mr){
     ## idea: find the at-risk set for pseudo-value k by
     ##       substracting 1 in the period where subj k is
     ##       at risk. need the position of obstime.k in time ...
-    ## pos <- match(obstimes,time)
-    ## if (useC==TRUE){
+
     tdex <- max(which(time <= times))
 
     loo <- .C("loo_surv2",
@@ -112,21 +139,7 @@ leaveOneOut.competing.risks2 <- function(object, times, cause, mr){
                NT=as.integer(NU),
                Tdex=as.integer(tdex - 1),
                PACKAGE="eventglm")$F
-    ## browser()
-    ## }
-    ## else{
-    ## pos <- sindex(jump.times=time,eval.times=obstimes)
-    ## loo <- do.call("rbind",lapply(1:N,function(k){
-    ## Dk <- D
-    ## if (status[k]==1 && E[k]==cause) Dk[pos[k]] <- Dk[pos[k]]-1
-    ## Yk <- Y-c(rep(1,pos[k]),rep(0,NU-pos[k]))
-    ## Sk <- as.numeric(lagSk[k,,drop=TRUE])
-    ## Hk <- Dk/Yk
-    ## Fk <- cumsum(Sk*Hk)
-    ## Fk
-    ## }))
-    ## out <- loo
-    ## }
+
 
     loo2
 }
