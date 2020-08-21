@@ -1,15 +1,17 @@
 
-jackknife.survival2 <- function(object,times,keepResponse=FALSE,...){
-    S <- predict(object,times=times,newdata=object$model.response)
-    Sk <- leaveOneOut.survival(object,times,...)
-    N <- NROW(Sk)
-    Jk <- t(N*S-t((N-1)*Sk))
-    colnames(Jk) <- paste("t",times,sep=".")
-    if (keepResponse==TRUE){
-        Jk <- cbind(object$model.response,Jk)
-    }
+jackknife.survival2 <- function(object,times,mr){
+    stopifnot(length(times) == 1)
+
+    event.time.order <- order(mr[,"time"],-1.0 * (mr[,"status"] != 0))
+    smary <- summary(object,times=times)
+    S <- smary$surv
+
+    Sk <- leaveOneOut.survival2(object,times,mr)
+    N <- length(Sk)
+    Jk <- N*S - (N-1) * Sk
+
     ## re-order the pseudo-values
-    Jk <- Jk[object$originalDataOrder,,drop=FALSE]
+    Jk <- Jk[order(event.time.order)]
     Jk
 }
 
@@ -24,13 +26,15 @@ jackknife.competing.risks2 <- function(object,times,cause,mr){
         Fk <- leaveOneOut.competing.risks2(object,times,cause=cause,mr)
         N <- length(Fk)
         Jk <- N*F-(N-1)*Fk
-        matrix(Jk[order(event.time.order)], ncol = 1)
+        Jk[order(event.time.order)]
 
 }
 
-leaveOneOut.survival2 <- function(object,times,lag=FALSE,...){
-    stopifnot(object$covariate.type==1)
-    mr <- object$model.response
+leaveOneOut.survival2 <- function(object,times,mr){
+    stopifnot(length(times)==1)
+    event.time.order <- order(mr[,"time"],-1.0*(mr[,"status"] != 0))
+    mr <- mr[event.time.order,]
+
     time <- object$time
     Y <- object$n.risk
     D <- object$n.event
@@ -42,41 +46,26 @@ leaveOneOut.survival2 <- function(object,times,lag=FALSE,...){
     status <- mr[,"status"]
     N <- length(obstimes)
     ##
-    S <- predict(object,times=time,newdata=mr)
+    #S <- predict(object,times=time,newdata=mr)
     ## idea: find the at-risk set for pseudo-value k by
     ##       substracting 1 in the period where subj k is
     ##       at risk. need the position of obstime.k in time ...
     ## pos <- match(obstimes,time)
     ## if (useC==TRUE){
-    loo <- .C("loo_surv",
+    tdex <- max(which(time <= times))
+
+    loo <- .C("loo_surv2",
               Y = as.double(Y),
               D=as.double(D),
               time=as.double(time),
               obsT=as.double(obstimes),
               status=as.double(status),
-              S=double(NU*N),
+              S=double(N),
               N=as.integer(N),
               NT=as.integer(NU),
-              PACKAGE="prodlim")$S
-    out <- matrix(loo,nrow=N,ncol=NU,byrow=FALSE)
-    ## }
-    ## else{
-    pos <- sindex(jump.times=time,eval.times=obstimes)
-    ## loo2 <- do.call("rbind",lapply(1:N,function(k){
-    ## Dk <- D
-    ## if (status[k]==1) Dk[pos[k]] <- Dk[pos[k]]-1
-    ## Yk <- Y-c(rep(1,pos[k]),rep(0,NU-pos[k]))
-    ## cumprod(1-Dk/Yk)}))
-    ## }
-    ## out <- loo
-    if (!missing(times)){
-        found <- sindex(jump.times=time,eval.times=times)+1
-        if (lag==FALSE)
-            out <- cbind(1,out)[,found,drop=TRUE]
-        else
-            out <- cbind(1,cbind(1,out))[,found,drop=TRUE]
-    }
-    out
+              Tdex=as.integer(tdex - 1),
+              PACKAGE="eventglm")$S
+    loo
 }
 
 leaveOneOut.competing.risks2 <- function(object, times, cause, mr){

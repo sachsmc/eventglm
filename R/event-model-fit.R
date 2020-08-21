@@ -24,11 +24,11 @@ cumincglm <- function(formula, time, cause = "1", link = "identity", data, ...) 
     marginal.estimate <- survival::survfit(update.formula(formula, . ~ 1), data = data)
 
     newdata <- do.call(rbind, lapply(1:length(time), function(i) data))
+    mr <- with(data, terms(update(formula, . ~ 1))[[2]])
+    jackk <- jackknife.competing.risks2(marginal.estimate, times = time,
+                                        cause = cause, mr)
 
-    jackk <- prodlim::jackknife(marginal.estimate, times = time, cause = cause)
-
-    nn <- nrow(jackk)
-    if(is.null(nn)) nn <- length(jackk)
+    nn <- length(jackk)
 
     newdata[["pseudo.vals"]] <- c(jackk)
     newdata[["pseudo.time"]] <- rep(time, each = nn)

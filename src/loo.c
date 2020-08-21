@@ -1,14 +1,15 @@
 #include <math.h>
 #include <R.h>
 
-void loo_surv(double *Y,
+void loo_surv2(double *Y,
 	      double *D,
 	      double *time,
 	      double *obsT,
 	      double *status,
 	      double *S,
 	      int *N,
-	      int *NT){
+	      int *NT,
+	      int *Tdex){
   int k, t;
   double na,pl;
   for (k=0; k<*N;k++){
@@ -41,7 +42,9 @@ void loo_surv(double *Y,
       }
       /* compute the product-limit estimate */
       pl *= (1-na);
-      S[k+(*N)*t]=pl;
+      if(t == *Tdex) {
+      S[k]=pl;
+      }
       /* Rprintf("t=%d\tk=%d\tD[t]=%1.2f\tY[t]=%1.2f\tna=%1.2f\tS[k](t)=%1.2f\n",t,k,D[t],Y[t],na,S[k+(*N)*t]); */
     }
   }
