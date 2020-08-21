@@ -9,7 +9,10 @@
 #'
 #' sfit.surv <- survival::survfit(survival::Surv(time, status) ~ 1, data = colon)
 #' mrs <- with(colon, survival::Surv(time, status))
-#' jackests <- jackknife.survival2(sfit.surv, times = 1000, mrs)
+#' pseudo.obs <- jackknife.survival2(sfit.surv, times = 1000, mrs)
+#' mean(pseudo.obs)
+#' # agrees with
+#' summary(sfit.surv, times = 1000)
 
 
 jackknife.survival2 <- function(object,times,mr){
@@ -34,13 +37,16 @@ jackknife.survival2 <- function(object,times,mr){
 #' @param times Times at which the cumulative incidence is computed, must be length 1
 #' @param cause Value indicating for which cause the cumulative incidence is to be computed, it must match one of the values available in object (see example)
 #' @param mr Model response, the result of a call to Surv, or a matrix with two columns: "time" (observed follow up time) and "status" (0 = censored, 1, ..., k = event types)
-#' @return A vector of jackknifed estimates of the cause-specific cumulative incidence at time times
+#' @return A vector of jackknifed pseudo-observations of the cause-specific cumulative incidence at time times
 #' @export
 #' @examples
 #'
 #' sfit.cuminc <- survival::survfit(survival::Surv(time, event) ~ 1, data = colon)
-#' mrs <- with(colon, survival::Surv(time, status))
-#' jackests <- jackknife.survival2(sfit.surv, times = 1000, mrs)
+#' mrs <- with(colon, survival::Surv(time, event))
+#' pseudo.obs <- jackknife.competing.risks2(sfit.cuminc, times = 1000, cause = "recurrence", mrs)
+#' mean(pseudo.obs)
+#' # agrees with
+#' summary(sfit.cuminc, times = 1000)
 
 
 jackknife.competing.risks2 <- function(object,times,cause,mr){
@@ -57,6 +63,24 @@ jackknife.competing.risks2 <- function(object,times,cause,mr){
         Jk[order(event.time.order)]
 
 }
+
+#' Compute leave one out jackknife contributions of the survival function
+#'
+#' For each subject, the survival function is recomputed leaving that subject out.
+#' This is the workhorse for \link{jackknife.survival2} and will generally not
+#' be called by the user.
+#'
+#' @param object A survfit object, with a single event (no competing risks)
+#' @param times Times at which the survival is computed, must be length 1
+#' @param mr Model response, the result of a call to Surv, or a matrix with two columns: "time" (observed follow up time) and "status" (0 = censored, 1 = event)
+#' @return A vector of jackknifed values of survival at time times
+#' @export
+#' @examples
+#'
+#' sfit.surv <- survival::survfit(survival::Surv(time, status) ~ 1, data = colon)
+#' mrs <- with(colon, survival::Surv(time, status))
+#' jackvals <- leaveOneOut.survival2(sfit.surv, times = 1000, mrs)
+
 
 leaveOneOut.survival2 <- function(object,times,mr){
     stopifnot(length(times)==1)
@@ -95,6 +119,22 @@ leaveOneOut.survival2 <- function(object,times,mr){
     loo
 }
 
+
+#' Compute jackknife pseudo-observations of the cause-specific cumulative incidence for competing risks
+#'
+#' @param object A survfit object, with competing events
+#' @param times Times at which the cumulative incidence is computed, must be length 1
+#' @param cause Value indicating for which cause the cumulative incidence is to be computed, it must match one of the values available in object (see example)
+#' @param mr Model response, the result of a call to Surv, or a matrix with two columns: "time" (observed follow up time) and "status" (0 = censored, 1, ..., k = event types)
+#' @return A vector of jackknifed values of the cause-specific cumulative incidence at time times
+#' @export
+#' @examples
+#'
+#' sfit.cuminc <- survival::survfit(survival::Surv(time, event) ~ 1, data = colon)
+#' mrs <- with(colon, survival::Surv(time, event))
+#' jackvals <- leaveOneOut.competing.risks2(sfit.cuminc, times = 1000, cause = "recurrence", mrs)
+
+
 leaveOneOut.competing.risks2 <- function(object, times, cause, mr){
     stopifnot(length(times) == 1)
 
@@ -102,8 +142,8 @@ leaveOneOut.competing.risks2 <- function(object, times, cause, mr){
     mr <- mr[event.time.order,]
     states <- object$states
     if (missing(cause)) {
-        C <- 1
-        cause <- states[1]
+        C <- 2
+        cause <- states[C]
     }   else{
         C <- match(cause,states,nomatch=0)
         if (length(C)>1 || C==0) stop("Cause must match exactly one of the names of object$n.event.")
