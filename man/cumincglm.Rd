@@ -4,14 +4,14 @@
 \alias{cumincglm}
 \title{Generalized linear models for cumulative incidence}
 \usage{
-cumincglm(formula, time, cause = "1", link = "identity", data, ...)
+cumincglm(formula, time, cause = 1, link = "identity", data, ...)
 }
 \arguments{
 \item{formula}{A formula specifying the model. The left hand side must be a \link[prodlim]{Hist} object. The right hand side is the usual linear combination of covariates.}
 
 \item{time}{Numeric constant specifying the time at which the cumulative incidence or survival probability effect estimates are desired.}
 
-\item{cause}{Character constant specifying the cause indicator of interest.}
+\item{cause}{Numeric or character constant specifying the cause indicator of interest.}
 
 \item{link}{Link function for the cumulative incidence regression model.}
 

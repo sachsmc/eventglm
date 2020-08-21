@@ -4,3 +4,11 @@
 \name{eventglm}
 \alias{eventglm}
 \title{Regression Models for Event History Outcomes}
+\description{
+A user friendly, easy to understand way of doing event history regression
+for marginal estimands of interest, including the cumulative incidence and the
+restricted mean survival, using the pseudo observation framework for estimation.
+The interface uses the well known formulation of a generalized linear model and allows
+for features including plotting of residuals, the use of sampling weights, and corrected
+variance estimation.
+}

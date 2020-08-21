@@ -22,6 +22,11 @@ cumincglm <- function(formula, time, cause = 1, link = "identity", data, ...) {
     stopifnot(length(time) == 1)
 
     marginal.estimate <- survival::survfit(update.formula(formula, . ~ 1), data = data)
+
+    if(max(marginal.estimate$time) < time){
+        stop("Requested time is greater than largest observed time")
+    }
+
     newdata <- do.call(rbind, lapply(1:length(time), function(i) data))
     mr <- eval(terms(update(formula, . ~ 1))[[2]], envir = data)
 
@@ -51,6 +56,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity", data, ...) {
 
     } else if(marginal.estimate$type == "right") {
 
+        causen <- 1
         jackk <- 1 - jackknife.survival2(marginal.estimate, times = time,
                                      mr)
 
@@ -59,6 +65,8 @@ cumincglm <- function(formula, time, cause = 1, link = "identity", data, ...) {
                          mr[, "status"] == causen,
                          mr[, "status"] == 0 ## censored indicator
         )
+
+
     } else {
         stop("Survival outcome type", marginal.estimate$type, "not supported.")
     }

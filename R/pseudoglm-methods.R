@@ -1,8 +1,9 @@
 
 #' Print method for pseudoglm
-#' @param x A pseudoglm object, as returned by \link{cuminglm} or \link{rmeanglm}
+#' @param x A pseudoglm object, as returned by \link{cumincglm} or \link{rmeanglm}
 #' @param digits Number of significant digits
 #' @param ... Not used
+#' @return x, invisibly
 #'
 #' @export
 #'
@@ -35,10 +36,12 @@ print.pseudoglm <- function (x, digits = max(3L, getOption("digits") - 3L), ...)
 #' Compute covariance matrix of regression coefficient estimates
 #'
 #'
-#' @param object A pseudoglm object, as returned by \link{cuminglm} or
+#' @param object A pseudoglm object, as returned by \link{cumincglm} or
 #'   \link{rmeanglm}.
-#' @param type The method to use for variance estimation; one of "corrected", "robust", "naive", or "cluster"
+#' @param type The method to use for variance estimation; one of "corrected",
+#'   "robust", "naive", or "cluster"
 #' @param ... Arguments passed to \link[sandwich]{vcovHC}
+#' @return A numeric matrix containing the variance-covariance estimates
 #'
 #' @details The "corrected" variance estimate is as described in Overgaard et
 #'   al. (2017) <doi:10.1214/16-AOS1516>, with code adapted from Overgaard's
@@ -50,7 +53,10 @@ print.pseudoglm <- function (x, digits = max(3L, getOption("digits") - 3L), ...)
 #'   anti-conservative. The bootstrap is another recommended option that can be
 #'   implemented using other tools; there is an example in the vignette.
 #'
-#' @references Overgaard, Morten; Parner, Erik Thorlund; Pedersen, Jan. Asymptotic theory of generalized estimating equations based on jack-knife pseudo-observations. Ann. Statist. 45 (2017), no. 5, 1988--2015. <doi:10.1214/16-AOS1516>.
+#' @references Overgaard, Morten; Parner, Erik Thorlund; Pedersen, Jan.
+#'   Asymptotic theory of generalized estimating equations based on jack-knife
+#'   pseudo-observations. Ann. Statist. 45 (2017), no. 5, 1988--2015.
+#'   <doi:10.1214/16-AOS1516>.
 #' @seealso \link[sandwich]{vcovHC}
 #' @export
 vcov.pseudoglm <- function(object, type = "robust", ...) {
@@ -222,11 +228,12 @@ vcov.pseudoglm <- function(object, type = "robust", ...) {
 
 #' Summary method
 #'
-#' @param object A pseudoglm object, as returned by \link{cuminglm} or \link{rmeanglm}
+#' @param object A pseudoglm object, as returned by \link{cumincglm} or \link{rmeanglm}
 #' @param correlation logical; if TRUE, the correlation matrix of the estimated parameters is returned and printed.
 #' @param symbolic.cor logical; If TRUE, print the correlations in a symbolic form rather than as numbers.
 #' @param type The method to use for variance estimation; one of "corrected", "robust", "naive", or "cluster"
 #' @param ... Additional arguments passed to \link{vcov.pseudoglm}
+#' @return An object of class \link[stats]{summary.glm}
 #' @export
 #'
 summary.pseudoglm <- function (object, correlation = FALSE, symbolic.cor = FALSE,
@@ -286,19 +293,46 @@ summary.pseudoglm <- function (object, correlation = FALSE, symbolic.cor = FALSE
 
 #' Pseudo-observation scaled residuals
 #'
-#' Computes residuals according to the recommendations of Pohar-Perme and Andersen (2009) <doi: 10.1002/sim.3401>.
+#' Computes residuals according to the recommendations of Pohar-Perme and
+#' Andersen (2009) <doi: 10.1002/sim.3401>.
 #'
-#' @param object A pseudoglm object, as returned by \link{cuminglm} or \link{rmeanglm}
-#' @param type Either "scaled" (the default for cumulative incidence outcomes) or "raw" default for restricted mean outcomes
+#' @param object A pseudoglm object, as returned by \link{cumincglm} or
+#'   \link{rmeanglm}
+#' @param type Either "scaled" (the default for cumulative incidence outcomes)
+#'   or one of the types available in \link[stats]{residuals.glm} for restricted mean outcomes, with the default being "deviance".
 #' @param ... Arguments passed on to \link[stats]{residuals.glm}.
+#' @return A numeric vector of residuals
 #'
-#' @details The scaled residuals are computed as
-#' \deqn{\hat{\epsilon}_i = \frac{\hat{E}(V_i) - \hat{Y}_i}{\sqrt{\hat{Y}_i (1 - \hat{Y}_i)}}}
-#'  When the outcome is the cumulative incidence, the denominator corresponds to an estimate of the standard error of the conditional estimate of the outcome in the absence of censoring. For the restricted mean, no such rescaling is done and the computation is passed off to \link[stats]{residuals.glm}.
-#'  @references Perme MP, Andersen PK. Checking hazard regression models using pseudo-observations. Stat Med. 2008;27(25):5309-5328. <doi:10.1002/sim.3401>
+#' @details The scaled residuals are computed as \deqn{\hat{\epsilon}_i =
+#'   \frac{\hat{E}(V_i) - \hat{Y}_i}{\sqrt{\hat{Y}_i (1 - \hat{Y}_i)}}} When the
+#'   outcome is the cumulative incidence, the denominator corresponds to an
+#'   estimate of the standard error of the conditional estimate of the outcome
+#'   in the absence of censoring. For the restricted mean, no such rescaling is
+#'   done and the computation is passed off to \link[stats]{residuals.glm}.
+#' @references Perme MP, Andersen PK. Checking hazard regression models using
+#'   pseudo-observations. Stat Med. 2008;27(25):5309-5328.
+#'   <doi:10.1002/sim.3401>
+#' @export
 residuals.pseudoglm <- function(object, type = NULL, ...){
 
-    residuals.glm(object)
+    if(object$type == "rmean") {
+        if(is.null(type)) {
+            type <- "deviance"
+        }
+        residuals.glm(object, type = type, ...)
+    } else if(object$type == "cuminc") {
+
+        if(is.null(type) || type == "scaled") {
+
+            cond.cuminc <- predict(object, type = "response")
+            (object$y - cond.cuminc) / sqrt(cond.cuminc * (1 - cond.cuminc))
+
+
+        } else {
+            residuals.glm(object, type = type, ...)
+        }
+
+    }
 
 }
 

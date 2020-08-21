@@ -41,12 +41,12 @@ jackknife.survival2 <- function(object,times,mr){
 #' @export
 #' @examples
 #'
-#' sfit.cuminc <- survival::survfit(survival::Surv(time, event) ~ 1, data = colon)
-#' mrs <- with(colon, survival::Surv(time, event))
-#' pseudo.obs <- jackknife.competing.risks2(sfit.cuminc, times = 1000, cause = "recurrence", mrs)
+#' sfit.cuminc <- survival::survfit(survival::Surv(etime, event) ~ 1, data = mgus2)
+#' mrs <- with(mgus2, survival::Surv(etime, event))
+#' pseudo.obs <- jackknife.competing.risks2(sfit.cuminc, times = 200, cause = "pcm", mrs)
 #' mean(pseudo.obs)
 #' # agrees with
-#' summary(sfit.cuminc, times = 1000)
+#' summary(sfit.cuminc, times = 200)
 
 
 jackknife.competing.risks2 <- function(object,times,cause,mr){
@@ -130,9 +130,9 @@ leaveOneOut.survival2 <- function(object,times,mr){
 #' @export
 #' @examples
 #'
-#' sfit.cuminc <- survival::survfit(survival::Surv(time, event) ~ 1, data = colon)
-#' mrs <- with(colon, survival::Surv(time, event))
-#' jackvals <- leaveOneOut.competing.risks2(sfit.cuminc, times = 1000, cause = "recurrence", mrs)
+#' sfit.cuminc <- survival::survfit(survival::Surv(etime, event) ~ 1, data = mgus2)
+#' mrs <- with(mgus2, survival::Surv(etime, event))
+#' jackvals <- leaveOneOut.competing.risks2(sfit.cuminc, times = 200, cause = "pcm", mrs)
 
 
 leaveOneOut.competing.risks2 <- function(object, times, cause, mr){

@@ -23,10 +23,10 @@ Compute jackknife pseudo-observations of the cause-specific cumulative incidence
 }
 \examples{
 
-sfit.cuminc <- survival::survfit(survival::Surv(time, event) ~ 1, data = colon)
-mrs <- with(colon, survival::Surv(time, event))
-pseudo.obs <- jackknife.competing.risks2(sfit.cuminc, times = 1000, cause = "recurrence", mrs)
+sfit.cuminc <- survival::survfit(survival::Surv(etime, event) ~ 1, data = mgus2)
+mrs <- with(mgus2, survival::Surv(etime, event))
+pseudo.obs <- jackknife.competing.risks2(sfit.cuminc, times = 200, cause = "pcm", mrs)
 mean(pseudo.obs)
 # agrees with
-summary(sfit.cuminc, times = 1000)
+summary(sfit.cuminc, times = 200)
 }

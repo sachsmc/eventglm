@@ -5,7 +5,7 @@
 \alias{colon}
 \title{Chemotherapy for Stage B/C colon cancer}
 \format{
-A data frame with 1858 rows and 17 variables:
+A data frame with 929 rows and 17 variables:
 \describe{
 
 \item{id}{id}
@@ -34,10 +34,8 @@ colon
 These are data from one of the first successful trials of adjuvant
 chemotherapy for colon cancer. Levamisole is a low-toxicity compound
 previously used to treat worm infestations in animals; 5-FU is a moderately
-toxic (as these things go) chemotherapy agent. There are two records per
-person, one for recurrence and one for death. This is redistributed from
-the survival package, with the addition of an indicator for the competing
-risks.
+toxic (as these things go) chemotherapy agent. There are only one record per patient for the death outcome (or censoring). This is redistributed from
+the survival package, with a small modification.
 }
 \seealso{
 \link[survival]{colon}
