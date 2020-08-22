@@ -1,9 +1,9 @@
 test_that("Residuals work", {
     cuminctest <- cumincglm(survival::Surv(etime, event) ~ sex,
-                            time = 200, cause = "pcm", link = "identity", mgus2)
+                            time = 200, cause = "pcm", link = "identity", data = mgus2)
 
     cuminclog <- cumincglm(survival::Surv(etime, event) ~ age,
-                            time = 200, cause = "pcm", link = "cloglog", mgus2)
+                            time = 200, cause = "pcm", link = "cloglog", data = mgus2)
 
     t1 <- residuals(cuminclog)
     t2 <- residuals.glm(cuminclog)
@@ -20,7 +20,33 @@ test_that("Residuals work", {
 
     #plot(s1 ~ colon$age)
 
-
     ## restricted mean should be no transformation
+
+})
+
+test_that("ipcw works", {
+
+
+    cumincipcw <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+                            time = 200, cause = "pcm", link = "identity",
+                            model.censoring = "independent", data = mgus2)
+
+    cumincipcw2 <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+                            time = 200, cause = "pcm", link = "identity",
+                            model.censoring = "stratified",
+                            formula.censoring = ~ sex, data = mgus2)
+
+    cumincipcw3 <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+                             time = 200, cause = "pcm", link = "identity",
+                             model.censoring = "aareg",
+                             data = mgus2)
+    cumincipcw4 <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+                             time = 200, cause = "pcm", link = "identity",
+                             model.censoring = "coxph",
+                             data = mgus2)
+
+    expect_true(cumincipcw$coefficients[3] - cumincipcw2$coefficients[3] < 1e-3)
+    expect_true(cumincipcw$coefficients[3] - cumincipcw3$coefficients[3] < 1e-3)
+    expect_true(cumincipcw$coefficients[3] - cumincipcw4$coefficients[3] < 1e-3)
 
 })
