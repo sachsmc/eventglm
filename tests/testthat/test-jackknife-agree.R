@@ -20,4 +20,21 @@ test_that("Jackknife agrees with prodlim", {
 
     expect_true(all(myests == jack.s))
 
+
+    ## restricted mean
+    times <- sfit.surv$time[sfit.surv$time <= 1000]
+    jack.s <- prodlim:::leaveOneOut.survival(me.surv, times = times)
+    myests <- eventglm:::leaveOneOut.survival(sfit.surv, 1000, mrs)
+
+    expect_true(all(dim(jack.s) == dim(myests)))
+    expect_true(all(jack.s == myests))
+
+
+    times <- sfit$time[sfit$time <= 200]
+    jack.s2 <- prodlim:::leaveOneOut.competing.risks(marginal.estimate, times = times)
+    myests2 <- eventglm:::leaveOneOut.competing.risks(sfit, 200, cause = "pcm", mr)
+
+    expect_true(all(dim(jack.s2) == dim(myests2)))
+    expect_true(all(jack.s2 == myests2))
+
 })

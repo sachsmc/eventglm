@@ -2,29 +2,66 @@
 % Please edit documentation in R/event-model-fit.R
 \name{rmeanglm}
 \alias{rmeanglm}
-\title{Generalized linear models for restricted mean}
+\title{Generalized linear models for the restricted mean survival}
 \usage{
 rmeanglm(formula, time, cause = "1", link = "identity", data, ...)
 }
 \arguments{
-\item{formula}{A formula specifying the model. The left hand side must be a \link[prodlim]{Hist} object. The right hand side is the usual linear combination of covariates.}
+\item{formula}{A formula specifying the model. The left hand side must be a
+\link[survival]{Surv} object specifying a right censored survival or
+competing risks outcome. The status indicator, normally 0=alive, 1=dead.
+Other choices are TRUE/FALSE (TRUE = death) or 1/2 (2=death). For competing
+risks, the event variable will be a factor, whose first level is treated as
+censoring. The right hand side is the usual linear combination of
+covariates.}
 
-\item{time}{Numeric constant specifying the time at which the cumulative incidence or survival probability effect estimates are desired.}
+\item{time}{Numeric constant specifying the time up to which the restricted
+mean effect estimates are desired.}
 
-\item{cause}{Character constant specifying the cause indicator of interest.}
+\item{cause}{Numeric or character constant specifying the cause indicator of
+interest.}
 
-\item{link}{Link function for the cumulative incidence regression model.}
+\item{link}{Link function for the restricted mean regression model.}
 
 \item{data}{Data frame in which all variables of formula can be interpreted.}
 
-\item{...}{Other arguments passed to \link[stats]{glm} such as weights, subset, etc.}
+\item{...}{Other arguments passed to \link[stats]{glm} such as weights,
+subset, etc.}
+
+\item{model.censoring}{Type of model for the censoring distribution. Options
+are "stratified", which computes the pseudo-observations stratified on a
+set of categorical covariates, "aareg" for Aalen's additive hazards model,
+and "coxph" for Cox's proportional hazards model. With those options, we
+assume that the time to event and event indicator are conditionally
+independent of the censoring time, and that the censoring model is
+correctly specified. If "independent", we assume completely independent
+censoring, i.e., that the time to event and covariates are independent of
+the censoring time. the censoring time is independent of the covariates in
+the model.}
+
+\item{formula.censoring}{A one sided formula (e.g., \code{~ x1 + x2})
+specifying the model for the censoring distribution. If NULL, uses the same
+mean model as for the outcome.}
 }
 \value{
-A pseudoglm object, with its own methods for print, summary, and vcov. It inherits from glm, so predict and other glm methods are supported.
+A pseudoglm object, with its own methods for print, summary, and
+  vcov. It inherits from glm, so predict and other glm methods are supported.
 }
 \description{
-Using pseudo observations, this function then runs a generalized
-linear model. The link function can be "identity" for estimating
-differences in the restricted mean, "log"
-for estimating ratios, and any of the other link functions supported by \link[stats]{quasi}.
+Using pseudo observations for the restricted mean, or the restricted mean
+lifetime lost in the competing risks case, this function then runs a
+generalized linear model to estimate associations with covariates. The link
+function can be "identity" for estimating differences in the restricted mean,
+"log" for estimating ratios, and any of the other link functions supported by
+\link[stats]{quasi}.
+}
+\examples{
+    cumincipcw <- rmeanglm(survival::Surv(etime, event) ~ age + sex,
+         time = 200, cause = "pcm", link = "identity",
+         model.censoring = "independent", data = mgus2)
+# stratified on only the categorical covariate
+     cumincipcw2 <- rmeanglm(survival::Surv(etime, event) ~ age + sex,
+                         time = 200, cause = "pcm", link = "identity",
+                         model.censoring = "stratified",
+                         formula.censoring = ~ sex, data = mgus2)
 }
