@@ -22,6 +22,13 @@ test_that("Residuals work", {
 
     ## restricted mean should be no transformation
 
+    rmeantest <- rmeanglm(survival::Surv(time, status) ~ age,
+                          time = 1000, link = "identity", data = colon)
+
+
+    rmeantest2 <- rmeanglm(survival::Surv(etime, event) ~ sex,
+                          time = 200, cause = "pcm", link = "identity", data = mgus2)
+
 })
 
 test_that("ipcw works", {
@@ -48,5 +55,31 @@ test_that("ipcw works", {
     expect_true(cumincipcw$coefficients[3] - cumincipcw2$coefficients[3] < 1e-3)
     expect_true(cumincipcw$coefficients[3] - cumincipcw3$coefficients[3] < 1e-3)
     expect_true(cumincipcw$coefficients[3] - cumincipcw4$coefficients[3] < 1e-3)
+
+
+    rmeanipcw1 <- rmeanglm(survival::Surv(etime, event) ~ age + sex,
+                             time = 200, cause = "pcm", link = "identity",
+                             model.censoring = "independent",
+                             formula.censoring = ~ sex, data = mgus2)
+
+    rmeanipcw2 <- rmeanglm(survival::Surv(etime, event) ~ age + sex,
+                             time = 200, cause = "pcm", link = "identity",
+                             model.censoring = "stratified",
+                             formula.censoring = ~ sex, data = mgus2)
+
+    rmeanipcw3 <- rmeanglm(survival::Surv(etime, event) ~ age + sex,
+                           time = 200, cause = "pcm", link = "identity",
+                           model.censoring = "aareg",
+                           formula.censoring = ~ age + sex, data = mgus2)
+
+    rmeanipcw4 <- rmeanglm(survival::Surv(etime, event) ~ age + sex,
+                           time = 200, cause = "pcm", link = "identity",
+                           model.censoring = "coxph",
+                           formula.censoring = ~ age + sex, data = mgus2)
+
+    expect_true(rmeanipcw1$coefficients[3] - rmeanipcw2$coefficients[3] < 1e-2)
+    expect_true(rmeanipcw1$coefficients[3] - rmeanipcw3$coefficients[3] < 1e-2)
+    expect_true(rmeanipcw1$coefficients[3] - rmeanipcw4$coefficients[3] < 1e-2)
+
 
 })

@@ -10,5 +10,5 @@
 #' @docType package
 #' @name eventglm
 #' @useDynLib eventglm, .registration=TRUE
-#' @importFrom stats coef model.frame model.response naprint pnorm predict quasi residuals residuals.glm terms update update.formula vcov
+#' @importFrom stats coef model.frame model.matrix model.response naprint pnorm predict quasi residuals residuals.glm terms update update.formula vcov
 NULL

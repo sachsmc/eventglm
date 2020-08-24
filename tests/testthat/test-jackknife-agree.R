@@ -27,7 +27,7 @@ test_that("Jackknife agrees with prodlim", {
     myests <- eventglm:::leaveOneOut.survival(sfit.surv, 1000, mrs)
 
     expect_true(all(dim(jack.s) == dim(myests)))
-    expect_true(all(jack.s == myests))
+    expect_true(all(jack.s == myests[order(mrs[,"time"],-1.0 * (mrs[,"status"] != 0)),]))
 
 
     times <- sfit$time[sfit$time <= 200]
@@ -35,6 +35,6 @@ test_that("Jackknife agrees with prodlim", {
     myests2 <- eventglm:::leaveOneOut.competing.risks(sfit, 200, cause = "pcm", mr)
 
     expect_true(all(dim(jack.s2) == dim(myests2)))
-    expect_true(all(jack.s2 == myests2))
+    expect_true(all(jack.s2 == myests2[order(mr[,"time"],-1.0 * (mr[,"status"] != 0)),]))
 
 })

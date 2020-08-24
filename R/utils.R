@@ -6,7 +6,7 @@
 #' @param mr Model response of the survival object
 #' @return A vector of pseudo-observations
 
-get_jackknife <- function(marginal.estimate, time, cause, mr) {
+get_pseudo_cuminc <- function(marginal.estimate, time, cause, mr) {
 
     if(marginal.estimate$type == "mright") {
         ## match cause
@@ -43,6 +43,51 @@ get_jackknife <- function(marginal.estimate, time, cause, mr) {
 
 }
 
+#' Utility to get jackknife pseudo observations of restricted mean
+#'
+#' @param marginal.estimate A survfit object with no covariates
+#' @param time Time at which to calculate the obs
+#' @param cause which cause
+#' @param mr Model response of the survival object
+#' @return A vector of pseudo-observations
+
+get_pseudo_rmean <- function(marginal.estimate, time, cause, mr) {
+
+    if(attr(mr, "type") == "mright") {
+        ## match cause
+        states <- marginal.estimate$states[-1] # remove censoring
+        if(is.numeric(cause)) {
+                stopifnot(cause <= length(states))
+                causec <- states[cause]
+                causen <- cause
+            } else {
+                stopifnot(length(match(cause, states)) > 0)
+                causen <- match(cause, states)[1]
+                causec <- cause
+            }
+
+        Smi <- leaveOneOut.competing.risks(marginal.estimate,
+                                           times = time, cause = causec, mr)
+
+    } else if(attr(mr, "type") == "right") {
+        Smi <- leaveOneOut.survival(marginal.estimate, times = time, mr)
+    }
+
+    thistype <- ifelse(attr(mr, "type") == "right", "surv", "cuminc")
+
+    uptimes <- c(0, sort(unique(mr[mr[, "time"] <= time, "time"])))
+
+    sfit0 <- summary(marginal.estimate, times  = uptimes)
+
+    if(thistype == "surv") {
+        sfit <- sfit0$surv
+    } else {
+        sfit <- sfit0$pstate[, causen + 1]
+    }
+
+    pseudo_rmst2(sfit, Smi, uptimes, time, type = thistype)
+
+}
 
 
 #' Compute pseudo-observations for the restricted mean survival
@@ -64,14 +109,14 @@ pseudo_rmst2 <- function(sfit, jacks, times, tmax, type = "cuminc") {
         sum(width * y[keep])
     }
 
-    if (type == "survival") { # ordinary survival
+    if (type == "surv") { # ordinary survival
         rmst <- rsum(sfit, times)
-        ijack <- apply(jacks, 1, rsum)
+        ijack <- apply(cbind(1, jacks), 1, rsum, times)
         length(ijack) * rmst - (length(ijack) -1)* ijack
     }
     else {
         rmst <- rsum(sfit, times)
-        ijack <- apply(jacks, 1, rsum, times)
+        ijack <- apply(cbind(0, jacks), 1, rsum, times)
         length(ijack) * rep(rmst, each= length(ijack)) - (length(ijack)-1)*ijack
     }
 }

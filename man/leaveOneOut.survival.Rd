@@ -24,5 +24,5 @@ This one does the calculation for all observed times, for calculation of the res
 
 sfit.surv <- survival::survfit(survival::Surv(time, status) ~ 1, data = colon)
 mrs <- with(colon, survival::Surv(time, status))
-jackvals <- leaveOneOut.survival(sfit.surv, mrs)
+jackvals <- leaveOneOut.survival(sfit.surv, 1000, mrs)
 }

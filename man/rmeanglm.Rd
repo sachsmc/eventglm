@@ -4,7 +4,16 @@
 \alias{rmeanglm}
 \title{Generalized linear models for the restricted mean survival}
 \usage{
-rmeanglm(formula, time, cause = "1", link = "identity", data, ...)
+rmeanglm(
+  formula,
+  time,
+  cause = 1,
+  link = "identity",
+  model.censoring = "independent",
+  formula.censoring = NULL,
+  data,
+  ...
+)
 }
 \arguments{
 \item{formula}{A formula specifying the model. The left hand side must be a
@@ -23,11 +32,6 @@ interest.}
 
 \item{link}{Link function for the restricted mean regression model.}
 
-\item{data}{Data frame in which all variables of formula can be interpreted.}
-
-\item{...}{Other arguments passed to \link[stats]{glm} such as weights,
-subset, etc.}
-
 \item{model.censoring}{Type of model for the censoring distribution. Options
 are "stratified", which computes the pseudo-observations stratified on a
 set of categorical covariates, "aareg" for Aalen's additive hazards model,
@@ -42,6 +46,11 @@ the model.}
 \item{formula.censoring}{A one sided formula (e.g., \code{~ x1 + x2})
 specifying the model for the censoring distribution. If NULL, uses the same
 mean model as for the outcome.}
+
+\item{data}{Data frame in which all variables of formula can be interpreted.}
+
+\item{...}{Other arguments passed to \link[stats]{glm} such as weights,
+subset, etc.}
 }
 \value{
 A pseudoglm object, with its own methods for print, summary, and

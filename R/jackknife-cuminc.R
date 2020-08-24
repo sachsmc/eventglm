@@ -198,7 +198,7 @@ leaveOneOut.competing.risks2 <- function(object, times, cause, mr){
 #'
 #' sfit.surv <- survival::survfit(survival::Surv(time, status) ~ 1, data = colon)
 #' mrs <- with(colon, survival::Surv(time, status))
-#' jackvals <- leaveOneOut.survival(sfit.surv, mrs)
+#' jackvals <- leaveOneOut.survival(sfit.surv, 1000, mrs)
 
 
 leaveOneOut.survival <- function(object, times, mr){
@@ -239,7 +239,7 @@ leaveOneOut.survival <- function(object, times, mr){
 
 
     out <- matrix(loo, nrow = N, byrow = FALSE)
-    out
+    out[order(event.time.order),]
 }
 
 
@@ -374,5 +374,5 @@ leaveOneOut.competing.risks <- function(object, times, cause, mr){
 
 
     out <- matrix(loo2, nrow = N, byrow = FALSE)
-    out
+    out[order(event.time.order),]
 }

@@ -95,7 +95,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
         marginal.estimate <- survival::survfit(update.formula(formula, . ~ 1), data = data)
 
-       jackk <- get_jackknife(marginal.estimate, time, cause, mr)
+       jackk <- get_pseudo_cuminc(marginal.estimate, time, cause, mr)
 
 
     } else if(model.censoring == "stratified") {
@@ -110,7 +110,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
             thisset <- orig.order[strata == i]
             new.order[chunk:(chunk + length(thisset) - 1)] <- thisset
             mest.i <- survival::survfit(update.formula(formula, . ~ 1), data = data[thisset, ])
-            jres.i <- get_jackknife(mest.i, time, cause, mr[thisset, ])
+            jres.i <- get_pseudo_cuminc(mest.i, time, cause, mr[thisset, ])
 
             stratified.jacks[chunk:(chunk + length(thisset) - 1)] <- jres.i
             chunk <- chunk + length(thisset)
@@ -248,33 +248,139 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #'                          model.censoring = "stratified",
 #'                          formula.censoring = ~ sex, data = mgus2)
 
-rmeanglm <- function(formula, time, cause = "1", link = "identity", data, ...) {
-
+rmeanglm <- function(formula, time, cause = 1, link = "identity",
+                     model.censoring = "independent", formula.censoring = NULL, data, ...) {
 
     stopifnot(length(time) == 1)
 
-    marginal.estimate <- prodlim::prodlim(update.formula(formula, . ~ 1), data = data)
+    mr <- model.response(model.frame(update.formula(formula, . ~ 1), data = data))
 
-    outcome <- model.response(model.frame(update.formula(formula, . ~ 1), data = data))
-    thistype <- ifelse(attr(outcome, "model") == "survival", "surv", "cuminc")
+    ## match cause
+    if(attr(mr, "type") == "mright") {
+        states <- attr(mr, "states")
+        if(is.numeric(cause)) {
+            stopifnot(cause <= length(states))
+            causec <- states[cause]
+            causen <- cause
+        } else {
+            stopifnot(length(match(cause, states)) > 0)
+            causen <- match(cause, states)[1]
+            causec <- cause
+        }
+    } else if(attr(mr, "type") == "right") {
+        causen <- 1
+    } else {
+        stop("Survival outcome type ", attr(mr, "type"), " not supported.")
+    }
+
+    if(max(mr[mr[,"status"] != 0, "time"]) < time){
+        stop("Requested time is greater than largest observed event time")
+    }
+
     newdata <- do.call(rbind, lapply(1:length(time), function(i) data))
+    newdata$.Ci <- as.numeric(mr[, "status"] == 0)
+    newdata$.Tci <- mr[, "time"]
 
-    uptimes <- c(0, sort(unique(outcome[outcome[, 1] <= time, 1])))
 
-    sfit <- predict(marginal.estimate,
-                    type = thistype,
-                    cause = cause, times  = uptimes)
+    if(is.null(formula.censoring)) {
+        cens.formula <- update.formula(formula, survival::Surv(.Tci, .Ci) ~ .)
+        formula.censoring <- formula[-2]
+    } else {
+        cens.formula <- update.formula(formula.censoring, survival::Surv(.Tci, .Ci) ~ .)
+    }
 
-    jackk <- prodlim::jackknife(marginal.estimate, times = uptimes, cause = cause)
+    if(model.censoring == "independent") {
 
-    smat <- matrix(rep(sfit, each = nrow(jackk)), nrow = nrow(jackk), ncol = ncol(jackk))
-    Smi <- (jackk - nrow(outcome) * smat) / (1 - nrow(outcome))
+        marginal.estimate <- survival::survfit(update.formula(formula, . ~ 1), data = data)
+        POi <- get_pseudo_rmean(marginal.estimate, time, cause, mr)
 
-    POi <- pseudo_rmst2(sfit, Smi, uptimes, time, type = thistype)
+
+    }  else if(model.censoring == "stratified") {
+
+        strata <- interaction(model.frame(formula.censoring, data = data))
+        orig.order <- 1:length(strata)
+        new.order <- rep(NA, length(strata))
+        stratified.jacks <- rep(NA, length(strata))
+        chunk <- 1
+        for(i in levels(strata)) {
+
+            thisset <- orig.order[strata == i]
+            new.order[chunk:(chunk + length(thisset) - 1)] <- thisset
+            mest.i <- survival::survfit(update.formula(formula, . ~ 1), data = data[thisset, ])
+            jres.i <- get_pseudo_rmean(mest.i, time, cause, mr[thisset, ])
+
+            stratified.jacks[chunk:(chunk + length(thisset) - 1)] <- jres.i
+            chunk <- chunk + length(thisset)
+        }
+
+        POi <- stratified.jacks[order(new.order)]
+
+    } else if(model.censoring == "aareg") {
+
+        predmat <- model.matrix(cens.formula, data = newdata)
+
+        fitcens <- survival::aareg(cens.formula, data = newdata)
+
+        tdex <- sapply(pmin(newdata$.Tci, time), function(t) max(c(1, which(fitcens$times <= t))))
+        Gi <- rep(NA, length(tdex))
+        for(i in 1:length(tdex)) {
+
+            Gi[i] <- prod(1 - c(fitcens$coefficient[1:tdex[i], ] %*% t(predmat[i, , drop = FALSE])))
+
+        }
+        if(attr(mr, "type") == "mright") {
+            Vi <- (time - pmin(mr[, "time"], time)) * as.numeric(mr[, "status"] == causen)
+
+        } else {
+            Vi <- pmin(mr[, "time"], time)
+
+        }
+
+        Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
+
+        nn <- length(Vi)
+        theta.n <- mean(Ii * Vi / Gi)
+
+        XXi <- Vi * Ii / Gi
+        POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+
+
+    } else if(model.censoring == "coxph") {
+
+        fitcens <- survival::coxph(cens.formula, data = newdata, x = TRUE)
+        coxsurv <- survival::survfit(fitcens, newdata = newdata)
+        tdex <- sapply(pmin(newdata$.Tci, time), function(t) max(c(1, which(coxsurv$time <= t))))
+        Gi <- coxsurv$surv[cbind(tdex,1:ncol(coxsurv$surv))]
+
+        if(attr(mr, "type") == "mright") {
+            Vi <- (time - pmin(mr[, "time"], time)) * as.numeric(mr[, "status"] == causen)
+
+        } else {
+            Vi <- pmin(mr[, "time"], time)
+
+        }
+
+        Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
+
+        nn <- length(Vi)
+        theta.n <- mean(Ii * Vi / Gi)
+
+        XXi <- Vi * Ii / Gi
+        POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+
+
+    } else {
+
+        stop("Model censoring type '", model.censoring, "' not supported. Options are 'independent', 'stratified', 'aareg' or 'coxph'.")
+
+    }
+
+
+
     # individuals in rows, times in columns
 
     newdata[["pseudo.vals"]] <- c(POi)
-    newdata[["pseudo.time"]] <- rep(time, each = nrow(jackk))
+    newdata[["pseudo.time"]] <- rep(time, each = length(POi))
 
     newdata[["startmu"]] <- rep(mean(newdata$pseudo.vals), nrow(newdata))
 
@@ -285,28 +391,12 @@ rmeanglm <- function(formula, time, cause = "1", link = "identity", data, ...) {
 
     ## update variance estimate
 
-    if(marginal.estimate$model == "survival") {
-
-        datamat <- cbind(marginal.estimate$model.response[, "time"],
-                         marginal.estimate$model.response[, "status"] != 0, ## not censored indicator
-                         as.character(marginal.estimate$model.response[, "status"]) == cause,
-                         marginal.estimate$model.response[, "status"] == 0 ## censored indicator
-        )
-
-    } else {
-
-        dmatframe <- as.matrix(model.frame(update.formula(formula, .~1), data = newdata)[, 1])
-        colnames(dmatframe) <- c("time", "status", "event")
-
-        datamat <- cbind(dmatframe[, "time"],
-                         dmatframe[, "status"] != 0,
-                         dmatframe[, "event"] == as.numeric(cause),
-                         dmatframe[, "status"] == 0)
-
-    }
+    datamat <- cbind(mr[, "time"],
+                     mr[, "status"] != 0, ## not censored indicator
+                     mr[, "status"] == causen,
+                     mr[, "status"] == 0 )## censored indicator
 
 
-    #    fit.lin$corrected.vcov <- ovg.vcov
     fit.lin$datamat <- datamat
     fit.lin$time <- time
     fit.lin$cause <- cause
