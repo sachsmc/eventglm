@@ -27,10 +27,13 @@ BugReports: https://github.com/sachsmc/eventglm/issues
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    testthat, 
-    prodlim
+    testthat,
+    prodlim,
+    knitr,
+    rmarkdown
 RoxygenNote: 7.1.1
 Imports: survival, 
   sandwich
 Depends: 
     R (>= 2.10)
+VignetteBuilder: knitr

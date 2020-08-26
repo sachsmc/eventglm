@@ -1,0 +1,107 @@
+---
+title: "Examples of using eventglm and interpreting the results"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Examples and interpreting the results}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  fig.width = 7, fig.height = 4.75
+)
+```
+
+```{r setup}
+library(eventglm)
+library(survival)
+```
+
+# Colon cancer treatment
+
+Our first example concerns the `colon` dataset, which is included in the package: 
+
+```{r}
+?eventglm::colon
+```
+
+This is a randomized trial, so the main interest is in comparing the distributions of time to death between the three treatment arms. Let's start with a survival curve. 
+
+```{r}
+sfit <- survfit(Surv(time, status) ~ rx, data = colon)
+plot(sfit, col = c("black", "slateblue", "salmon"), 
+     xlab = "days since registration", ylab = "survival")
+legend("bottomleft", fill = c("black", "slateblue", "salmon"), 
+       legend = names(sfit$strata))
+```
+
+As we know, hazard ratios are difficult to interpret as causal effects, even in randomized controlled trials. Better options for summarizing the effect of treatment are the survival at a particular time, or the restricted mean survival up to a given time. Let's compare the survival at 7 years, or about 2500 days since registration. 
+
+```{r}
+plot(sfit[1], conf.int = FALSE, xlab = "days since registration", ylab = "survival")
+
+seg0 <- summary(sfit[1], times = sfit[1]$time[sfit[1]$time <= 2500])
+rect(c(0, seg0$time), 0, c(seg0$time, 2500), c(seg0$surv), 
+     border = NA, col = "grey80")
+lines(sfit[1], conf.int = FALSE)
+abline(v = 2500, lty = 2)
+points(x = 2500, y = summary(sfit[1], times = 2500)$surv)
+
+```
+
+In the figure above, we plot only the survival curve in the observation group. The vertical dotted line is at the time of interest (tmax = 2500 days). The open point is at the estimated survival probability at time tmax, i.e., $P(T > tmax)$ and the shaded area represents the restricted mean survival up to tmax, i.e., $E\{\min(T, tmax)\} = \int_0^{tmax} P(T > u) \, du$. We can estimate these things using the `survival` package: 
+
+```{r}
+colon.sfit <- summary(sfit, times = 2500, rmean = 2500)
+colon.sfit
+```
+
+And we can now do inference using the `eventglm` package. First, we fit a regression model for the cumulative incidence, or 1 - survival:  
+
+```{r}
+colon.cifit <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
+summary(colon.cifit)
+se.ci <- sqrt(diag(vcov(colon.cifit, method = "robust")))
+b.ci <- colon.cifit$coefficients
+```
+We find that compared to observation alone, the Levamisole alone treatment group has a `r round(b.ci[2], 2)` difference in the cumulative incidence of death at 2500 days, with 95\% confidence interval `r round(b.ci[2] + c(-1.96, 1.96) * se.ci[2], 2)`, while the Levamisole plus 5-FU group has a `r round(b.ci[3], 2)` difference in the cumulative incidence of death at 2500 days, with 95\% confidence interval `r round(b.ci[3] + c(-1.96, 1.96) * se.ci[3], 2)`. This roughly agrees with the Kaplan-Meier estimates from survfit above: 
+
+```{r}
+cbind(eventglm = b.ci, 
+      survfit = c(1 - colon.sfit$surv[1], 
+  (1 - colon.sfit$surv[2:3]) - 
+    (1 - rep(colon.sfit$surv[1], 2))))
+```
+
+Now for the restricted mean: 
+```{r}
+colon.rmfit <- rmeanglm(Surv(time, status) ~ rx, time = 2500, data = colon)
+summary(colon.rmfit)
+se.rm <- sqrt(diag(vcov(colon.rmfit, method = "robust")))
+b.rm <- colon.rmfit$coefficients
+```
+We find that compared to observation alone, the Levamisole alone treatment group has a `r round(b.rm[2], 2)` difference in the mean time to death up to 2500 days, with 95\% confidence interval `r round(b.rm[2] + c(-1.96, 1.96) * se.rm[2], 2)`, while the Levamisole plus 5-FU group has a `r round(b.rm[3], 2)` difference in the mean time to death up to 2500 days, with 95\% confidence interval `r round(b.rm[3] + c(-1.96, 1.96) * se.rm[3], 2)`. Again, this roughly agrees with the Kaplan-Meier estimates from survfit above:
+
+```{r}
+cbind(eventglm = b.rm, 
+      survfit = c(colon.sfit$table[1, 5], 
+colon.sfit$table[2:3, 5] - colon.sfit$table[1, 5]))
+
+```
+
+A key advantage of the regression approach is that it gives us the ability to adjust or model other covariates. In this example, since it is a randomized trial, we know that all covariates are independent of treatment assignment. However, several variables are associated with time to death, so in this case they would be called "precision variables". We would expect that adjusting for age, or the number of positive lymph nodes (more than 4) in the above models would reduce the standard error estimates of the treatment effects, without changing the coefficient estimates. Let's find out: 
+
+```{r}
+colon.ci.adj <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, data = colon)
+summary(colon.ci.adj)
+colon.rm.adj <- rmeanglm(Surv(time, status) ~ rx + age + node4, time = 2500, data = colon)
+summary(colon.rm.adj)
+```
+
+The estimates don't change (much) and the standard errors reduce by about 5\%. 
+
+
+
