@@ -30,7 +30,9 @@ Suggests:
     testthat,
     prodlim,
     knitr,
-    rmarkdown
+    rmarkdown, 
+    rio,
+    data.table
 RoxygenNote: 7.1.1
 Imports: survival, 
   sandwich
