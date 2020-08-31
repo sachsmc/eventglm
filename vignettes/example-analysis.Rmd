@@ -192,6 +192,32 @@ plot(obs.p ~ pred.p, xlab = "predicted", ylab = "observed")
 abline(0, 1)
 ```
 
+# Censoring assumptions
+
+By default, we assume that time to censoring is independent of the time to the event, and of all covariates in the model. This is more restrictive than parametric survival models, or Cox regression, which only assumes that censoring time is conditionally independent of event time given the covariates in the model. We provide several options to relax that assumption using the `model.censoring` and `formula.censoring` options. The first is to compute stratified pseudo observations, which assumes that the censoring is independent given a set of categorical covariates: 
+
+```{r}
+colon.ci.cen1 <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, 
+                           data = colon, model.censoring = "stratified", 
+                           formula.censoring = ~ rx)
+```
+
+Next, we can assume that the time to censoring follows a Cox model given a set of covariates. By default, the same covariate formula (right hand side) as the main model is used, but any formula can be specified. We can also use Aalens additive hazards model instead of a Cox model for the censoring distribution. Then inverse probability of censoring weighted pseudo observations are used [@overgaard2019pseudo]. According to our simulation study, the stratified option works quite well even when the censoring model is misspecified, and the Aalen additive model tends to work better than the Cox model. 
+
+```{r}
+colon.ci.cen2 <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, 
+                           data = colon, model.censoring = "coxph", 
+                           formula.censoring = ~ rx + age + node4)
+colon.ci.cen3 <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, 
+                           data = colon, model.censoring = "aareg", 
+                           formula.censoring = ~ rx + age + node4)
+
+knitr::kable(cbind("indep" = colon.ci.adj$coefficients, 
+      "strat" = colon.ci.cen1$coefficients, 
+      "coxipcw" = colon.ci.cen2$coefficients, 
+      "aalenipcw" = colon.ci.cen3$coefficients), digits = 3)
+```
+
 # Relative survival/net survival
 
 Following Professor Paul Lambert's example here: https://pclambert.net/software/stpp/using_stpp/ , let's load the datasets:

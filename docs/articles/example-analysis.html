@@ -438,13 +438,13 @@
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">3.882</td>
+<td align="right">3.802</td>
 <td align="right">3.874</td>
 <td align="right">4.749</td>
 </tr>
 <tr class="even">
 <td align="left">sexM</td>
-<td align="right">0.982</td>
+<td align="right">0.973</td>
 <td align="right">0.992</td>
 <td align="right">1.012</td>
 </tr>
@@ -456,7 +456,7 @@
 </tr>
 <tr class="even">
 <td align="left">hgb</td>
-<td align="right">0.254</td>
+<td align="right">0.252</td>
 <td align="right">0.251</td>
 <td align="right">0.253</td>
 </tr>
@@ -484,11 +484,77 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html">abline</a></span>(<span class="fl">0</span>, <span class="fl">1</span>)</pre></body></html></div>
 <p><img src="example-analysis_files/figure-html/unnamed-chunk-16-2.png" width="672"></p>
 </div>
+<div id="censoring-assumptions" class="section level1">
+<h1 class="hasAnchor">
+<a href="#censoring-assumptions" class="anchor"></a>Censoring assumptions</h1>
+<p>By default, we assume that time to censoring is independent of the time to the event, and of all covariates in the model. This is more restrictive than parametric survival models, or Cox regression, which only assumes that censoring time is conditionally independent of event time given the covariates in the model. We provide several options to relax that assumption using the <code>model.censoring</code> and <code>formula.censoring</code> options. The first is to compute stratified pseudo observations, which assumes that the censoring is independent given a set of categorical covariates:</p>
+<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="no">colon.ci.cen1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span>(<span class="no">time</span>, <span class="no">status</span>) ~ <span class="no">rx</span> + <span class="no">age</span> + <span class="no">node4</span>, <span class="kw">time</span> <span class="kw">=</span> <span class="fl">2500</span>,
+                           <span class="kw">data</span> <span class="kw">=</span> <span class="no">colon</span>, <span class="kw">model.censoring</span> <span class="kw">=</span> <span class="st">"stratified"</span>,
+                           <span class="kw">formula.censoring</span> <span class="kw">=</span> ~ <span class="no">rx</span>)</pre></body></html></div>
+<p>Next, we can assume that the time to censoring follows a Cox model given a set of covariates. By default, the same covariate formula (right hand side) as the main model is used, but any formula can be specified. We can also use Aalens additive hazards model instead of a Cox model for the censoring distribution. Then inverse probability of censoring weighted pseudo observations are used <span class="citation">(Overgaard, Parner, and Pedersen 2019)</span>. According to our simulation study, the stratified option works quite well even when the censoring model is misspecified, and the Aalen additive model tends to work better than the Cox model.</p>
+<div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="no">colon.ci.cen2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span>(<span class="no">time</span>, <span class="no">status</span>) ~ <span class="no">rx</span> + <span class="no">age</span> + <span class="no">node4</span>, <span class="kw">time</span> <span class="kw">=</span> <span class="fl">2500</span>,
+                           <span class="kw">data</span> <span class="kw">=</span> <span class="no">colon</span>, <span class="kw">model.censoring</span> <span class="kw">=</span> <span class="st">"coxph"</span>,
+                           <span class="kw">formula.censoring</span> <span class="kw">=</span> ~ <span class="no">rx</span> + <span class="no">age</span> + <span class="no">node4</span>)
+<span class="no">colon.ci.cen3</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span>(<span class="no">time</span>, <span class="no">status</span>) ~ <span class="no">rx</span> + <span class="no">age</span> + <span class="no">node4</span>, <span class="kw">time</span> <span class="kw">=</span> <span class="fl">2500</span>,
+                           <span class="kw">data</span> <span class="kw">=</span> <span class="no">colon</span>, <span class="kw">model.censoring</span> <span class="kw">=</span> <span class="st">"aareg"</span>,
+                           <span class="kw">formula.censoring</span> <span class="kw">=</span> ~ <span class="no">rx</span> + <span class="no">age</span> + <span class="no">node4</span>)
+
+<span class="kw pkg">knitr</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="st">"indep"</span> <span class="kw">=</span> <span class="no">colon.ci.adj</span>$<span class="no">coefficients</span>,
+      <span class="st">"strat"</span> <span class="kw">=</span> <span class="no">colon.ci.cen1</span>$<span class="no">coefficients</span>,
+      <span class="st">"coxipcw"</span> <span class="kw">=</span> <span class="no">colon.ci.cen2</span>$<span class="no">coefficients</span>,
+      <span class="st">"aalenipcw"</span> <span class="kw">=</span> <span class="no">colon.ci.cen3</span>$<span class="no">coefficients</span>), <span class="kw">digits</span> <span class="kw">=</span> <span class="fl">3</span>)</pre></body></html></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left"></th>
+<th align="right">indep</th>
+<th align="right">strat</th>
+<th align="right">coxipcw</th>
+<th align="right">aalenipcw</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.318</td>
+<td align="right">0.314</td>
+<td align="right">0.297</td>
+<td align="right">0.317</td>
+</tr>
+<tr class="even">
+<td align="left">rxLev</td>
+<td align="right">-0.034</td>
+<td align="right">-0.035</td>
+<td align="right">-0.031</td>
+<td align="right">-0.036</td>
+</tr>
+<tr class="odd">
+<td align="left">rxLev+5FU</td>
+<td align="right">-0.127</td>
+<td align="right">-0.128</td>
+<td align="right">-0.110</td>
+<td align="right">-0.129</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0.002</td>
+<td align="right">0.002</td>
+<td align="right">0.003</td>
+<td align="right">0.002</td>
+</tr>
+<tr class="odd">
+<td align="left">node4</td>
+<td align="right">0.332</td>
+<td align="right">0.334</td>
+<td align="right">0.330</td>
+<td align="right">0.335</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div id="relative-survivalnet-survival" class="section level1">
 <h1 class="hasAnchor">
 <a href="#relative-survivalnet-survival" class="anchor"></a>Relative survival/net survival</h1>
 <p>Following Professor Paul Lambert’s example here: <a href="https://pclambert.net/software/stpp/using_stpp/" class="uri">https://pclambert.net/software/stpp/using_stpp/</a> , let’s load the datasets:</p>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">data.table</span>)
+<div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">data.table</span>)
 
 <span class="no">colon2</span> <span class="kw">&lt;-</span> <span class="kw pkg">rio</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rio/man/import.html">import</a></span>(<span class="st">"https://pclambert.net/data/colon.dta"</span>)
 <span class="no">colon2</span>$<span class="no">surv_mm_trunc</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fifelse.html">ifelse</a></span>(<span class="no">colon2</span>$<span class="no">surv_mm</span> <span class="kw">&gt;</span> <span class="fl">120.5</span>, <span class="fl">120.5</span>, <span class="no">colon2</span>$<span class="no">surv_mm</span>)
@@ -502,7 +568,7 @@
 RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)}, 
 \]</span></p>
 <p>where <span class="math inline">\(S_{P}(t | D)\)</span> is the expected survival probability based on the life tables for the demographics <span class="math inline">\(D\)</span> of patient <span class="math inline">\(i\)</span>, and <span class="math inline">\(PO_i(t)\)</span> are the pseudo observations for time <span class="math inline">\(t\)</span>. We get the survival probability by merging with the life table estimates, and the pseudo observations from our package. The <code>prob</code> from the life tables is the probability of surviving one year, so to get the probability of surviving 5 and 10 years, we need to calculate the cumulative product estimates.</p>
-<div class="sourceCode" id="cb19"><html><body><pre class="r">
+<div class="sourceCode" id="cb21"><html><body><pre class="r">
 <span class="no">lifetab</span>[, <span class="no">prob.5</span> <span class="kw">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/prod.html">prod</a></span>(<span class="no">lifetab</span>[<span class="no">`_age`</span> <span class="kw">%in%</span> <span class="no">.BY</span><span class="kw">[[</span><span class="st">"_age"</span>]]:(<span class="no">.BY</span><span class="kw">[[</span><span class="st">"_age"</span>]]+<span class="fl">4</span>) <span class="kw">&amp;</span>
                               <span class="no">`_year`</span> <span class="kw">%in%</span> <span class="no">.BY</span><span class="kw">[[</span><span class="st">"_year"</span>]]:(<span class="no">.BY</span><span class="kw">[[</span><span class="st">"_year"</span>]]+<span class="fl">4</span>) <span class="kw">&amp;</span>
                                 <span class="no">`_year`</span> <span class="kw">==</span> <span class="no">.BY</span><span class="kw">[[</span><span class="st">"_year"</span>]] - <span class="no">.BY</span><span class="kw">[[</span><span class="st">"_age"</span>]] + <span class="no">`_age`</span> <span class="kw">&amp;</span>
@@ -565,6 +631,9 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
 <div id="refs" class="references">
+<div id="ref-overgaard2019pseudo">
+<p>Overgaard, Morten, Erik Thorlund Parner, and Jan Pedersen. 2019. “Pseudo-Observations Under Covariate-Dependent Censoring.” <em>Journal of Statistical Planning and Inference</em> 202: 112–22.</p>
+</div>
 <div id="ref-overgaard2017asymptotic">
 <p>Overgaard, Morten, Erik Thorlund Parner, Jan Pedersen, and others. 2017. “Asymptotic Theory of Generalized Estimating Equations Based on Jack-Knife Pseudo-Observations.” <em>The Annals of Statistics</em> 45 (5): 1988–2015.</p>
 </div>
@@ -589,7 +658,7 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 
 
       <footer><div class="copyright">
-  <p>Developed by Michael C Sachs.</p>
+  <p>Developed by Michael C Sachs, Erin E Gabriel.</p>
 </div>
 
 <div class="pkgdown">
