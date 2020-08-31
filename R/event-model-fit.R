@@ -137,10 +137,12 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
 
         nn <- length(Vi)
-        theta.n <- mean(Ii * Vi / Gi)
+        theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
 
         XXi <- Vi * Ii / Gi
-        jackk <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+        #jackk <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+        jackk <- nn * theta.n - (nn - 1) *
+            (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
 
 
     } else if(model.censoring == "coxph") {
@@ -153,10 +155,12 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
 
         nn <- length(Vi)
-        theta.n <- mean(Ii * Vi / Gi)
+        theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
 
         XXi <- Vi * Ii / Gi
-        jackk <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+        #jackk <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+        jackk <- nn * theta.n - (nn - 1) *
+            (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
 
 
     } else {
@@ -339,10 +343,12 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
         Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
 
         nn <- length(Vi)
-        theta.n <- mean(Ii * Vi / Gi)
+        theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
 
         XXi <- Vi * Ii / Gi
-        POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+        #jackk <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+        POi <- nn * theta.n - (nn - 1) *
+            (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
 
 
     } else if(model.censoring == "coxph") {
@@ -363,10 +369,12 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
         Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
 
         nn <- length(Vi)
-        theta.n <- mean(Ii * Vi / Gi)
+        theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
 
         XXi <- Vi * Ii / Gi
-        POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+        #jackk <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+        POi <- nn * theta.n - (nn - 1) *
+            (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
 
 
     } else {

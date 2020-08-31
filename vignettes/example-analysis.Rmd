@@ -1,6 +1,7 @@
 ---
 title: "Examples of using eventglm and interpreting the results"
 output: rmarkdown::html_vignette
+bibliography: refs.bib
 vignette: >
   %\VignetteIndexEntry{Examples and interpreting the results}
   %\VignetteEngine{knitr::rmarkdown}
@@ -16,11 +17,11 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(eventglm)
 library(survival)
+library(eventglm)
 ```
 
-# Colon cancer treatment
+# Colon cancer treatment and time to death (standard survival)
 
 Our first example concerns the `colon` dataset, which is included in the package: 
 
@@ -103,5 +104,154 @@ summary(colon.rm.adj)
 
 The estimates don't change (much) and the standard errors reduce by about 5\%. 
 
+# Monoclonal gammopathy data (Competing risks)
+
+Our next example involves the `mgus2` dataset, included in the package: 
+
+```{r}
+?mgus2
+head(mgus2)
+```
+
+This dataset has a number of covariates, and the time until progression to plasma cell malignancy (PCM), or death. Here the event PCM is of primary interest, with death being a competing event. The data are described and analyzed in the survival vignette (section 2.3.2): 
+
+```{r}
+crfit <- survfit(Surv(etime, event) ~ sex, eventglm::mgus2)
+summary(crfit, times = 120)
+print(crfit, rmean = 120)
+
+plot(crfit, col=1:2,  noplot="",
+     lty=c(3,3,2,2,1,1), lwd=2, xscale=12,
+     xlab="Years post diagnosis", ylab="P(state)")
+legend(240, .65, c("Female, death", "Male, death", "malignancy", "(s0)"),
+       lty=c(1,1,2,3), col=c(1,2,1,1), bty='n', lwd=2)
+abline(v = 120, lty = 2)
+```
+
+We can get similar estimates for the cumulative incidence of pcm at 10 years and the expected lifetime lost due to pcm up to 10 years with similar commands as above. Note the `cause` option to specify the cause of interest.
+
+```{r}
+mgfitci <- cumincglm(Surv(etime, event) ~ sex, cause = "pcm", time = 120, 
+                   data = mgus2)
+summary(mgfitci)
+
+mgfitrmean <- rmeanglm(Surv(etime, event) ~ sex, cause = "pcm", time = 120, 
+                       data = mgus2)
+summary(mgfitrmean)
+```
+
+Sex may be an important predictor of time to pcm, what about the other variables? 
+
+```{r}
+mgfitci2 <- cumincglm(Surv(etime, event) ~ sex + age + hgb, cause = "pcm", 
+                      time = 120, data = mgus2)
+mgfitrmean2 <- rmeanglm(Surv(etime, event) ~ sex + age + hgb, cause = "pcm", 
+                      time = 120, data = mgus2)
+summary(mgfitrmean2)
+```
+
+The objects returned by `cumincglm` and `rmeanglm` inherit from `glm`, so many methods are available. First, the `vcov` function has several options for calculation of the estimated variance of the estimated regression parameters. By default, the `robust` variance estimates are used, based on the Huber-White estimator. Other options are naive, and corrected, which are the corrected estimators suggested by @overgaard2017asymptotic which are based on a second order Von-Mises expansion. We can also use the bootstrap. This recalculated the pseudo-observations every time, but it is still pretty fast because of the C code. Let's compare:
+
+```{r}
+nboot <- 1000
+bootests <- matrix(NA, nrow = nboot, ncol = 4)
+for(i in 1:nboot) {
+  mgus.b <- mgus2[sample(1:nrow(mgus2), replace = TRUE), ]
+  mgfitrmean.b <- rmeanglm(Surv(etime, event) ~ sex + age + hgb, cause = "pcm", 
+                      time = 120, data = mgus.b)
+  bootests[i,] <- mgfitrmean.b$coefficients
+}
+
+se.boot <- sqrt(diag(cov(bootests)))
+knitr::kable(cbind(se.boot = se.boot, 
+      se.robust = sqrt(diag(vcov(mgfitrmean2))), 
+      #se.corrected = sqrt(diag(vcov(mgfitrmean2, type = "corrected"))), 
+      se.naive = sqrt(diag(vcov(mgfitrmean2, type = "naive")))), digits = 3)
+
+```
+
+The corrected estimator fails pretty often, and the benefits are negligible, and thus may be removed from the package. 
+
+Residuals also work, using the scaling factor suggested by @perme2008checking, as do predictions. Predicted restricted means give a possible method to predict individual event times, while the predicted cumulative incidence should be probabilities. Note that with the identity link, the predicted cumulative incidence is not guaranteed to be between 0 and 1. 
+
+```{r}
+hist(predict(mgfitrmean2, newdata = mgus2), 
+     xlab = "Predicted lifetime lost due to PCM", main = "")
+
+mgus2$prob.pcm10 <- predict(mgfitci2, newdata = mgus2)
+mgus2$pseudo.ci <- mgfitci$y
+summary(mgus2$prob.pcm10)
+cutps <- quantile(mgus2$prob.pcm10, seq(.1, .9, by = .1), na.rm = TRUE)
+mgus2$prob.cut <- cut(mgus2$prob.pcm10, 
+                      cutps)
+
+pred.p <- cutps[-length(cutps)] + diff(cutps)
+obs.p <- c(by(mgus2$pseudo.ci, mgus2$prob.cut, mean))
+
+plot(obs.p ~ pred.p, xlab = "predicted", ylab = "observed")
+abline(0, 1)
+```
+
+# Relative survival/net survival
+
+Following Professor Paul Lambert's example here: https://pclambert.net/software/stpp/using_stpp/ , let's load the datasets:
+
+```{r}
+library(data.table)
+
+colon2 <- rio::import("https://pclambert.net/data/colon.dta")
+colon2$surv_mm_trunc <- ifelse(colon2$surv_mm > 120.5, 120.5, colon2$surv_mm)
+
+colon2$death <- colon2$status %in% c(1, 2)
+colon2$death[colon2$surv_mm > colon2$surv_mm_trunc] <- 0
+
+lifetab <- data.table(rio::import("https://pclambert.net/data/popmort.dta"))
+```
+
+Now we will estimate the marginal relative survival using the approach described in @pavlivc2019using, which is based on the estimator: 
+
+$$
+RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)}, 
+$$
+
+where $S_{P}(t | D)$ is the expected survival probability based on the life tables for the demographics $D$ of patient $i$, and $PO_i(t)$ are the pseudo observations for time $t$. We get the survival probability by merging with the life table estimates, and the pseudo observations from our package. The `prob` from the life tables is the probability of surviving one year, so to get the probability of surviving 5 and 10 years, we need to calculate the cumulative product estimates. 
+
+```{r}
+
+lifetab[, prob.5 := prod(lifetab[`_age` %in% .BY[["_age"]]:(.BY[["_age"]]+4) & 
+                              `_year` %in% .BY[["_year"]]:(.BY[["_year"]]+4) & 
+                                `_year` == .BY[["_year"]] - .BY[["_age"]] + `_age` &
+                              sex == .BY[["sex"]] ]$prob, na.rm = TRUE), 
+        by = c("sex", "_year", "_age")]
+
+lifetab[, prob.10 := prod(lifetab[`_age` %in% .BY[["_age"]]:(.BY[["_age"]]+9) & 
+                              `_year` %in% .BY[["_year"]]:(.BY[["_year"]]+9) & 
+                                `_year` == .BY[["_year"]] - .BY[["_age"]] + `_age` &
+                              sex == .BY[["sex"]] ]$prob, na.rm = TRUE), 
+        by = c("sex", "_year", "_age")]
 
 
+colon2 <- merge(colon2, lifetab, 
+                by.x = c("sex", "yydx", "age"), 
+                by.y = c("sex",  "_year", "_age"), all.x = TRUE, all.y = FALSE)
+
+fit1 <- cumincglm(survival::Surv(surv_mm_trunc, death) ~ 1, data = colon2, time = 1 * 12)
+fit5 <- cumincglm(survival::Surv(surv_mm_trunc, death) ~ 1, data = colon2, time = 5 * 12)
+fit10 <- cumincglm(survival::Surv(surv_mm_trunc, death) ~ 1, data = colon2, time = 10 * 12)
+
+colon2$po_1 <- 1 - fit1$y
+colon2$po_5 <- 1 - fit5$y
+colon2$po_10 <- 1 - fit10$y
+
+knitr::kable(cbind(time = c(1, 5, 10), 
+                   relsurv.pseudo = with(colon2, 
+                                  c(mean(po_1 / prob), 
+                                    mean(po_5 / prob.5), 
+                                    mean(po_10 / prob.10)),
+                                  ),
+                   relsurv.pohar = c(0.682, 0.479, 0.441)), digits = 3)
+```
+
+They are pretty close to those computed using the Pohar Perme estimator reported by Prof Lambert.
+
+# References
