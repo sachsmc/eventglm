@@ -280,4 +280,26 @@ knitr::kable(cbind(time = c(1, 5, 10),
 
 They are pretty close to those computed using the Pohar Perme estimator reported by Prof Lambert.
 
+# Case cohort sampling
+
+@parner2020cumulative describe how to fit regression models with pseudo-observations that account for case-cohort sampling. The basic idea is weighted estimating equations, which we can implement easily with the `weights` argument that gets passed to `glm.fit`. First let's create a case-cohort sample of the `colon2` dataset by sampling the cancer deaths (`status == 1`) with probability 0.8, and a random subcohort with probability 0.1.
+
+```{r}
+colon2$status2 <- factor(ifelse(colon2$status == 4, 0, colon2$status), 
+                         labels = c("censored", "cancer death", "other death"))
+subc <- rbinom(nrow(colon2), size = 1, p = .1)
+samp.ind <- subc + (1 - subc) * (colon2$status == 1) * rbinom(nrow(colon2), size = 1, p = .8)
+colon.cc <- colon2[as.logical(samp.ind), ]
+colon.cc$samp.wt <- 1 / ifelse(colon.cc$status == 1, .1 + .9 * .8, .1)
+```
+
+Now, the weighted regression model should give similar results as the unweighted one in the full sample: 
+
+```{r}
+cfit.cc <- cumincglm(Surv(surv_mm, status2) ~ age + sex + factor(subsite), 
+                     cause = "cancer death", time = 5 * 12, data = colon.cc, 
+                     weights = samp.wt)
+```
+
+
 # References
