@@ -329,8 +329,35 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #'   specifying the model for the censoring distribution. If NULL, uses the same
 #'   mean model as for the outcome.
 #' @param data Data frame in which all variables of formula can be interpreted.
-#' @param ... Other arguments passed to \link[stats]{glm} such as weights,
-#'   subset, etc.
+#' @param weights an optional vector of ‘prior weights’ to be used in the
+#'   fitting process. Should be NULL or a numeric vector.
+#' @param subset an optional vector specifying a subset of observations to be
+#'   used in the fitting process.
+#' @param na.action a function which indicates what should happen when the data
+#'   contain \code{NA}s. The default is set by the \code{na.action} setting of
+#'   \link[base]{options}, and is \link[stats]{na.fail} if that is unset. The
+#'   ‘factory-fresh’ default is \link[stats]{na.omit}. Another possible value is
+#'   NULL, no action. Value \link[stats]{na.exclude} can be useful.
+#' @param offset this can be used to specify an a priori known component to be
+#'   included in the linear predictor during fitting. This should be NULL or a
+#'   numeric vector of length equal to the number of cases. One or more
+#'   \link[stats]{offset} terms can be included in the formula instead or as
+#'   well, and if more than one is specified their sum is used. See
+#'   \link[stats]{model.offset}.
+#' @param control a list of parameters for controlling the fitting process. This
+#'   is passed to \link[stats]{glm.control}.
+#' @param model a logical value indicating whether model frame should be
+#'   included as a component of the returned value.
+#' @param x logical value indicating whether the model matrix used in the
+#'   fitting process should be returned as components of the returned value.
+#' @param y logical value indicating whether the response vector
+#'   (pseudo-observations) used in the fitting process should be returned as
+#'   components of the returned value.
+#' @param singular.ok logical; if FALSE a singular fit is an error.
+#' @param contrasts an optional list. See the contrasts.arg of
+#'   \link[stats]{model.matrix.default}.
+#' @param ... Other arguments passed to \link[stats]{glm.fit}
+#'
 #'
 #' @export
 #'
@@ -345,9 +372,14 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #'                          formula.censoring = ~ sex, data = mgus2)
 
 rmeanglm <- function(formula, time, cause = 1, link = "identity",
-                     model.censoring = "independent", formula.censoring = NULL, data, ...) {
+                     model.censoring = "independent", formula.censoring = NULL, data,
+                     weights, subset,
+                     na.action, offset,
+                     control = list(...), model = TRUE,
+                     x = FALSE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...) {
 
     stopifnot(length(time) == 1)
+    cal <- match.call()
 
     mr <- model.response(model.frame(update.formula(formula, . ~ 1), data = data))
 
@@ -482,12 +514,70 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
     newdata[["pseudo.vals"]] <- c(POi)
     newdata[["pseudo.time"]] <- rep(time, each = length(POi))
 
-    newdata[["startmu"]] <- rep(mean(newdata$pseudo.vals), nrow(newdata))
+    ## get stuff ready for glm.fit
+    formula2 <- update.formula(formula, pseudo.vals ~ .)
 
-    fit.lin <- stats::glm(update.formula(formula, pseudo.vals ~ .),
+    mf <- match.call(expand.dots = FALSE)
+    m <- match(c("formula", "data", "subset",
+                 "weights", "na.action", "offset"), names(mf), 0L)
+    mf <- mf[c(1L, m)]
+    mf$drop.unused.levels <- TRUE
+    mf[[1L]] <- quote(stats::model.frame)
+    mf[["formula"]] <- formula2
+    mf[["data"]] <- newdata
+    mf <- eval(mf, parent.frame())
+    mt <- attr(mf, "terms")
+    control <- do.call("glm.control", control)
+
+    Y <- model.response(mf, "any")
+    if (length(dim(Y)) == 1L) {
+        nm <- rownames(Y)
+        dim(Y) <- NULL
+        if (!is.null(nm))
+            names(Y) <- nm
+    }
+    X <- if (!stats::is.empty.model(mt)) {
+        model.matrix(mt, mf, contrasts)
+    } else {
+        matrix(, NROW(Y), 0L)
+    }
+    weights <- as.vector(model.weights(mf))
+    if (!is.null(weights) && !is.numeric(weights))
+        stop("'weights' must be a numeric vector")
+    if (!is.null(weights) && any(weights < 0))
+        stop("negative weights not allowed")
+    if (is.null(weights)) {
+        weights <- rep.int(1, nrow(mf))
+    }
+    offset <- as.vector(model.offset(mf))
+    if (!is.null(offset)) {
+        if (length(offset) != NROW(Y))
+            stop(gettextf("number of offsets is %d should equal %d (number of observations)",
+                          length(offset), NROW(Y)), domain = NA)
+    }
+    mustart <- rep(mean(newdata$pseudo.vals), nrow(mf))
+
+
+    fit <- stats::glm.fit(X, Y, weights = weights,
                           family = quasi(link = link, variance = "constant"),
-                          mustart = startmu,
-                          data = newdata, x = TRUE, ...)
+                          mustart = mustart,
+                          intercept = attr(mt, "intercept") > 0L, singular.ok = singular.ok)
+
+    if (model) {
+        fit$model <- mf
+    }
+    fit$na.action <- attr(mf, "na.action")
+    if (x) {
+        fit$x <- X
+    }
+    if (!y) {
+        fit$y <- NULL
+    }
+    fit.lin <- structure(c(fit, list(call = cal, formula = formula, terms = mt,
+                                     data = data, offset = offset, control = list(), method = "glm.fit",
+                                     contrasts = attr(X, "contrasts"), xlevels = .getXlevels(mt,
+                                                                                             mf))),
+                         class = c(fit$class, c("glm", "lm")))
 
     ## update variance estimate
 

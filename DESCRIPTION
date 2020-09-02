@@ -1,7 +1,7 @@
 Package: eventglm
 Type: Package
 Title: Regression Models for Event History Outcomes
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     c(person(given = "Michael C",
              family = "Sachs",
@@ -38,7 +38,8 @@ Suggests:
     data.table
 RoxygenNote: 7.1.1
 Imports: survival, 
-  sandwich
+  sandwich,
+  stats
 Depends: 
     R (>= 2.10)
 VignetteBuilder: knitr

@@ -287,10 +287,10 @@ They are pretty close to those computed using the Pohar Perme estimator reported
 ```{r}
 colon2$status2 <- factor(ifelse(colon2$status == 4, 0, colon2$status), 
                          labels = c("censored", "cancer death", "other death"))
-subc <- rbinom(nrow(colon2), size = 1, p = .1)
-samp.ind <- subc + (1 - subc) * (colon2$status == 1) * rbinom(nrow(colon2), size = 1, p = .8)
+subc <- rbinom(nrow(colon2), size = 1, p = .2)
+samp.ind <- subc + (1 - subc) * (colon2$status == 1) * rbinom(nrow(colon2), size = 1, p = .9)
 colon.cc <- colon2[as.logical(samp.ind), ]
-colon.cc$samp.wt <- 1 / ifelse(colon.cc$status == 1, .1 + .9 * .8, .1)
+colon.cc$samp.wt <- 1 / ifelse(colon.cc$status == 1, .2 + .8 * .9, .2)
 ```
 
 Now, the weighted regression model should give similar results as the unweighted one in the full sample: 
@@ -299,6 +299,10 @@ Now, the weighted regression model should give similar results as the unweighted
 cfit.cc <- cumincglm(Surv(surv_mm, status2) ~ age + sex + factor(subsite), 
                      cause = "cancer death", time = 5 * 12, data = colon.cc, 
                      weights = samp.wt)
+cfit.full <- cumincglm(Surv(surv_mm, status2) ~ age + sex + factor(subsite), 
+                     cause = "cancer death", time = 5 * 12, data = colon2)
+knitr::kable(cbind(casecohort = cfit.cc$coefficients, 
+      fullsamp = cfit.full$coefficients), digits = 2)
 ```
 
 
