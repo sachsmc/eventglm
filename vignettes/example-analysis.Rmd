@@ -3,7 +3,7 @@ title: "Examples of using eventglm and interpreting the results"
 output: rmarkdown::html_vignette
 bibliography: refs.bib
 vignette: >
-  %\VignetteIndexEntry{Examples and interpreting the results}
+  %\VignetteIndexEntry{Examples of using eventglm and interpreting the results}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -153,7 +153,7 @@ summary(mgfitrmean2)
 The objects returned by `cumincglm` and `rmeanglm` inherit from `glm`, so many methods are available. First, the `vcov` function has several options for calculation of the estimated variance of the estimated regression parameters. By default, the `robust` variance estimates are used, based on the Huber-White estimator. Other options are naive, and corrected, which are the corrected estimators suggested by @overgaard2017asymptotic which are based on a second order Von-Mises expansion. We can also use the bootstrap. This recalculated the pseudo-observations every time, but it is still pretty fast because of the C code. Let's compare:
 
 ```{r}
-nboot <- 1000
+nboot <- 100 # use a bigger number for real
 bootests <- matrix(NA, nrow = nboot, ncol = 4)
 for(i in 1:nboot) {
   mgus.b <- mgus2[sample(1:nrow(mgus2), replace = TRUE), ]
@@ -170,7 +170,7 @@ knitr::kable(cbind(se.boot = se.boot,
 
 ```
 
-The corrected estimator fails pretty often, and the benefits are negligible, and thus may be removed from the package. 
+The corrected estimator fails pretty often, because it doesn't handle ties, and the benefits are negligible, and thus may be removed from the package in the future. 
 
 Residuals also work, using the scaling factor suggested by @perme2008checking, as do predictions. Predicted restricted means give a possible method to predict individual event times, while the predicted cumulative incidence should be probabilities. Note that with the identity link, the predicted cumulative incidence is not guaranteed to be between 0 and 1. 
 
@@ -225,13 +225,15 @@ Following Professor Paul Lambert's example here: https://pclambert.net/software/
 ```{r}
 library(data.table)
 
-colon2 <- rio::import("https://pclambert.net/data/colon.dta")
+# from https://pclambert.net/data/colon.dta
+colon2 <- rio::import(system.file("extdata", "colon.dta", package = "eventglm"))
 colon2$surv_mm_trunc <- ifelse(colon2$surv_mm > 120.5, 120.5, colon2$surv_mm)
 
 colon2$death <- colon2$status %in% c(1, 2)
 colon2$death[colon2$surv_mm > colon2$surv_mm_trunc] <- 0
 
-lifetab <- data.table(rio::import("https://pclambert.net/data/popmort.dta"))
+# from https://pclambert.net/data/popmort.dta
+lifetab <- data.table(rio::import(system.file("extdata", "popmort.dta", package = "eventglm")))
 ```
 
 Now we will estimate the marginal relative survival using the approach described in @pavlivc2019using, which is based on the estimator: 
@@ -240,7 +242,7 @@ $$
 RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)}, 
 $$
 
-where $S_{P}(t | D)$ is the expected survival probability based on the life tables for the demographics $D$ of patient $i$, and $PO_i(t)$ are the pseudo observations for time $t$. We get the survival probability by merging with the life table estimates, and the pseudo observations from our package. The `prob` from the life tables is the probability of surviving one year, so to get the probability of surviving 5 and 10 years, we need to calculate the cumulative product estimates. 
+where $S_{P}(t | D)$ is the survival probability based on the life tables for the demographics $D$ of patient $i$, and $PO_i(t)$ are the pseudo observations for time $t$. We get the survival probability by merging with the life table estimates, and the pseudo observations from our package. The `prob` from the life tables is the probability of surviving one year, so to get the probability of surviving 5 and 10 years, we need to calculate the cumulative product estimates. 
 
 ```{r}
 

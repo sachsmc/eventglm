@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
       </span>
     </div>
 
@@ -145,9 +145,7 @@
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">colon.cifit</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = update.formula(formula, pseudo.vals ~ .), </span>
-<span class="co">#&gt;     family = quasi(link = link, variance = "constant"), data = newdata, </span>
-<span class="co">#&gt;     mustart = startmu, x = TRUE)</span>
+<span class="co">#&gt; cumincglm(formula = Surv(time, status) ~ rx, time = 2500, data = colon)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
@@ -184,9 +182,7 @@
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">colon.rmfit</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = update.formula(formula, pseudo.vals ~ .), </span>
-<span class="co">#&gt;     family = quasi(link = link, variance = "constant"), data = newdata, </span>
-<span class="co">#&gt;     mustart = startmu, x = TRUE)</span>
+<span class="co">#&gt; rmeanglm(formula = Surv(time, status) ~ rx, time = 2500, data = colon)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
@@ -222,9 +218,8 @@
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">colon.ci.adj</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = update.formula(formula, pseudo.vals ~ .), </span>
-<span class="co">#&gt;     family = quasi(link = link, variance = "constant"), data = newdata, </span>
-<span class="co">#&gt;     mustart = startmu, x = TRUE)</span>
+<span class="co">#&gt; cumincglm(formula = Surv(time, status) ~ rx + age + node4, time = 2500, </span>
+<span class="co">#&gt;     data = colon)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
@@ -251,9 +246,8 @@
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">colon.rm.adj</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = update.formula(formula, pseudo.vals ~ .), </span>
-<span class="co">#&gt;     family = quasi(link = link, variance = "constant"), data = newdata, </span>
-<span class="co">#&gt;     mustart = startmu, x = TRUE)</span>
+<span class="co">#&gt; rmeanglm(formula = Surv(time, status) ~ rx + age + node4, time = 2500, </span>
+<span class="co">#&gt;     data = colon)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
@@ -332,9 +326,8 @@
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">mgfitci</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = update.formula(formula, pseudo.vals ~ .), </span>
-<span class="co">#&gt;     family = quasi(link = link, variance = "constant"), data = newdata, </span>
-<span class="co">#&gt;     mustart = startmu, x = TRUE)</span>
+<span class="co">#&gt; cumincglm(formula = Surv(etime, event) ~ sex, time = 120, cause = "pcm", </span>
+<span class="co">#&gt;     data = mgus2)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;      Min        1Q    Median        3Q       Max  </span>
@@ -360,9 +353,8 @@
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">mgfitrmean</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = update.formula(formula, pseudo.vals ~ .), </span>
-<span class="co">#&gt;     family = quasi(link = link, variance = "constant"), data = newdata, </span>
-<span class="co">#&gt;     mustart = startmu, x = TRUE)</span>
+<span class="co">#&gt; rmeanglm(formula = Surv(etime, event) ~ sex, time = 120, cause = "pcm", </span>
+<span class="co">#&gt;     data = mgus2)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
@@ -390,9 +382,8 @@
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">mgfitrmean2</span>)
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Call:</span>
-<span class="co">#&gt; stats::glm(formula = update.formula(formula, pseudo.vals ~ .), </span>
-<span class="co">#&gt;     family = quasi(link = link, variance = "constant"), data = newdata, </span>
-<span class="co">#&gt;     mustart = startmu, x = TRUE)</span>
+<span class="co">#&gt; rmeanglm(formula = Surv(etime, event) ~ sex + age + hgb, time = 120, </span>
+<span class="co">#&gt;     cause = "pcm", data = mgus2)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Deviance Residuals: </span>
 <span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span>
@@ -414,7 +405,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Number of Fisher Scoring iterations: 2</span></pre></body></html></div>
 <p>The objects returned by <code>cumincglm</code> and <code>rmeanglm</code> inherit from <code>glm</code>, so many methods are available. First, the <code>vcov</code> function has several options for calculation of the estimated variance of the estimated regression parameters. By default, the <code>robust</code> variance estimates are used, based on the Huber-White estimator. Other options are naive, and corrected, which are the corrected estimators suggested by <span class="citation">Overgaard et al. (2017)</span> which are based on a second order Von-Mises expansion. We can also use the bootstrap. This recalculated the pseudo-observations every time, but it is still pretty fast because of the C code. Let’s compare:</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">nboot</span> <span class="kw">&lt;-</span> <span class="fl">1000</span>
+<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">nboot</span> <span class="kw">&lt;-</span> <span class="fl">100</span> <span class="co"># use a bigger number for real</span>
 <span class="no">bootests</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fl">NA</span>, <span class="kw">nrow</span> <span class="kw">=</span> <span class="no">nboot</span>, <span class="kw">ncol</span> <span class="kw">=</span> <span class="fl">4</span>)
 <span class="kw">for</span>(<span class="no">i</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="no">nboot</span>) {
   <span class="no">mgus.b</span> <span class="kw">&lt;-</span> <span class="no">mgus2</span>[<span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="fl">1</span>:<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">mgus2</span>), <span class="kw">replace</span> <span class="kw">=</span> <span class="fl">TRUE</span>), ]
@@ -438,31 +429,31 @@
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">3.802</td>
+<td align="right">3.318</td>
 <td align="right">3.874</td>
 <td align="right">4.749</td>
 </tr>
 <tr class="even">
 <td align="left">sexM</td>
-<td align="right">0.973</td>
+<td align="right">1.006</td>
 <td align="right">0.992</td>
 <td align="right">1.012</td>
 </tr>
 <tr class="odd">
 <td align="left">age</td>
-<td align="right">0.029</td>
+<td align="right">0.030</td>
 <td align="right">0.029</td>
 <td align="right">0.041</td>
 </tr>
 <tr class="even">
 <td align="left">hgb</td>
-<td align="right">0.252</td>
+<td align="right">0.210</td>
 <td align="right">0.251</td>
 <td align="right">0.253</td>
 </tr>
 </tbody>
 </table>
-<p>The corrected estimator fails pretty often, and the benefits are negligible, and thus may be removed from the package.</p>
+<p>The corrected estimator fails pretty often, because it doesn’t handle ties, and the benefits are negligible, and thus may be removed from the package in the future.</p>
 <p>Residuals also work, using the scaling factor suggested by <span class="citation">Perme and Andersen (2008)</span>, as do predictions. Predicted restricted means give a possible method to predict individual event times, while the predicted cumulative incidence should be probabilities. Note that with the identity link, the predicted cumulative incidence is not guaranteed to be between 0 and 1.</p>
 <div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span>(<span class="no">mgfitrmean2</span>, <span class="kw">newdata</span> <span class="kw">=</span> <span class="no">mgus2</span>),
      <span class="kw">xlab</span> <span class="kw">=</span> <span class="st">"Predicted lifetime lost due to PCM"</span>, <span class="kw">main</span> <span class="kw">=</span> <span class="st">""</span>)</pre></body></html></div>
@@ -556,18 +547,20 @@
 <p>Following Professor Paul Lambert’s example here: <a href="https://pclambert.net/software/stpp/using_stpp/" class="uri">https://pclambert.net/software/stpp/using_stpp/</a> , let’s load the datasets:</p>
 <div class="sourceCode" id="cb20"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">data.table</span>)
 
-<span class="no">colon2</span> <span class="kw">&lt;-</span> <span class="kw pkg">rio</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rio/man/import.html">import</a></span>(<span class="st">"https://pclambert.net/data/colon.dta"</span>)
+<span class="co"># from https://pclambert.net/data/colon.dta</span>
+<span class="no">colon2</span> <span class="kw">&lt;-</span> <span class="kw pkg">rio</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rio/man/import.html">import</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"colon.dta"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"eventglm"</span>))
 <span class="no">colon2</span>$<span class="no">surv_mm_trunc</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fifelse.html">ifelse</a></span>(<span class="no">colon2</span>$<span class="no">surv_mm</span> <span class="kw">&gt;</span> <span class="fl">120.5</span>, <span class="fl">120.5</span>, <span class="no">colon2</span>$<span class="no">surv_mm</span>)
 
 <span class="no">colon2</span>$<span class="no">death</span> <span class="kw">&lt;-</span> <span class="no">colon2</span>$<span class="no">status</span> <span class="kw">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>, <span class="fl">2</span>)
 <span class="no">colon2</span>$<span class="no">death</span>[<span class="no">colon2</span>$<span class="no">surv_mm</span> <span class="kw">&gt;</span> <span class="no">colon2</span>$<span class="no">surv_mm_trunc</span>] <span class="kw">&lt;-</span> <span class="fl">0</span>
 
-<span class="no">lifetab</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html">data.table</a></span>(<span class="kw pkg">rio</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rio/man/import.html">import</a></span>(<span class="st">"https://pclambert.net/data/popmort.dta"</span>))</pre></body></html></div>
+<span class="co"># from https://pclambert.net/data/popmort.dta</span>
+<span class="no">lifetab</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html">data.table</a></span>(<span class="kw pkg">rio</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rio/man/import.html">import</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"extdata"</span>, <span class="st">"popmort.dta"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"eventglm"</span>)))</pre></body></html></div>
 <p>Now we will estimate the marginal relative survival using the approach described in <span class="citation">Pavlič and Pohar Perme (2019)</span>, which is based on the estimator:</p>
 <p><span class="math display">\[
 RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)}, 
 \]</span></p>
-<p>where <span class="math inline">\(S_{P}(t | D)\)</span> is the expected survival probability based on the life tables for the demographics <span class="math inline">\(D\)</span> of patient <span class="math inline">\(i\)</span>, and <span class="math inline">\(PO_i(t)\)</span> are the pseudo observations for time <span class="math inline">\(t\)</span>. We get the survival probability by merging with the life table estimates, and the pseudo observations from our package. The <code>prob</code> from the life tables is the probability of surviving one year, so to get the probability of surviving 5 and 10 years, we need to calculate the cumulative product estimates.</p>
+<p>where <span class="math inline">\(S_{P}(t | D)\)</span> is the survival probability based on the life tables for the demographics <span class="math inline">\(D\)</span> of patient <span class="math inline">\(i\)</span>, and <span class="math inline">\(PO_i(t)\)</span> are the pseudo observations for time <span class="math inline">\(t\)</span>. We get the survival probability by merging with the life table estimates, and the pseudo observations from our package. The <code>prob</code> from the life tables is the probability of surviving one year, so to get the probability of surviving 5 and 10 years, we need to calculate the cumulative product estimates.</p>
 <div class="sourceCode" id="cb21"><html><body><pre class="r">
 <span class="no">lifetab</span>[, <span class="no">prob.5</span> <span class="kw">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/prod.html">prod</a></span>(<span class="no">lifetab</span>[<span class="no">`_age`</span> <span class="kw">%in%</span> <span class="no">.BY</span><span class="kw">[[</span><span class="st">"_age"</span>]]:(<span class="no">.BY</span><span class="kw">[[</span><span class="st">"_age"</span>]]+<span class="fl">4</span>) <span class="kw">&amp;</span>
                               <span class="no">`_year`</span> <span class="kw">%in%</span> <span class="no">.BY</span><span class="kw">[[</span><span class="st">"_year"</span>]]:(<span class="no">.BY</span><span class="kw">[[</span><span class="st">"_year"</span>]]+<span class="fl">4</span>) <span class="kw">&amp;</span>
@@ -627,6 +620,64 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 </table>
 <p>They are pretty close to those computed using the Pohar Perme estimator reported by Prof Lambert.</p>
 </div>
+<div id="case-cohort-sampling" class="section level1">
+<h1 class="hasAnchor">
+<a href="#case-cohort-sampling" class="anchor"></a>Case cohort sampling</h1>
+<p><span class="citation">Parner, Andersen, and Overgaard (2020)</span> describe how to fit regression models with pseudo-observations that account for case-cohort sampling. The basic idea is weighted estimating equations, which we can implement easily with the <code>weights</code> argument that gets passed to <code>glm.fit</code>. First let’s create a case-cohort sample of the <code>colon2</code> dataset by sampling the cancer deaths (<code>status == 1</code>) with probability 0.8, and a random subcohort with probability 0.1.</p>
+<div class="sourceCode" id="cb22"><html><body><pre class="r"><span class="no">colon2</span>$<span class="no">status2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fifelse.html">ifelse</a></span>(<span class="no">colon2</span>$<span class="no">status</span> <span class="kw">==</span> <span class="fl">4</span>, <span class="fl">0</span>, <span class="no">colon2</span>$<span class="no">status</span>),
+                         <span class="kw">labels</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"censored"</span>, <span class="st">"cancer death"</span>, <span class="st">"other death"</span>))
+<span class="no">subc</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">colon2</span>), <span class="kw">size</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">p</span> <span class="kw">=</span> <span class="fl">.2</span>)
+<span class="no">samp.ind</span> <span class="kw">&lt;-</span> <span class="no">subc</span> + (<span class="fl">1</span> - <span class="no">subc</span>) * (<span class="no">colon2</span>$<span class="no">status</span> <span class="kw">==</span> <span class="fl">1</span>) * <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">colon2</span>), <span class="kw">size</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">p</span> <span class="kw">=</span> <span class="fl">.9</span>)
+<span class="no">colon.cc</span> <span class="kw">&lt;-</span> <span class="no">colon2</span>[<span class="fu"><a href="https://rdrr.io/r/base/logical.html">as.logical</a></span>(<span class="no">samp.ind</span>), ]
+<span class="no">colon.cc</span>$<span class="no">samp.wt</span> <span class="kw">&lt;-</span> <span class="fl">1</span> / <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fifelse.html">ifelse</a></span>(<span class="no">colon.cc</span>$<span class="no">status</span> <span class="kw">==</span> <span class="fl">1</span>, <span class="fl">.2</span> + <span class="fl">.8</span> * <span class="fl">.9</span>, <span class="fl">.2</span>)</pre></body></html></div>
+<p>Now, the weighted regression model should give similar results as the unweighted one in the full sample:</p>
+<div class="sourceCode" id="cb23"><html><body><pre class="r"><span class="no">cfit.cc</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span>(<span class="no">surv_mm</span>, <span class="no">status2</span>) ~ <span class="no">age</span> + <span class="no">sex</span> + <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">subsite</span>),
+                     <span class="kw">cause</span> <span class="kw">=</span> <span class="st">"cancer death"</span>, <span class="kw">time</span> <span class="kw">=</span> <span class="fl">5</span> * <span class="fl">12</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">colon.cc</span>,
+                     <span class="kw">weights</span> <span class="kw">=</span> <span class="no">samp.wt</span>)
+<span class="no">cfit.full</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span>(<span class="no">surv_mm</span>, <span class="no">status2</span>) ~ <span class="no">age</span> + <span class="no">sex</span> + <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span>(<span class="no">subsite</span>),
+                     <span class="kw">cause</span> <span class="kw">=</span> <span class="st">"cancer death"</span>, <span class="kw">time</span> <span class="kw">=</span> <span class="fl">5</span> * <span class="fl">12</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">colon2</span>)
+<span class="kw pkg">knitr</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="kw">casecohort</span> <span class="kw">=</span> <span class="no">cfit.cc</span>$<span class="no">coefficients</span>,
+      <span class="kw">fullsamp</span> <span class="kw">=</span> <span class="no">cfit.full</span>$<span class="no">coefficients</span>), <span class="kw">digits</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left"></th>
+<th align="right">casecohort</th>
+<th align="right">fullsamp</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">0.24</td>
+<td align="right">0.21</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="odd">
+<td align="left">sex</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">factor(subsite)2</td>
+<td align="right">0.08</td>
+<td align="right">0.06</td>
+</tr>
+<tr class="odd">
+<td align="left">factor(subsite)3</td>
+<td align="right">0.01</td>
+<td align="right">0.00</td>
+</tr>
+<tr class="even">
+<td align="left">factor(subsite)4</td>
+<td align="right">0.02</td>
+<td align="right">0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
@@ -636,6 +687,9 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 </div>
 <div id="ref-overgaard2017asymptotic">
 <p>Overgaard, Morten, Erik Thorlund Parner, Jan Pedersen, and others. 2017. “Asymptotic Theory of Generalized Estimating Equations Based on Jack-Knife Pseudo-Observations.” <em>The Annals of Statistics</em> 45 (5): 1988–2015.</p>
+</div>
+<div id="ref-parner2020cumulative">
+<p>Parner, Erik T, Per K Andersen, and Morten Overgaard. 2020. “Cumulative Risk Regression in Case–Cohort Studies Using Pseudo-Observations.” <em>Lifetime Data Analysis</em>, 1–20.</p>
 </div>
 <div id="ref-pavlivc2019using">
 <p>Pavlič, Klemen, and Maja Pohar Perme. 2019. “Using Pseudo-Observations for Estimation in Relative Survival.” <em>Biostatistics</em> 20 (3): 384–99.</p>
