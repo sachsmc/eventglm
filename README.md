@@ -29,7 +29,7 @@ library(eventglm)
 
 colon.cifit <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.cifit)
-se.ci <- sqrt(diag(vcov(colon.cifit, method = "robust")))
+se.ci <- sqrt(diag(vcov(colon.cifit, type = "robust")))
 b.ci <- colon.cifit$coefficients
 ```
 

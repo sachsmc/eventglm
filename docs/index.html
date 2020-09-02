@@ -108,7 +108,7 @@ library(eventglm)
 
 colon.cifit &lt;- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.cifit)
-se.ci &lt;- sqrt(diag(vcov(colon.cifit, method = "robust")))
+se.ci &lt;- sqrt(diag(vcov(colon.cifit, type = "robust")))
 b.ci &lt;- colon.cifit$coefficients</code></pre>
 <p>Check out the vignette for more examples.</p>
 </div>

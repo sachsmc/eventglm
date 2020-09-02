@@ -65,7 +65,7 @@ And we can now do inference using the `eventglm` package. First, we fit a regres
 ```{r}
 colon.cifit <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.cifit)
-se.ci <- sqrt(diag(vcov(colon.cifit, method = "robust")))
+se.ci <- sqrt(diag(vcov(colon.cifit, type = "robust")))
 b.ci <- colon.cifit$coefficients
 ```
 We find that compared to observation alone, the Levamisole alone treatment group has a `r round(b.ci[2], 2)` difference in the cumulative incidence of death at 2500 days, with 95\% confidence interval `r round(b.ci[2] + c(-1.96, 1.96) * se.ci[2], 2)`, while the Levamisole plus 5-FU group has a `r round(b.ci[3], 2)` difference in the cumulative incidence of death at 2500 days, with 95\% confidence interval `r round(b.ci[3] + c(-1.96, 1.96) * se.ci[3], 2)`. This roughly agrees with the Kaplan-Meier estimates from survfit above: 
@@ -81,7 +81,7 @@ Now for the restricted mean:
 ```{r}
 colon.rmfit <- rmeanglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.rmfit)
-se.rm <- sqrt(diag(vcov(colon.rmfit, method = "robust")))
+se.rm <- sqrt(diag(vcov(colon.rmfit, type = "robust")))
 b.rm <- colon.rmfit$coefficients
 ```
 We find that compared to observation alone, the Levamisole alone treatment group has a `r round(b.rm[2], 2)` difference in the mean time to death up to 2500 days, with 95\% confidence interval `r round(b.rm[2] + c(-1.96, 1.96) * se.rm[2], 2)`, while the Levamisole plus 5-FU group has a `r round(b.rm[3], 2)` difference in the mean time to death up to 2500 days, with 95\% confidence interval `r round(b.rm[3] + c(-1.96, 1.96) * se.rm[3], 2)`. Again, this roughly agrees with the Kaplan-Meier estimates from survfit above:
