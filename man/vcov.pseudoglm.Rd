@@ -24,7 +24,7 @@ Compute covariance matrix of regression coefficient estimates
 \details{
 The "corrected" variance estimate is as described in Overgaard et
   al. (2017) <doi:10.1214/16-AOS1516>, with code adapted from Overgaard's
-  Stata program. This method does not handle ties very well and only has
+  Stata program. This method does not handle ties and only has
   marginal benefits in reasonable sample sizes. The default is "robust" which
   uses a sandwich estimator as implemented in the sandwich package. "cluster"
   is another option if you have clustered observations. Finally "naive" uses

@@ -25,6 +25,7 @@ test_that("Residuals work", {
     rmeantest <- rmeanglm(survival::Surv(time, status) ~ age,
                           time = 1000, link = "identity", data = colon)
 
+    expect_error(vcov(rmeantest, type = "corrected"))
 
     rmeantest2 <- rmeanglm(survival::Surv(etime, event) ~ sex,
                           time = 200, cause = "pcm", link = "identity", data = mgus2)
@@ -81,5 +82,9 @@ test_that("ipcw works", {
     expect_true(rmeanipcw1$coefficients[3] - rmeanipcw3$coefficients[3] < 1e-2)
     expect_true(rmeanipcw1$coefficients[3] - rmeanipcw4$coefficients[3] < 1e-2)
 
+
+    expect_error(vcov(rmeanipcw1, type = "corrected"))
+    expect_true(all(sqrt(diag(vcov(rmeanipcw1, type = "naive"))) > 0))
+    expect_true(all(sqrt(diag(vcov(rmeanipcw1, type = "robust"))) > 0))
 
 })

@@ -81,8 +81,8 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
                       data,
                       weights, subset,
                       na.action, offset,
-                      control = list(...), model = TRUE,
-                      x = FALSE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...) {
+                      control = list(...), model = FALSE,
+                      x = TRUE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...) {
 
 
     stopifnot(length(time) == 1)
@@ -375,8 +375,8 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
                      model.censoring = "independent", formula.censoring = NULL, data,
                      weights, subset,
                      na.action, offset,
-                     control = list(...), model = TRUE,
-                     x = FALSE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...) {
+                     control = list(...), model = FALSE,
+                     x = TRUE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...) {
 
     stopifnot(length(time) == 1)
     cal <- match.call()

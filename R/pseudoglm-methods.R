@@ -45,7 +45,7 @@ print.pseudoglm <- function (x, digits = max(3L, getOption("digits") - 3L), ...)
 #'
 #' @details The "corrected" variance estimate is as described in Overgaard et
 #'   al. (2017) <doi:10.1214/16-AOS1516>, with code adapted from Overgaard's
-#'   Stata program. This method does not handle ties very well and only has
+#'   Stata program. This method does not handle ties and only has
 #'   marginal benefits in reasonable sample sizes. The default is "robust" which
 #'   uses a sandwich estimator as implemented in the sandwich package. "cluster"
 #'   is another option if you have clustered observations. Finally "naive" uses
@@ -63,6 +63,9 @@ vcov.pseudoglm <- function(object, type = "robust", ...) {
 
     if(type == "corrected") {
 
+        if(is.null(object$x)) {
+            stop("Corrected variance requires 'x = TRUE' in the model fit.")
+        }
         datamat <- object$datamat
         noobs <- len <- nrow(datamat)
 
@@ -70,6 +73,10 @@ vcov.pseudoglm <- function(object, type = "robust", ...) {
         datamat <- datamat[datord, ]
 
         datain <- datamat[datamat[, 1] <= object$time, ]
+
+        if(any(table(datain[, 1]) > 1)) {
+            stop("Corrected variance not available when there are tied event times")
+        }
 
         len2 <- nrow(datain)
 
