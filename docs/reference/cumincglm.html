@@ -76,7 +76,7 @@ ratios, and any of the other link functions supported by quasi." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
       </span>
     </div>
 
@@ -144,6 +144,7 @@ ratios, and any of the other link functions supported by <a href='https://rdrr.i
   <span class='kw'>link</span> <span class='kw'>=</span> <span class='st'>"identity"</span>,
   <span class='kw'>model.censoring</span> <span class='kw'>=</span> <span class='st'>"independent"</span>,
   <span class='kw'>formula.censoring</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>ipcw.method</span> <span class='kw'>=</span> <span class='st'>"binder"</span>,
   <span class='no'>data</span>,
   <span class='no'>weights</span>,
   <span class='no'>subset</span>,
@@ -203,6 +204,13 @@ the model.</p></td>
       <td><p>A one sided formula (e.g., <code>~ x1 + x2</code>)
 specifying the model for the censoring distribution. If NULL, uses the same
 mean model as for the outcome.</p></td>
+    </tr>
+    <tr>
+      <th>ipcw.method</th>
+      <td><p>Which method to use for calculation of inverse
+probability of censoring weighted pseudo observations. "binder" the
+default, uses the number of observations as the denominator, while the
+"hajek" method uses the sum of the weights as the denominator.</p></td>
     </tr>
     <tr>
       <th>data</th>
