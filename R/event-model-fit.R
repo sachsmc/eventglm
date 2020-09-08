@@ -34,6 +34,10 @@
 #' @param formula.censoring A one sided formula (e.g., \code{~ x1 + x2})
 #'   specifying the model for the censoring distribution. If NULL, uses the same
 #'   mean model as for the outcome.
+#' @param ipcw.method Which method to use for calculation of inverse
+#'   probability of censoring weighted pseudo observations. "binder" the
+#'   default, uses the number of observations as the denominator, while the
+#'   "hajek" method uses the sum of the weights as the denominator.
 #' @param data Data frame in which all variables of formula can be interpreted.
 #' @param weights an optional vector of ‘prior weights’ to be used in the
 #'   fitting process. Should be NULL or a numeric vector.
@@ -78,6 +82,7 @@
 
 cumincglm <- function(formula, time, cause = 1, link = "identity",
                       model.censoring = "independent", formula.censoring = NULL,
+                      ipcw.method = "binder",
                       data,
                       weights, subset,
                       na.action, offset,
@@ -128,7 +133,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
         marginal.estimate <- survival::survfit(update.formula(formula, . ~ 1), data = data)
 
-       jackk <- get_pseudo_cuminc(marginal.estimate, time, cause, mr)
+       POi <- get_pseudo_cuminc(marginal.estimate, time, cause, mr)
 
 
     } else if(model.censoring == "stratified") {
@@ -149,7 +154,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
             chunk <- chunk + length(thisset)
         }
 
-        jackk <- stratified.jacks[order(new.order)]
+        POi <- stratified.jacks[order(new.order)]
 
 
 
@@ -173,10 +178,20 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
 
         XXi <- Vi * Ii / Gi
-        #jackk <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
-        jackk <- nn * theta.n - (nn - 1) *
-            (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
+        if(ipcw.method == "binder") {
 
+            POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+
+
+        } else if(ipcw.method == "hajek") {
+
+            POi <- nn * theta.n - (nn - 1) *
+                (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
+
+
+        } else {
+            stop("Weighting method ", weight.method, " not available, options are 'binder' or 'hajek'")
+        }
 
     } else if(model.censoring == "coxph") {
 
@@ -191,9 +206,20 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
 
         XXi <- Vi * Ii / Gi
-        #jackk <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
-        jackk <- nn * theta.n - (nn - 1) *
-            (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
+        if(ipcw.method == "binder") {
+
+            POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+
+
+        } else if(ipcw.method == "hajek") {
+
+            POi <- nn * theta.n - (nn - 1) *
+                (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
+
+
+        } else {
+            stop("Weighting method ", weight.method, " not available, options are 'binder' or 'hajek'")
+        }
 
 
     } else {
@@ -202,9 +228,9 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
     }
 
-    nn <- length(jackk)
+    nn <- length(POi)
 
-    newdata[["pseudo.vals"]] <- c(jackk)
+    newdata[["pseudo.vals"]] <- c(POi)
     newdata[["pseudo.time"]] <- rep(time, each = nn)
 
 
@@ -328,6 +354,10 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #' @param formula.censoring A one sided formula (e.g., \code{~ x1 + x2})
 #'   specifying the model for the censoring distribution. If NULL, uses the same
 #'   mean model as for the outcome.
+#' @param ipcw.method Which method to use for calculation of inverse
+#'   probability of censoring weighted pseudo observations. "binder" the
+#'   default, uses the number of observations as the denominator, while the
+#'   "hajek" method uses the sum of the weights as the denominator.
 #' @param data Data frame in which all variables of formula can be interpreted.
 #' @param weights an optional vector of ‘prior weights’ to be used in the
 #'   fitting process. Should be NULL or a numeric vector.
@@ -372,7 +402,9 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #'                          formula.censoring = ~ sex, data = mgus2)
 
 rmeanglm <- function(formula, time, cause = 1, link = "identity",
-                     model.censoring = "independent", formula.censoring = NULL, data,
+                     model.censoring = "independent", formula.censoring = NULL,
+                     ipcw.method = "binder",
+                     data,
                      weights, subset,
                      na.action, offset,
                      control = list(...), model = FALSE,
@@ -470,9 +502,21 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
         theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
 
         XXi <- Vi * Ii / Gi
-        #jackk <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
-        POi <- nn * theta.n - (nn - 1) *
-            (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
+
+        if(ipcw.method == "binder") {
+
+            POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+
+
+        } else if(ipcw.method == "hajek") {
+
+            POi <- nn * theta.n - (nn - 1) *
+                (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
+
+
+        } else {
+            stop("Weighting method ", weight.method, " not available, options are 'binder' or 'hajek'")
+        }
 
 
     } else if(model.censoring == "coxph") {
@@ -496,10 +540,21 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
         theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
 
         XXi <- Vi * Ii / Gi
-        #jackk <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
-        POi <- nn * theta.n - (nn - 1) *
-            (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
 
+        if(ipcw.method == "binder") {
+
+            POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
+
+
+        } else if(ipcw.method == "hajek") {
+
+            POi <- nn * theta.n - (nn - 1) *
+                (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
+
+
+        } else {
+            stop("Weighting method ", weight.method, " not available, options are 'binder' or 'hajek'")
+        }
 
     } else {
 
@@ -508,8 +563,6 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
     }
 
 
-
-    # individuals in rows, times in columns
 
     newdata[["pseudo.vals"]] <- c(POi)
     newdata[["pseudo.time"]] <- rep(time, each = length(POi))

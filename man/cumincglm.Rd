@@ -11,6 +11,7 @@ cumincglm(
   link = "identity",
   model.censoring = "independent",
   formula.censoring = NULL,
+  ipcw.method = "binder",
   data,
   weights,
   subset,
@@ -56,6 +57,11 @@ the model.}
 \item{formula.censoring}{A one sided formula (e.g., \code{~ x1 + x2})
 specifying the model for the censoring distribution. If NULL, uses the same
 mean model as for the outcome.}
+
+\item{ipcw.method}{Which method to use for calculation of inverse
+probability of censoring weighted pseudo observations. "binder" the
+default, uses the number of observations as the denominator, while the
+"hajek" method uses the sum of the weights as the denominator.}
 
 \item{data}{Data frame in which all variables of formula can be interpreted.}
 

@@ -5,8 +5,6 @@
 \title{Compute jackknife pseudo-observations of the cause-specific cumulative incidence for competing risks}
 \usage{
 leaveOneOut.competing.risks2(object, times, cause, mr)
-
-leaveOneOut.competing.risks2(object, times, cause, mr)
 }
 \arguments{
 \item{object}{A survfit object, with competing events}
@@ -19,19 +17,11 @@ leaveOneOut.competing.risks2(object, times, cause, mr)
 }
 \value{
 A vector of jackknifed values of the cause-specific cumulative incidence at time times
-
-A vector of jackknifed values of the cause-specific cumulative incidence at time times
 }
 \description{
 Compute jackknife pseudo-observations of the cause-specific cumulative incidence for competing risks
-
-Compute jackknife pseudo-observations of the cause-specific cumulative incidence for competing risks
 }
 \examples{
-
-sfit.cuminc <- survival::survfit(survival::Surv(etime, event) ~ 1, data = mgus2)
-mrs <- with(mgus2, survival::Surv(etime, event))
-jackvals <- leaveOneOut.competing.risks2(sfit.cuminc, times = 200, cause = "pcm", mrs)
 
 sfit.cuminc <- survival::survfit(survival::Surv(etime, event) ~ 1, data = mgus2)
 mrs <- with(mgus2, survival::Surv(etime, event))
