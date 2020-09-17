@@ -67,8 +67,9 @@ colon.cifit <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.cifit)
 se.ci <- sqrt(diag(vcov(colon.cifit, type = "robust")))
 b.ci <- colon.cifit$coefficients
+conf.ci <- confint(colon.cifit)
 ```
-We find that compared to observation alone, the Levamisole alone treatment group has a `r round(b.ci[2], 2)` difference in the cumulative incidence of death at 2500 days, with 95\% confidence interval `r round(b.ci[2] + c(-1.96, 1.96) * se.ci[2], 2)`, while the Levamisole plus 5-FU group has a `r round(b.ci[3], 2)` difference in the cumulative incidence of death at 2500 days, with 95\% confidence interval `r round(b.ci[3] + c(-1.96, 1.96) * se.ci[3], 2)`. This roughly agrees with the Kaplan-Meier estimates from survfit above: 
+We find that compared to observation alone, the Levamisole alone treatment group has a `r round(b.ci[2], 2)` difference in the cumulative incidence of death at 2500 days, with 95\% confidence interval `r round(conf.ci[2,], 2)`, while the Levamisole plus 5-FU group has a `r round(b.ci[3], 2)` difference in the cumulative incidence of death at 2500 days, with 95\% confidence interval `r round(conf.ci[3,], 2)`. This roughly agrees with the Kaplan-Meier estimates from survfit above: 
 
 ```{r}
 cbind(eventglm = b.ci, 
@@ -77,14 +78,27 @@ cbind(eventglm = b.ci,
     (1 - rep(colon.sfit$surv[1], 2))))
 ```
 
+We can fit another model using the log link to obtain estimates of the log relative risks comparing the active treatment arms to the observation arm: 
+
+```{r}
+colon.rr <- cumincglm(Surv(time, status) ~ rx, time = 2500, 
+                      data = colon, link = "log")
+br.ci <- colon.rr$coefficients
+confr.ci <- confint(colon.rr)
+```
+
+We find that the estimated probability of death before 2500 days in the Levamisole alone arm is `r round(exp(br.ci[2]), 2)` times lower compared to observation with 95\% confidence interval `r round(exp(confr.ci[2,]), 2)` and the estimated probability of death before 2500 days in the Levamisole+5FU arm is `r round(exp(br.ci[3]), 2)` times lower compared to observation with 95\% confidence interval `r round(exp(confr.ci[3, ]), 2)`. If odds ratios are of interest, then the `link = "logit"` option can be used instead. Another interesting option is the `link = "cloglog"`: the complementary log log link for the cumulative incidence implies proportional hazards. Thus models using the cloglog link applied at various time points can be used to assess the proportional hazards assumption [@perme2008checking]. Other options for link functions are probit, inverse, $\mu^{-2}$, square root, and users can define custom link function. It is not immediately clear what the interpretation of the regression coefficients would be in these cases, but they are possible. See the `stats::family` help file for more details. 
+
+
 Now for the restricted mean: 
 ```{r}
 colon.rmfit <- rmeanglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.rmfit)
 se.rm <- sqrt(diag(vcov(colon.rmfit, type = "robust")))
 b.rm <- colon.rmfit$coefficients
+conf.rm <- confint(colon.rmfit)
 ```
-We find that compared to observation alone, the Levamisole alone treatment group has a `r round(b.rm[2], 2)` difference in the mean time to death up to 2500 days, with 95\% confidence interval `r round(b.rm[2] + c(-1.96, 1.96) * se.rm[2], 2)`, while the Levamisole plus 5-FU group has a `r round(b.rm[3], 2)` difference in the mean time to death up to 2500 days, with 95\% confidence interval `r round(b.rm[3] + c(-1.96, 1.96) * se.rm[3], 2)`. Again, this roughly agrees with the Kaplan-Meier estimates from survfit above:
+We find that compared to observation alone, the Levamisole alone treatment group has a `r round(b.rm[2], 2)` difference in the mean time to death up to 2500 days, with 95\% confidence interval `r round(conf.rm[2,], 2)`, while the Levamisole plus 5-FU group has a `r round(b.rm[3], 2)` difference in the mean time to death up to 2500 days, with 95\% confidence interval `r round(conf.rm[3,], 2)`. Again, this roughly agrees with the Kaplan-Meier estimates from survfit above:
 
 ```{r}
 cbind(eventglm = b.rm, 
@@ -97,7 +111,6 @@ A key advantage of the regression approach is that it gives us the ability to ad
 
 ```{r}
 colon.ci.adj <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, data = colon)
-summary(colon.ci.adj)
 colon.rm.adj <- rmeanglm(Surv(time, status) ~ rx + age + node4, time = 2500, data = colon)
 summary(colon.rm.adj)
 ```

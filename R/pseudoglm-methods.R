@@ -343,3 +343,50 @@ residuals.pseudoglm <- function(object, type = NULL, ...){
 
 }
 
+
+#' Confidence Intervals for pseudoglm Model Parameters
+#'
+#' Computes Wald confidence intervals for one or more parameters in a fitted model. Users can specify the type of variance estimate used, with the default being the robust sandwich variance estimator.
+#'
+#' @usage confint(object, parm, level = 0.95, type = "robust", ...)
+#'
+#' @param object A fitted model object from \link{cumincglm} or \link{rmeanglm}
+#' @param parm a specification of which parameters are to be given confidence intervals, either a vector of numbers or a vector of names. If missing, all parameters are considered.
+#' @param level the confidence level required.
+#' @param type The type of variance estimate to use, see \link{vcov.pseudoglm}
+#' @param ... Not used
+#'
+#' @return A matrix (or vector) with columns giving lower and upper confidence limits for each parameter. These will be labelled as (1-level)/2 and 1 - (1-level)/2 in % (by default 2.5% and 97.5%).
+#'
+#' @export
+#' @examples
+#' cumincipcw <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+#'          time = 200, cause = "pcm", link = "identity",
+#'          model.censoring = "independent", data = mgus2)
+#' confint(cumincipcw)
+#'
+confint.pseudoglm <- function (object, parm, level = 0.95, type = "robust", ...)
+{
+    cf <- coef(object)
+    ses <- sqrt(diag(vcov(object, type = type)))
+    pnames <- names(ses)
+    if (is.matrix(cf)){
+        cf <- setNames(as.vector(cf), pnames)
+    }
+    if (missing(parm)) {
+        parm <- pnames
+    } else if (is.numeric(parm)){
+        parm <- pnames[parm]
+    }
+    a <- (1 - level)/2
+    a <- c(a, 1 - a)
+    fac <- stats::qnorm(a)
+    pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), "%")
+    ci <- array(NA_real_, dim = c(length(parm), 2L), dimnames = list(parm,
+                                                                     pct))
+    ci[] <- cf[parm] + ses[parm] %o% fac
+    ci
+}
+
+
+

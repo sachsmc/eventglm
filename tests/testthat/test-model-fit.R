@@ -25,6 +25,8 @@ test_that("Residuals work", {
     rmeantest <- rmeanglm(survival::Surv(time, status) ~ age,
                           time = 1000, link = "identity", data = colon)
 
+    expect_true(is.numeric(confint(rmeantest)))
+
     expect_error(vcov(rmeantest, type = "corrected"))
 
     rmeantest2 <- rmeanglm(survival::Surv(etime, event) ~ sex,
