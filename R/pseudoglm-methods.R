@@ -348,8 +348,6 @@ residuals.pseudoglm <- function(object, type = NULL, ...){
 #'
 #' Computes Wald confidence intervals for one or more parameters in a fitted model. Users can specify the type of variance estimate used, with the default being the robust sandwich variance estimator.
 #'
-#' @usage confint(object, parm, level = 0.95, type = "robust", ...)
-#'
 #' @param object A fitted model object from \link{cumincglm} or \link{rmeanglm}
 #' @param parm a specification of which parameters are to be given confidence intervals, either a vector of numbers or a vector of names. If missing, all parameters are considered.
 #' @param level the confidence level required.

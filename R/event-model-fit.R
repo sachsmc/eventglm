@@ -190,7 +190,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
 
         } else {
-            stop("Weighting method ", weight.method, " not available, options are 'binder' or 'hajek'")
+            stop("Weighting method ", ipcw.method, " not available, options are 'binder' or 'hajek'")
         }
 
     } else if(model.censoring == "coxph") {
@@ -218,7 +218,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
 
         } else {
-            stop("Weighting method ", weight.method, " not available, options are 'binder' or 'hajek'")
+            stop("Weighting method ", ipcw.method, " not available, options are 'binder' or 'hajek'")
         }
 
 
@@ -515,7 +515,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
 
 
         } else {
-            stop("Weighting method ", weight.method, " not available, options are 'binder' or 'hajek'")
+            stop("Weighting method ", ipcw.method, " not available, options are 'binder' or 'hajek'")
         }
 
 
@@ -553,7 +553,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
 
 
         } else {
-            stop("Weighting method ", weight.method, " not available, options are 'binder' or 'hajek'")
+            stop("Weighting method ", ipcw.method, " not available, options are 'binder' or 'hajek'")
         }
 
     } else {

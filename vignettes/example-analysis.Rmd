@@ -25,7 +25,7 @@ library(eventglm)
 
 Our first example concerns the `colon` dataset, which is included in the package: 
 
-```{r}
+```{r, eval = FALSE}
 ?eventglm::colon
 ```
 

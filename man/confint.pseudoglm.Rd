@@ -4,7 +4,7 @@
 \alias{confint.pseudoglm}
 \title{Confidence Intervals for pseudoglm Model Parameters}
 \usage{
-confint(object, parm, level = 0.95, type = "robust", ...)
+\method{confint}{pseudoglm}(object, parm, level = 0.95, type = "robust", ...)
 }
 \arguments{
 \item{object}{A fitted model object from \link{cumincglm} or \link{rmeanglm}}
