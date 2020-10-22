@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -57,6 +57,9 @@
       <a href="../articles/example-analysis.html">Examples of using eventglm and interpreting the results</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">Changelog</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -257,15 +260,7 @@
 <h1 class="hasAnchor">
 <a href="#monoclonal-gammopathy-data-competing-risks" class="anchor"></a>Monoclonal gammopathy data (Competing risks)</h1>
 <p>Our next example involves the <code>mgus2</code> dataset, included in the package:</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r">?<span class="no">mgus2</span>
-<span class="co">#&gt; Help on topic 'mgus2' was found in the following packages:</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;   Package               Library</span>
-<span class="co">#&gt;   eventglm              C:/Users/micsac/Documents/R/R-4.0.2/library</span>
-<span class="co">#&gt;   survival              C:/Users/micsac/Documents/R/R-4.0.2/library</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Using the first match ...</span>
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="co">## ?mgus2</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">mgus2</span>)
 <span class="co">#&gt;   id age sex dxyr  hgb creat mspike ptime pstat futime death etime event</span>
 <span class="co">#&gt; 1  1  88   F 1981 13.1   1.3    0.5    30     0     30     1    30 death</span>
@@ -410,25 +405,25 @@
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">4.083</td>
+<td align="right">3.507</td>
 <td align="right">3.874</td>
 <td align="right">4.749</td>
 </tr>
 <tr class="even">
 <td align="left">sexM</td>
-<td align="right">0.885</td>
+<td align="right">1.015</td>
 <td align="right">0.992</td>
 <td align="right">1.012</td>
 </tr>
 <tr class="odd">
 <td align="left">age</td>
-<td align="right">0.031</td>
+<td align="right">0.028</td>
 <td align="right">0.029</td>
 <td align="right">0.041</td>
 </tr>
 <tr class="even">
 <td align="left">hgb</td>
-<td align="right">0.248</td>
+<td align="right">0.242</td>
 <td align="right">0.251</td>
 <td align="right">0.253</td>
 </tr>
@@ -628,7 +623,7 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">0.24</td>
+<td align="right">0.27</td>
 <td align="right">0.21</td>
 </tr>
 <tr class="even">
@@ -638,17 +633,17 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 </tr>
 <tr class="odd">
 <td align="left">sex</td>
-<td align="right">-0.01</td>
+<td align="right">-0.03</td>
 <td align="right">0.00</td>
 </tr>
 <tr class="even">
 <td align="left">factor(subsite)2</td>
-<td align="right">0.05</td>
+<td align="right">0.02</td>
 <td align="right">0.06</td>
 </tr>
 <tr class="odd">
 <td align="left">factor(subsite)3</td>
-<td align="right">0.01</td>
+<td align="right">-0.03</td>
 <td align="right">0.00</td>
 </tr>
 <tr class="even">
