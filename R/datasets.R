@@ -43,7 +43,7 @@
 #'     \item{\code{dxyr}}{year of diagnosis}
 #'     \item{\code{hgb}}{hemoglobin}
 #'     \item{\code{creat}}{creatinine}
-#'     \item{\code{mspike}}{size of the monoclonal serum splike}
+#'     \item{\code{mspike}}{size of the monoclonal serum spike}
 #'     \item{\code{ptime}}{time until progression to a plasma cell
 #'         malignancy (PCM) or last contact, in months}
 #'     \item{\code{pstat}}{occurrence of PCM: 0=no, 1=yes }

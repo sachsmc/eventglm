@@ -65,7 +65,7 @@ default, uses the number of observations as the denominator, while the
 
 \item{data}{Data frame in which all variables of formula can be interpreted.}
 
-\item{weights}{an optional vector of ‘prior weights’ to be used in the
+\item{weights}{an optional vector of 'prior weights' to be used in the
 fitting process. Should be NULL or a numeric vector.}
 
 \item{subset}{an optional vector specifying a subset of observations to be
@@ -74,7 +74,7 @@ used in the fitting process.}
 \item{na.action}{a function which indicates what should happen when the data
 contain \code{NA}s. The default is set by the \code{na.action} setting of
 \link[base]{options}, and is \link[stats]{na.fail} if that is unset. The
-‘factory-fresh’ default is \link[stats]{na.omit}. Another possible value is
+'factory-fresh' default is \link[stats]{na.omit}. Another possible value is
 NULL, no action. Value \link[stats]{na.exclude} can be useful.}
 
 \item{offset}{this can be used to specify an a priori known component to be
@@ -111,10 +111,11 @@ A pseudoglm object, with its own methods for print, summary, and
 \description{
 Using pseudo observations for the restricted mean, or the restricted mean
 lifetime lost in the competing risks case, this function then runs a
-generalized linear model to estimate associations with covariates. The link
-function can be "identity" for estimating differences in the restricted mean,
-"log" for estimating ratios, and any of the other link functions supported by
-\link[stats]{quasi}.
+generalized linear model to estimate associations of the restricted
+mean/lifetime lost up to a particular time (specified by the \code{time}
+argument) with covariates. The link function can be "identity" for estimating
+differences in the restricted mean, "log" for estimating ratios, and any of
+the other link functions supported by \link[stats]{quasi}.
 }
 \examples{
     cumincipcw <- rmeanglm(Surv(etime, event) ~ age + sex,

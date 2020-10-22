@@ -1,10 +1,12 @@
 #' Generalized linear models for cumulative incidence
 #'
 #' Using pseudo observations for the cumulative incidence, this function then
-#' runs a generalized linear model and estimates the variance correctly
-#' according to Overgaard et al (2018). The link function can be "identity" for
-#' estimating differences in the cumulative incidence, "log" for estimating
-#' ratios, and any of the other link functions supported by \link[stats]{quasi}.
+#' runs a generalized linear model and estimates the parameters representing
+#' contrasts in the cumulative incidence at a particular time (specified by the
+#' \code{time} argument) across covariate values. The link function can be
+#' "identity" for estimating differences in the cumulative incidence, "log" for
+#' estimating ratios, and any of the other link functions supported by
+#' \link[stats]{quasi}.
 #'
 #' @return A pseudoglm object, with its own methods for print, summary, and
 #'   vcov. It inherits from glm, so predict and other glm methods are supported.
@@ -39,14 +41,14 @@
 #'   default, uses the number of observations as the denominator, while the
 #'   "hajek" method uses the sum of the weights as the denominator.
 #' @param data Data frame in which all variables of formula can be interpreted.
-#' @param weights an optional vector of ‘prior weights’ to be used in the
+#' @param weights an optional vector of 'prior weights' to be used in the
 #'   fitting process. Should be NULL or a numeric vector.
 #' @param subset an optional vector specifying a subset of observations to be
 #'   used in the fitting process.
 #' @param na.action a function which indicates what should happen when the data
 #'   contain \code{NA}s. The default is set by the \code{na.action} setting of
 #'   \link[base]{options}, and is \link[stats]{na.fail} if that is unset. The
-#'   ‘factory-fresh’ default is \link[stats]{na.omit}. Another possible value is
+#'   'factory-fresh' default is \link[stats]{na.omit}. Another possible value is
 #'   NULL, no action. Value \link[stats]{na.exclude} can be useful.
 #' @param offset this can be used to specify an a priori known component to be
 #'   included in the linear predictor during fitting. This should be NULL or a
@@ -321,10 +323,11 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #'
 #' Using pseudo observations for the restricted mean, or the restricted mean
 #' lifetime lost in the competing risks case, this function then runs a
-#' generalized linear model to estimate associations with covariates. The link
-#' function can be "identity" for estimating differences in the restricted mean,
-#' "log" for estimating ratios, and any of the other link functions supported by
-#' \link[stats]{quasi}.
+#' generalized linear model to estimate associations of the restricted
+#' mean/lifetime lost up to a particular time (specified by the \code{time}
+#' argument) with covariates. The link function can be "identity" for estimating
+#' differences in the restricted mean, "log" for estimating ratios, and any of
+#' the other link functions supported by \link[stats]{quasi}.
 #'
 #' @return A pseudoglm object, with its own methods for print, summary, and
 #'   vcov. It inherits from glm, so predict and other glm methods are supported.
@@ -359,14 +362,14 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #'   default, uses the number of observations as the denominator, while the
 #'   "hajek" method uses the sum of the weights as the denominator.
 #' @param data Data frame in which all variables of formula can be interpreted.
-#' @param weights an optional vector of ‘prior weights’ to be used in the
+#' @param weights an optional vector of 'prior weights' to be used in the
 #'   fitting process. Should be NULL or a numeric vector.
 #' @param subset an optional vector specifying a subset of observations to be
 #'   used in the fitting process.
 #' @param na.action a function which indicates what should happen when the data
 #'   contain \code{NA}s. The default is set by the \code{na.action} setting of
 #'   \link[base]{options}, and is \link[stats]{na.fail} if that is unset. The
-#'   ‘factory-fresh’ default is \link[stats]{na.omit}. Another possible value is
+#'   'factory-fresh' default is \link[stats]{na.omit}. Another possible value is
 #'   NULL, no action. Value \link[stats]{na.exclude} can be useful.
 #' @param offset this can be used to specify an a priori known component to be
 #'   included in the linear predictor during fitting. This should be NULL or a

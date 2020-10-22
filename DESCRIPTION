@@ -1,7 +1,7 @@
 Package: eventglm
 Type: Package
 Title: Regression Models for Event History Outcomes
-Version: 1.0
+Version: 1.0.0
 Authors@R: 
     c(person(given = "Michael C",
              family = "Sachs",
@@ -25,8 +25,8 @@ Description: A user friendly, easy to understand way of doing event history regr
     for features including plotting of residuals, the use of sampling weights, and corrected
     variance estimation. 
 License: GPL-3
-URL: https://sachsmc.github.io/eventglm
-BugReports: https://github.com/sachsmc/eventglm/issues
+URL: https://sachsmc.github.io/eventglm/
+BugReports: https://github.com/sachsmc/eventglm/issues/
 Encoding: UTF-8
 LazyData: true
 Suggests: 
