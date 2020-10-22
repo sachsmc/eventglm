@@ -24,7 +24,7 @@ Compute jackknife pseudo-observations of the cause-specific cumulative incidence
 \examples{
 
 sfit.cuminc <- survival::survfit(survival::Surv(etime, event) ~ 1, data = mgus2)
-mrs <- with(mgus2, survival::Surv(etime, event))
+mrs <- with(mgus2, Surv(etime, event))
 pseudo.obs <- jackknife.competing.risks2(sfit.cuminc, times = 200, cause = "pcm", mrs)
 mean(pseudo.obs)
 # agrees with

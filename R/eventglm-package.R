@@ -12,3 +12,7 @@
 #' @useDynLib eventglm, .registration=TRUE
 #' @importFrom stats coef model.frame model.matrix model.response .getXlevels model.offset model.weights naprint pnorm predict quasi residuals residuals.glm terms update update.formula vcov qnorm setNames
 NULL
+
+#' @importFrom survival Surv
+#' @export
+survival::Surv

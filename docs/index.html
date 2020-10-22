@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0</span>
       </span>
     </div>
 
@@ -103,8 +103,7 @@
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
 <p>The main functions users will use are <code>cumincglm</code> and <code>rmeanglm</code>. These are generalized linear regression models for the cumulative incidence and restricted mean of a censored time to event outcome, with or without competing risks. The models are specified just like <code>glm</code>, but the outcome must be a call to <code>Surv</code> (like in <code>coxph</code>), and you must specify the <code>time</code> argument (the fixed time at which the cumulative incidence or restricted mean is computed).</p>
-<pre class="{r}"><code>library(survival)
-library(eventglm)
+<pre class="{r}"><code>library(eventglm)
 
 colon.cifit &lt;- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.cifit)
@@ -135,7 +134,7 @@ b.ci &lt;- colon.cifit$coefficients</code></pre>
 <h2>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
+<li><small><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></small></li>
 </ul>
 </div>
 <div class="developers">

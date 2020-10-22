@@ -121,7 +121,7 @@ The estimates don't change (much) and the standard errors reduce by about 5\%.
 
 Our next example involves the `mgus2` dataset, included in the package: 
 
-```{r}
+```{r, eval = 2}
 ?mgus2
 head(mgus2)
 ```

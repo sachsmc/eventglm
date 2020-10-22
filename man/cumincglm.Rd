@@ -116,11 +116,11 @@ estimating differences in the cumulative incidence, "log" for estimating
 ratios, and any of the other link functions supported by \link[stats]{quasi}.
 }
 \examples{
-    cumincipcw <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+    cumincipcw <- cumincglm(Surv(etime, event) ~ age + sex,
          time = 200, cause = "pcm", link = "identity",
          model.censoring = "independent", data = mgus2)
 # stratified on only the categorical covariate
-     cumincipcw2 <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+     cumincipcw2 <- cumincglm(Surv(etime, event) ~ age + sex,
                          time = 200, cause = "pcm", link = "identity",
                          model.censoring = "stratified",
                          formula.censoring = ~ sex, data = mgus2)

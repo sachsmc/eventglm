@@ -1,8 +1,8 @@
 test_that("Residuals work", {
-    cuminctest <- cumincglm(survival::Surv(etime, event) ~ sex,
+    cuminctest <- cumincglm(Surv(etime, event) ~ sex,
                             time = 200, cause = "pcm", link = "identity", data = mgus2)
 
-    cuminclog <- cumincglm(survival::Surv(etime, event) ~ age,
+    cuminclog <- cumincglm(Surv(etime, event) ~ age,
                             time = 200, cause = "pcm", link = "cloglog", data = mgus2)
 
     t1 <- residuals(cuminclog)
@@ -11,7 +11,7 @@ test_that("Residuals work", {
 
     #plot(t1 ~ mgus2$age)
 
-    survtest <- cumincglm(survival::Surv(time, status) ~ age,
+    survtest <- cumincglm(Surv(time, status) ~ age,
                           time = 1000, link = "identity", data = colon)
 
     s1 <- residuals(survtest)
@@ -22,14 +22,14 @@ test_that("Residuals work", {
 
     ## restricted mean should be no transformation
 
-    rmeantest <- rmeanglm(survival::Surv(time, status) ~ age,
+    rmeantest <- rmeanglm(Surv(time, status) ~ age,
                           time = 1000, link = "identity", data = colon)
 
     expect_true(is.numeric(confint(rmeantest)))
 
     expect_error(vcov(rmeantest, type = "corrected"))
 
-    rmeantest2 <- rmeanglm(survival::Surv(etime, event) ~ sex,
+    rmeantest2 <- rmeanglm(Surv(etime, event) ~ sex,
                           time = 200, cause = "pcm", link = "identity", data = mgus2)
 
 })
@@ -37,20 +37,20 @@ test_that("Residuals work", {
 test_that("ipcw works", {
 
 
-    cumincipcw <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+    cumincipcw <- cumincglm(Surv(etime, event) ~ age + sex,
                             time = 200, cause = "pcm", link = "identity",
                             model.censoring = "independent", data = mgus2)
 
-    cumincipcw2 <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+    cumincipcw2 <- cumincglm(Surv(etime, event) ~ age + sex,
                             time = 200, cause = "pcm", link = "identity",
                             model.censoring = "stratified",
                             formula.censoring = ~ sex, data = mgus2)
 
-    cumincipcw3 <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+    cumincipcw3 <- cumincglm(Surv(etime, event) ~ age + sex,
                              time = 200, cause = "pcm", link = "identity",
                              model.censoring = "aareg",
                              data = mgus2)
-    cumincipcw4 <- cumincglm(survival::Surv(etime, event) ~ age + sex,
+    cumincipcw4 <- cumincglm(Surv(etime, event) ~ age + sex,
                              time = 200, cause = "pcm", link = "identity",
                              model.censoring = "coxph",
                              data = mgus2)
@@ -60,22 +60,22 @@ test_that("ipcw works", {
     expect_true(cumincipcw$coefficients[3] - cumincipcw4$coefficients[3] < 1e-3)
 
 
-    rmeanipcw1 <- rmeanglm(survival::Surv(etime, event) ~ age + sex,
+    rmeanipcw1 <- rmeanglm(Surv(etime, event) ~ age + sex,
                              time = 200, cause = "pcm", link = "identity",
                              model.censoring = "independent",
                              formula.censoring = ~ sex, data = mgus2)
 
-    rmeanipcw2 <- rmeanglm(survival::Surv(etime, event) ~ age + sex,
+    rmeanipcw2 <- rmeanglm(Surv(etime, event) ~ age + sex,
                              time = 200, cause = "pcm", link = "identity",
                              model.censoring = "stratified",
                              formula.censoring = ~ sex, data = mgus2)
 
-    rmeanipcw3 <- rmeanglm(survival::Surv(etime, event) ~ age + sex,
+    rmeanipcw3 <- rmeanglm(Surv(etime, event) ~ age + sex,
                            time = 200, cause = "pcm", link = "identity",
                            model.censoring = "aareg",
                            formula.censoring = ~ age + sex, data = mgus2)
 
-    rmeanipcw4 <- rmeanglm(survival::Surv(etime, event) ~ age + sex,
+    rmeanipcw4 <- rmeanglm(Surv(etime, event) ~ age + sex,
                            time = 200, cause = "pcm", link = "identity",
                            model.censoring = "coxph",
                            formula.censoring = ~ age + sex, data = mgus2)

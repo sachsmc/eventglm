@@ -8,7 +8,7 @@
 #' @examples
 #'
 #' sfit.surv <- survival::survfit(survival::Surv(time, status) ~ 1, data = colon)
-#' mrs <- with(colon, survival::Surv(time, status))
+#' mrs <- with(colon, Surv(time, status))
 #' pseudo.obs <- jackknife.survival2(sfit.surv, times = 1000, mrs)
 #' mean(pseudo.obs)
 #' # agrees with
@@ -42,7 +42,7 @@ jackknife.survival2 <- function(object,times,mr){
 #' @examples
 #'
 #' sfit.cuminc <- survival::survfit(survival::Surv(etime, event) ~ 1, data = mgus2)
-#' mrs <- with(mgus2, survival::Surv(etime, event))
+#' mrs <- with(mgus2, Surv(etime, event))
 #' pseudo.obs <- jackknife.competing.risks2(sfit.cuminc, times = 200, cause = "pcm", mrs)
 #' mean(pseudo.obs)
 #' # agrees with
@@ -78,7 +78,7 @@ jackknife.competing.risks2 <- function(object,times,cause,mr){
 #' @examples
 #'
 #' sfit.surv <- survival::survfit(survival::Surv(time, status) ~ 1, data = colon)
-#' mrs <- with(colon, survival::Surv(time, status))
+#' mrs <- with(colon, Surv(time, status))
 #' jackvals <- leaveOneOut.survival2(sfit.surv, times = 1000, mrs)
 
 
@@ -131,7 +131,7 @@ leaveOneOut.survival2 <- function(object,times,mr){
 #' @examples
 #'
 #' sfit.cuminc <- survival::survfit(survival::Surv(etime, event) ~ 1, data = mgus2)
-#' mrs <- with(mgus2, survival::Surv(etime, event))
+#' mrs <- with(mgus2, Surv(etime, event))
 #' jackvals <- leaveOneOut.competing.risks2(sfit.cuminc, times = 200, cause = "pcm", mrs)
 
 
@@ -197,7 +197,7 @@ leaveOneOut.competing.risks2 <- function(object, times, cause, mr){
 #' @examples
 #'
 #' sfit.surv <- survival::survfit(survival::Surv(time, status) ~ 1, data = colon)
-#' mrs <- with(colon, survival::Surv(time, status))
+#' mrs <- with(colon, Surv(time, status))
 #' jackvals <- leaveOneOut.survival(sfit.surv, 1000, mrs)
 
 
@@ -257,7 +257,7 @@ leaveOneOut.survival <- function(object, times, mr){
 #' @examples
 #'
 #' sfit.cuminc <- survival::survfit(survival::Surv(etime, event) ~ 1, data = mgus2)
-#' mrs <- with(mgus2, survival::Surv(etime, event))
+#' mrs <- with(mgus2, Surv(etime, event))
 #' jackvals <- leaveOneOut.competing.risks(sfit.cuminc, times = 200, cause = "pcm", mrs)
 
 

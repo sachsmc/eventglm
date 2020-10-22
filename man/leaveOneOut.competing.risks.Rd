@@ -24,6 +24,6 @@ This version computes them for all times up to \code{times}, for the restricted 
 \examples{
 
 sfit.cuminc <- survival::survfit(survival::Surv(etime, event) ~ 1, data = mgus2)
-mrs <- with(mgus2, survival::Surv(etime, event))
+mrs <- with(mgus2, Surv(etime, event))
 jackvals <- leaveOneOut.competing.risks(sfit.cuminc, times = 200, cause = "pcm", mrs)
 }

@@ -24,6 +24,6 @@ be called by the user.
 \examples{
 
 sfit.surv <- survival::survfit(survival::Surv(time, status) ~ 1, data = colon)
-mrs <- with(colon, survival::Surv(time, status))
+mrs <- with(colon, Surv(time, status))
 jackvals <- leaveOneOut.survival2(sfit.surv, times = 1000, mrs)
 }

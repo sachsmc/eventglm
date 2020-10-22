@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute jackknife pseudo-observations of the cause-specific cumulative incidence for competing risks — leaveOneOut.competing.risks • eventglm</title>
+<title>Objects exported from other packages — reexports • eventglm</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,13 @@
 
 
 
-<meta property="og:title" content="Compute jackknife pseudo-observations of the cause-specific cumulative incidence for competing risks — leaveOneOut.competing.risks" />
-<meta property="og:description" content="This version computes them for all times up to times, for the restricted mean lifetime lost" />
+<meta property="og:title" content="Objects exported from other packages — reexports" />
+<meta property="og:description" content="These objects are imported from other packages. Follow the links
+below to see their documentation.
+
+  survivalSurv
+
+" />
 
 
 
@@ -120,47 +125,23 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute jackknife pseudo-observations of the cause-specific cumulative incidence for competing risks</h1>
-    <small class="dont-index">Source: <a href='https://github.com/sachsmc/eventglm/blob/master/R/jackknife-cuminc.R'><code>R/jackknife-cuminc.R</code></a></small>
-    <div class="hidden name"><code>leaveOneOut.competing.risks.Rd</code></div>
+    <h1>Objects exported from other packages</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sachsmc/eventglm/blob/master/R/eventglm-package.R'><code>R/eventglm-package.R</code></a></small>
+    <div class="hidden name"><code>reexports.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This version computes them for all times up to <code>times</code>, for the restricted mean lifetime lost</p>
+    <p>These objects are imported from other packages. Follow the links
+below to see their documentation.</p>
+<dl'>
+  <dt>survival</dt><dd><p><code><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></code></p></dd>
+
+</dl>
     </div>
 
-    <pre class="usage"><span class='fu'>leaveOneOut.competing.risks</span>(<span class='no'>object</span>, <span class='no'>times</span>, <span class='no'>cause</span>, <span class='no'>mr</span>)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>object</th>
-      <td><p>A survfit object, with competing events</p></td>
-    </tr>
-    <tr>
-      <th>times</th>
-      <td><p>Times at which the cumulative incidence is computed, must be length 1</p></td>
-    </tr>
-    <tr>
-      <th>cause</th>
-      <td><p>Value indicating for which cause the cumulative incidence is to be computed, it must match one of the values available in object (see example)</p></td>
-    </tr>
-    <tr>
-      <th>mr</th>
-      <td><p>Model response, the result of a call to Surv, or a matrix with two columns: "time" (observed follow up time) and "status" (0 = censored, 1, ..., k = event types)</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A vector of jackknifed values of the cause-specific cumulative incidence at time times</p>
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='no'>sfit.cuminc</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>survival</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/survfit.html'>survfit</a></span>(<span class='kw pkg'>survival</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span>(<span class='no'>etime</span>, <span class='no'>event</span>) ~ <span class='fl'>1</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>mgus2</span>)
-<span class='no'>mrs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>with</a></span>(<span class='no'>mgus2</span>, <span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span>(<span class='no'>etime</span>, <span class='no'>event</span>))
-<span class='no'>jackvals</span> <span class='kw'>&lt;-</span> <span class='fu'>leaveOneOut.competing.risks</span>(<span class='no'>sfit.cuminc</span>, <span class='kw'>times</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>cause</span> <span class='kw'>=</span> <span class='st'>"pcm"</span>, <span class='no'>mrs</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

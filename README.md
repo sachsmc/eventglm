@@ -24,7 +24,6 @@ remotes::install_github("sachsmc/eventglm")
 The main functions users will use are `cumincglm` and `rmeanglm`. These are generalized linear regression models for the cumulative incidence and restricted mean of a censored time to event outcome, with or without competing risks. The models are specified just like `glm`, but the outcome must be a call to `Surv` (like in `coxph`), and you must specify the `time` argument (the fixed time at which the cumulative incidence or restricted mean is computed).
 
 ```{r}
-library(survival)
 library(eventglm)
 
 colon.cifit <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
