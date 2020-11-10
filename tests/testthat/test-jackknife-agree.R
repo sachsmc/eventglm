@@ -8,7 +8,8 @@ test_that("Jackknife agrees with prodlim", {
     mr <- with(mgus2, survival::Surv(etime, event))
     myest <- eventglm:::jackknife.competing.risks2(sfit, times = 200, cause = "pcm", mr)
 
-    expect_true(all(myest == jackk2))
+    head(cbind(myest, jackk2[, 1]))
+    expect_true(all(abs(myest - jackk2[, 1]) < 1e-5))
 
 
     sfit.surv <- survival::survfit(survival::Surv(time, status) ~ 1, data = colon)
@@ -18,7 +19,7 @@ test_that("Jackknife agrees with prodlim", {
     mrs <- with(colon, survival::Surv(time, status))
     myests <- eventglm:::jackknife.survival2(sfit.surv, times = 1000, mrs)
 
-    expect_true(all(myests == jack.s))
+    expect_true(all(abs(myests - jack.s[, 1]) < 1e-5))
 
 
     ## restricted mean
@@ -27,7 +28,8 @@ test_that("Jackknife agrees with prodlim", {
     myests <- eventglm:::leaveOneOut.survival(sfit.surv, 1000, mrs)
 
     expect_true(all(dim(jack.s) == dim(myests)))
-    expect_true(all(jack.s == myests[order(mrs[,"time"],-1.0 * (mrs[,"status"] != 0)),]))
+
+    expect_true(all(abs(jack.s - myests[order(mrs[,"time"],-1.0 * (mrs[,"status"] != 0)),]) < 1e-5))
 
 
     times <- sfit$time[sfit$time <= 200]
@@ -35,6 +37,7 @@ test_that("Jackknife agrees with prodlim", {
     myests2 <- eventglm:::leaveOneOut.competing.risks(sfit, 200, cause = "pcm", mr)
 
     expect_true(all(dim(jack.s2) == dim(myests2)))
-    expect_true(all(jack.s2 == myests2[order(mr[,"time"],-1.0 * (mr[,"status"] != 0)),]))
+    expect_true(all(abs(jack.s2 -
+                            myests2[order(mr[,"time"],-1.0 * (mr[,"status"] != 0)),]) < 1e-5))
 
 })

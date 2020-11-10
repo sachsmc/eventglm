@@ -1,4 +1,5 @@
-This is a resubmission to fix a few issues in the DESCRIPTION. 
+This is a resubmission to fix errors in the CRAN checks on solaris. 
 
-- I removed the extra spaces in the Description field. 
-- I added a citation with DOI to a review paper about the methodology.
+- I reproduced the errors using the solaris platforms on Rhub
+- Updated the tests to correctly compare floating point numbers (sorry!)
+- Confirmed that the check passes on solaris using Rhub (R-release and R-release Oracle developer studio 12.6)
