@@ -78,7 +78,7 @@ the other link functions supported by quasi." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -102,6 +102,9 @@ the other link functions supported by quasi." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/example-analysis.html">Examples of using eventglm and interpreting the results</a>
+    </li>
+    <li>
+      <a href="../articles/stata-sas-comparason.html">Comparison to other software</a>
     </li>
   </ul>
 </li>
@@ -144,27 +147,27 @@ differences in the restricted mean, "log" for estimating ratios, and any of
 the other link functions supported by <a href='https://rdrr.io/r/stats/family.html'>quasi</a>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>rmeanglm</span>(
-  <span class='no'>formula</span>,
-  <span class='no'>time</span>,
-  <span class='kw'>cause</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>link</span> <span class='kw'>=</span> <span class='st'>"identity"</span>,
-  <span class='kw'>model.censoring</span> <span class='kw'>=</span> <span class='st'>"independent"</span>,
-  <span class='kw'>formula.censoring</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ipcw.method</span> <span class='kw'>=</span> <span class='st'>"binder"</span>,
-  <span class='no'>data</span>,
-  <span class='no'>weights</span>,
-  <span class='no'>subset</span>,
-  <span class='no'>na.action</span>,
-  <span class='no'>offset</span>,
-  <span class='kw'>control</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>...</span>),
-  <span class='kw'>model</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>x</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>y</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>singular.ok</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>contrasts</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>rmeanglm</span><span class='op'>(</span>
+  <span class='va'>formula</span>,
+  <span class='va'>time</span>,
+  cause <span class='op'>=</span> <span class='fl'>1</span>,
+  link <span class='op'>=</span> <span class='st'>"identity"</span>,
+  model.censoring <span class='op'>=</span> <span class='st'>"independent"</span>,
+  formula.censoring <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ipcw.method <span class='op'>=</span> <span class='st'>"binder"</span>,
+  <span class='va'>data</span>,
+  <span class='va'>weights</span>,
+  <span class='va'>subset</span>,
+  <span class='va'>na.action</span>,
+  <span class='va'>offset</span>,
+  control <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='va'>...</span><span class='op'>)</span>,
+  model <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  x <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  y <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  singular.ok <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  contrasts <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -292,14 +295,15 @@ components of the returned value.</p></td>
   vcov. It inherits from glm, so predict and other glm methods are supported.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>    <span class='no'>cumincipcw</span> <span class='kw'>&lt;-</span> <span class='fu'>rmeanglm</span>(<span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span>(<span class='no'>etime</span>, <span class='no'>event</span>) ~ <span class='no'>age</span> + <span class='no'>sex</span>,
-         <span class='kw'>time</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>cause</span> <span class='kw'>=</span> <span class='st'>"pcm"</span>, <span class='kw'>link</span> <span class='kw'>=</span> <span class='st'>"identity"</span>,
-         <span class='kw'>model.censoring</span> <span class='kw'>=</span> <span class='st'>"independent"</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>mgus2</span>)
+    <pre class="examples"><div class='input'>    <span class='va'>cumincipcw</span> <span class='op'>&lt;-</span> <span class='fu'>rmeanglm</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span><span class='op'>(</span><span class='va'>etime</span>, <span class='va'>event</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>age</span> <span class='op'>+</span> <span class='va'>sex</span>,
+         time <span class='op'>=</span> <span class='fl'>200</span>, cause <span class='op'>=</span> <span class='st'>"pcm"</span>, link <span class='op'>=</span> <span class='st'>"identity"</span>,
+         model.censoring <span class='op'>=</span> <span class='st'>"independent"</span>, data <span class='op'>=</span> <span class='va'>mgus2</span><span class='op'>)</span>
 <span class='co'># stratified on only the categorical covariate</span>
-     <span class='no'>cumincipcw2</span> <span class='kw'>&lt;-</span> <span class='fu'>rmeanglm</span>(<span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span>(<span class='no'>etime</span>, <span class='no'>event</span>) ~ <span class='no'>age</span> + <span class='no'>sex</span>,
-                         <span class='kw'>time</span> <span class='kw'>=</span> <span class='fl'>200</span>, <span class='kw'>cause</span> <span class='kw'>=</span> <span class='st'>"pcm"</span>, <span class='kw'>link</span> <span class='kw'>=</span> <span class='st'>"identity"</span>,
-                         <span class='kw'>model.censoring</span> <span class='kw'>=</span> <span class='st'>"stratified"</span>,
-                         <span class='kw'>formula.censoring</span> <span class='kw'>=</span> ~ <span class='no'>sex</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>mgus2</span>)</div></pre>
+     <span class='va'>cumincipcw2</span> <span class='op'>&lt;-</span> <span class='fu'>rmeanglm</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span><span class='op'>(</span><span class='va'>etime</span>, <span class='va'>event</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>age</span> <span class='op'>+</span> <span class='va'>sex</span>,
+                         time <span class='op'>=</span> <span class='fl'>200</span>, cause <span class='op'>=</span> <span class='st'>"pcm"</span>, link <span class='op'>=</span> <span class='st'>"identity"</span>,
+                         model.censoring <span class='op'>=</span> <span class='st'>"stratified"</span>,
+                         formula.censoring <span class='op'>=</span> <span class='op'>~</span> <span class='va'>sex</span>, data <span class='op'>=</span> <span class='va'>mgus2</span><span class='op'>)</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -315,7 +319,7 @@ components of the returned value.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

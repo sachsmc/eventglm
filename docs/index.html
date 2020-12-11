@@ -12,11 +12,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Regression Models for Event History Outcomes">
-<meta property="og:description" content="A user friendly, easy to understand way of doing event history regression 
-    for marginal estimands of interest, including the cumulative incidence and the 
-    restricted mean survival, using the pseudo observation framework for estimation. 
-    The interface uses the well known formulation of a generalized linear model and allows
-    for features including plotting of residuals, the use of sampling weights, and corrected
+<meta property="og:description" content="A user friendly, easy to understand way of doing event
+    history regression for marginal estimands of interest,
+    including the cumulative incidence and the restricted mean
+    survival, using the pseudo observation framework for 
+    estimation. For a review of the methodology, see Andersen and
+    Pohar Perme (2010) &lt;doi:10.1177/0962280209105020&gt;. The
+    interface uses the well known formulation of a generalized
+    linear model and allows for features including plotting of 
+    residuals, the use of sampling weights, and corrected
     variance estimation. ">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -36,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -60,6 +64,9 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="articles/example-analysis.html">Examples of using eventglm and interpreting the results</a>
+    </li>
+    <li>
+      <a href="articles/stata-sas-comparason.html">Comparison to other software</a>
     </li>
   </ul>
 </li>
@@ -100,19 +107,19 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<pre class="{r}"><code>install.packages("eventglm")
-remotes::install_github("sachsmc/eventglm")</code></pre>
+<pre class="{r}"><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("eventglm")
+remotes::install_github("sachsmc/eventglm")</a></code></pre>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
 <p>The main functions users will use are <code>cumincglm</code> and <code>rmeanglm</code>. These are generalized linear regression models for the cumulative incidence and restricted mean of a censored time to event outcome, with or without competing risks. The models are specified just like <code>glm</code>, but the outcome must be a call to <code>Surv</code> (like in <code>coxph</code>), and you must specify the <code>time</code> argument (the fixed time at which the cumulative incidence or restricted mean is computed).</p>
-<pre class="{r}"><code>library(eventglm)
+<pre class="{r}"><code><a href="https://sachsmc.github.io/eventglm/">library(eventglm)
 
 colon.cifit &lt;- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.cifit)
 se.ci &lt;- sqrt(diag(vcov(colon.cifit, type = "robust")))
-b.ci &lt;- colon.cifit$coefficients</code></pre>
+b.ci &lt;- colon.cifit$coefficients</a></code></pre>
 <p>Check out the vignette for more examples.</p>
 </div>
 <div id="references" class="section level2">
@@ -128,6 +135,8 @@ b.ci &lt;- colon.cifit$coefficients</code></pre>
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
+<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=eventglm">https://​cloud.r-project.org/​package=eventglm</a>
+</li>
 <li>Browse source code at <br><a href="https://github.com/sachsmc/eventglm/">https://​github.com/​sachsmc/​eventglm/​</a>
 </li>
 <li>Report a bug at <br><a href="https://github.com/sachsmc/eventglm/issues/">https://​github.com/​sachsmc/​eventglm/​issues/​</a>
@@ -167,7 +176,7 @@ b.ci &lt;- colon.cifit$coefficients</code></pre>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

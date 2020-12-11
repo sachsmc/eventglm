@@ -74,7 +74,7 @@ be called by the user." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
       </span>
     </div>
 
@@ -98,6 +98,9 @@ be called by the user." />
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/example-analysis.html">Examples of using eventglm and interpreting the results</a>
+    </li>
+    <li>
+      <a href="../articles/stata-sas-comparason.html">Comparison to other software</a>
     </li>
   </ul>
 </li>
@@ -136,7 +139,7 @@ This is the workhorse for <a href='jackknife.survival2.html'>jackknife.survival2
 be called by the user.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>leaveOneOut.survival2</span>(<span class='no'>object</span>, <span class='no'>times</span>, <span class='no'>mr</span>)</pre>
+    <pre class="usage"><span class='fu'>leaveOneOut.survival2</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>times</span>, <span class='va'>mr</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -161,9 +164,10 @@ be called by the user.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='no'>sfit.surv</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>survival</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/survfit.html'>survfit</a></span>(<span class='kw pkg'>survival</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span>(<span class='no'>time</span>, <span class='no'>status</span>) ~ <span class='fl'>1</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>colon</span>)
-<span class='no'>mrs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>with</a></span>(<span class='no'>colon</span>, <span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span>(<span class='no'>time</span>, <span class='no'>status</span>))
-<span class='no'>jackvals</span> <span class='kw'>&lt;-</span> <span class='fu'>leaveOneOut.survival2</span>(<span class='no'>sfit.surv</span>, <span class='kw'>times</span> <span class='kw'>=</span> <span class='fl'>1000</span>, <span class='no'>mrs</span>)</div></pre>
+<span class='va'>sfit.surv</span> <span class='op'>&lt;-</span> <span class='fu'>survival</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/survfit.html'>survfit</a></span><span class='op'>(</span><span class='fu'>survival</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span><span class='op'>(</span><span class='va'>time</span>, <span class='va'>status</span><span class='op'>)</span> <span class='op'>~</span> <span class='fl'>1</span>, data <span class='op'>=</span> <span class='va'>colon</span><span class='op'>)</span>
+<span class='va'>mrs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>with</a></span><span class='op'>(</span><span class='va'>colon</span>, <span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span><span class='op'>(</span><span class='va'>time</span>, <span class='va'>status</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>jackvals</span> <span class='op'>&lt;-</span> <span class='fu'>leaveOneOut.survival2</span><span class='op'>(</span><span class='va'>sfit.surv</span>, times <span class='op'>=</span> <span class='fl'>1000</span>, <span class='va'>mrs</span><span class='op'>)</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -179,7 +183,7 @@ be called by the user.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

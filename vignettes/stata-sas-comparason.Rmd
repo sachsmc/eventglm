@@ -1,0 +1,104 @@
+---
+title: "Comparison to other software"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Comparison to other software}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## R code and results
+
+```{r setup}
+library(eventglm)
+
+colon.cifit <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
+summary(colon.cifit)
+confint(colon.cifit)
+```
+
+
+## Stata code and results
+
+This uses the `st0202_1` package, available from here: https://www.stata-journal.com/article.html?article=st0202_1
+
+
+```{stata, include = TRUE, eval = FALSE}
+. import delimited "colon.csv", clear
+(18 vars, 929 obs)
+
+. 
+. stset time, failure(status==1)
+
+     failure event:  status == 1
+obs. time interval:  (0, time]
+ exit on or before:  failure
+
+------------------------------------------------------------------------------
+        929  total observations
+          0  exclusions
+------------------------------------------------------------------------------
+        929  observations remaining, representing
+        452  failures in single-record/single-failure data
+  1,551,389  total analysis time at risk and under observation
+                                                at risk from t =         0
+                                     earliest observed entry t =         0
+                                          last observed exit t =     3,329
+
+. 
+. // requires st0202_1 install (search stpci)
+. stpci, at(2500)
+Pseudo-observations for the cumulative incidence function.
+Competing risks: (none).
+Computing pseudo-observations (progress dots indicate percent completed).
+----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5 
+..................................................    50
+..................................................   100
+Generated variable: pseudo.
+
+. tabulate rx, gen(rxdum)
+
+         rx |      Freq.     Percent        Cum.
+------------+-----------------------------------
+        Lev |        310       33.37       33.37
+    Lev+5FU |        304       32.72       66.09
+        Obs |        315       33.91      100.00
+------------+-----------------------------------
+      Total |        929      100.00
+
+. glm pseudo rxdum1 rxdum2, vce(robust)
+
+Iteration 0:   log pseudolikelihood =  -708.7556  
+
+Generalized linear models                         Number of obs   =        929
+Optimization     : ML                             Residual df     =        926
+                                                  Scale parameter =    .270145
+Deviance         =   250.154308                   (1/df) Deviance =    .270145
+Pearson          =   250.154308                   (1/df) Pearson  =    .270145
+
+Variance function: V(u) = 1                       [Gaussian]
+Link function    : g(u) = u                       [Identity]
+
+                                                  AIC             =   1.532305
+Log pseudolikelihood = -708.7556003               BIC             =   -6078.23
+
+------------------------------------------------------------------------------
+             |               Robust
+      pseudo |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      rxdum1 |   -.029075   .0416186    -0.70   0.485    -.1106459    .0524959
+      rxdum2 |  -.1317578   .0417443    -3.16   0.002    -.2135752   -.0499404
+       _cons |   .5434514     .02938    18.50   0.000     .4858676    .6010352
+------------------------------------------------------------------------------
+```
+
+## SAS code and results
+
+TODO
