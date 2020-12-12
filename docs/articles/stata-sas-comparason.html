@@ -207,7 +207,220 @@
 <div id="sas-code-and-results" class="section level2">
 <h2 class="hasAnchor">
 <a href="#sas-code-and-results" class="anchor"></a>SAS code and results</h2>
-<p>TODO</p>
+<p>Assuming you have loaded the colon data in your workspace.</p>
+<pre class="sas"><code>proc lifetest data=colon noprint plots=none timelist=2500 reduceout outsurv=sall;
+time time*status(0);
+run;
+
+data sall;
+set sall;
+theta = survival;
+keep theta;
+run;
+
+data sout;
+set colon;
+keep id;
+run;
+
+%macro pseudosurv;
+
+%do ip=1 %to 929;
+data coloni;
+set colon;
+where id ^= &amp;ip;
+run;
+
+proc lifetest data=coloni noprint plots=none timelist=2500 reduceout outsurv=salli;
+time time*status(0);
+run;
+
+data salli;
+set salli;
+thetamini = survival;
+id = &amp;ip;
+keep id thetamini;
+run;
+
+data souti;
+merge salli sall;
+run;
+
+data sout; 
+merge sout souti;
+by id;
+run;
+%end;
+%mend pseudosurv;
+
+%pseudosurv;
+
+
+data sout2;
+set sout;
+pseudoci = 1 - (929 * theta - (929 - 1) * thetamini);
+run;
+
+data colon2;
+merge colon sout2;
+by id;
+if rx='Lev' then rxlev = 1;
+else rxlev = 0;
+if rx='Lev+5FU' then rxlevplus = 1;
+else rxlevplus = 0;
+run;
+
+proc reg data = colon2;
+model pseudoci = rxlev rxlevplus / white;
+run;
+</code></pre>
+<div align="center">
+<table class="table table">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead>
+<tr>
+<th class="c b header" colspan="9" scope="colgroup">
+Parameter Estimates
+</th>
+</tr>
+<tr>
+<th class="l b header" rowspan="2" scope="col">
+Variable
+</th>
+<th class="r b header" rowspan="2" scope="col">
+DF
+</th>
+<th class="r b header" rowspan="2" scope="col">
+Parameter<br>Estimate
+</th>
+<th class="r b header" rowspan="2" scope="col">
+Standard<br>Error
+</th>
+<th class="r b header" rowspan="2" scope="col">
+t Value
+</th>
+<th class="r b header" rowspan="2" scope="col">
+Pr &gt; |t|
+</th>
+<th class="c b header" colspan="3" scope="colgroup">
+Heteroscedasticity Consistent
+</th>
+</tr>
+<tr>
+<th class="r b header" scope="col">
+Standard<br>Error
+</th>
+<th class="r b header" scope="col">
+t Value
+</th>
+<th class="r b header" scope="col">
+Pr &gt; |t|
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th class="l rowheader" scope="row">
+Intercept
+</th>
+<th class="r data">
+1
+</th>
+<td class="r data">
+0.54345
+</td>
+<td class="r data">
+0.02928
+</td>
+<td class="r data">
+18.56
+</td>
+<td class="r data">
+&lt;.0001
+</td>
+<td class="r data">
+0.02936
+</td>
+<td class="r data">
+18.51
+</td>
+<td class="r data">
+&lt;.0001
+</td>
+</tr>
+<tr>
+<th class="l rowheader" scope="row">
+rxlev
+</th>
+<th class="r data">
+1
+</th>
+<td class="r data" nowrap>
+-0.02907
+</td>
+<td class="r data">
+0.04158
+</td>
+<td class="r data" nowrap>
+-0.70
+</td>
+<td class="r data">
+0.4846
+</td>
+<td class="r data">
+0.04160
+</td>
+<td class="r data" nowrap>
+-0.70
+</td>
+<td class="r data">
+0.4847
+</td>
+</tr>
+<tr>
+<th class="l rowheader" scope="row">
+rxlevplus
+</th>
+<th class="r data">
+1
+</th>
+<td class="r data" nowrap>
+-0.13176
+</td>
+<td class="r data">
+0.04179
+</td>
+<td class="r data" nowrap>
+-3.15
+</td>
+<td class="r data">
+0.0017
+</td>
+<td class="r data">
+0.04172
+</td>
+<td class="r data" nowrap>
+-3.16
+</td>
+<td class="r data">
+0.0016
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
   </div>
 
