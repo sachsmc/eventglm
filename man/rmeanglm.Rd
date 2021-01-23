@@ -52,7 +52,8 @@ independent of the censoring time, and that the censoring model is
 correctly specified. If "independent", we assume completely independent
 censoring, i.e., that the time to event and covariates are independent of
 the censoring time. the censoring time is independent of the covariates in
-the model.}
+the model. Can also be a custom function, see Details and the
+"Extending eventglm" vignette.}
 
 \item{formula.censoring}{A one sided formula (e.g., \code{~ x1 + x2})
 specifying the model for the censoring distribution. If NULL, uses the same
@@ -116,6 +117,17 @@ mean/lifetime lost up to a particular time (specified by the \code{time}
 argument) with covariates. The link function can be "identity" for estimating
 differences in the restricted mean, "log" for estimating ratios, and any of
 the other link functions supported by \link[stats]{quasi}.
+}
+\details{
+The argument "model.censoring" determines how the pseudo observations
+are calculated. This can be the name of a function or the function itself, which
+must have arguments "formula", "time", "cause", "data", "type",
+"formula.censoring", and "ipcw.method". If it is the name of a function, this code
+will look for a function with the prefix "pseudo_" first, to avoid clashes with
+related methods such as coxph. The function then must return a vector
+of pseudo observations, one for each subject in data which are used in subsequent
+calculations. For examples of the implementation, see the "pseudo-modules.R"
+file, or the vignette "Extending eventglm".
 }
 \examples{
     cumincipcw <- rmeanglm(Surv(etime, event) ~ age + sex,

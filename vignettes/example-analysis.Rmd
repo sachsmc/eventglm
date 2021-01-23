@@ -66,7 +66,7 @@ And we can now do inference using the `eventglm` package. First, we fit a regres
 colon.cifit <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.cifit)
 se.ci <- sqrt(diag(vcov(colon.cifit, type = "robust")))
-b.ci <- colon.cifit$coefficients
+b.ci <- coefficients(colon.cifit)
 conf.ci <- confint(colon.cifit)
 ```
 We find that compared to observation alone, the Levamisole alone treatment group has a `r round(b.ci[2], 2)` difference in the cumulative incidence of death at 2500 days, with 95\% confidence interval `r round(conf.ci[2,], 2)`, while the Levamisole plus 5-FU group has a `r round(b.ci[3], 2)` difference in the cumulative incidence of death at 2500 days, with 95\% confidence interval `r round(conf.ci[3,], 2)`. This roughly agrees with the Kaplan-Meier estimates from survfit above: 
@@ -83,7 +83,7 @@ We can fit another model using the log link to obtain estimates of the log relat
 ```{r}
 colon.rr <- cumincglm(Surv(time, status) ~ rx, time = 2500, 
                       data = colon, link = "log")
-br.ci <- colon.rr$coefficients
+br.ci <- coefficients(colon.rr)
 confr.ci <- confint(colon.rr)
 ```
 
@@ -95,7 +95,7 @@ Now for the restricted mean:
 colon.rmfit <- rmeanglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.rmfit)
 se.rm <- sqrt(diag(vcov(colon.rmfit, type = "robust")))
-b.rm <- colon.rmfit$coefficients
+b.rm <- coefficients(colon.rmfit)
 conf.rm <- confint(colon.rmfit)
 ```
 We find that compared to observation alone, the Levamisole alone treatment group has a `r round(b.rm[2], 2)` difference in the mean time to death up to 2500 days, with 95\% confidence interval `r round(conf.rm[2,], 2)`, while the Levamisole plus 5-FU group has a `r round(b.rm[3], 2)` difference in the mean time to death up to 2500 days, with 95\% confidence interval `r round(conf.rm[3,], 2)`. Again, this roughly agrees with the Kaplan-Meier estimates from survfit above:
@@ -116,6 +116,16 @@ summary(colon.rm.adj)
 ```
 
 The estimates don't change (much) and the standard errors reduce by about 5\%. 
+
+
+## Models for survival
+
+If you would like to model the survival which is equal to one minus the cumulative incidence, it is straightforward. You can simply use the `survival = TRUE` option: 
+
+```{r}
+cumincglm(Surv(time, status) ~ rx, time = 2500, 
+                      data = colon, survival = TRUE)
+```
 
 # Monoclonal gammopathy data (Competing risks)
 
@@ -172,7 +182,7 @@ for(i in 1:nboot) {
   mgus.b <- mgus2[sample(1:nrow(mgus2), replace = TRUE), ]
   mgfitrmean.b <- rmeanglm(Surv(etime, event) ~ sex + age + hgb, cause = "pcm", 
                       time = 120, data = mgus.b)
-  bootests[i,] <- mgfitrmean.b$coefficients
+  bootests[i,] <- coefficients(mgfitrmean.b)
 }
 
 se.boot <- sqrt(diag(cov(bootests)))
@@ -316,8 +326,8 @@ cfit.cc <- cumincglm(Surv(surv_mm, status2) ~ age + sex + factor(subsite),
                      weights = samp.wt)
 cfit.full <- cumincglm(Surv(surv_mm, status2) ~ age + sex + factor(subsite), 
                      cause = "cancer death", time = 5 * 12, data = colon2)
-knitr::kable(cbind(casecohort = cfit.cc$coefficients, 
-      fullsamp = cfit.full$coefficients), digits = 2)
+knitr::kable(cbind(casecohort = coefficients(cfit.cc), 
+      fullsamp = coefficients(cfit.full)), digits = 2)
 ```
 
 

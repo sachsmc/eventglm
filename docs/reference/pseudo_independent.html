@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • eventglm</title>
+<title>Compute pseudo observations under independent censoring — pseudo_independent • eventglm</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,10 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Compute pseudo observations under independent censoring — pseudo_independent" />
+<meta property="og:description" content="Assuming completely independent censoring, i.e., censoring does not
+depend on the survival time nor any covariates in the model, the pseudo
+observations are calculated with the standard jackknife approach" />
 
 
 
@@ -58,7 +61,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -128,53 +131,83 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/sachsmc/eventglm/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Compute pseudo observations under independent censoring</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sachsmc/eventglm/blob/master/R/pseudo-modules.R'><code>R/pseudo-modules.R</code></a></small>
+    <div class="hidden name"><code>pseudo_independent.Rd</code></div>
     </div>
 
-    <div id="eventglm-110" class="section level1">
-<h1 class="page-header" data-toc-text="1.1.0">
-<a href="#eventglm-110" class="anchor"></a>eventglm 1.1.0<small> Unreleased </small>
-</h1>
-<p>New features and vignette:</p>
-<ul>
-<li>Methods for computing pseudo observations are now in modules.</li>
-<li>Users can define their own modules for computing pseudo observations</li>
-<li>Option to use survival instead of cumulative incidence in standard models</li>
-</ul>
-</div>
-    <div id="eventglm-102" class="section level1">
-<h1 class="page-header" data-toc-text="1.0.2">
-<a href="#eventglm-102" class="anchor"></a>eventglm 1.0.2<small> 2020-11-10 </small>
-</h1>
-<ul>
-<li>Update tests/jackknife-agree.R to do tolerance based comparison rather than floating point comparison</li>
-</ul>
-</div>
-    <div id="eventglm-101" class="section level1">
-<h1 class="page-header" data-toc-text="1.0.1">
-<a href="#eventglm-101" class="anchor"></a>eventglm 1.0.1<small> 2020-11-06 </small>
-</h1>
-<ul>
-<li>fix typos and add reference to DESCRIPTION</li>
-</ul>
-</div>
-    <div id="eventglm-100" class="section level1">
-<h1 class="page-header" data-toc-text="1.0.0">
-<a href="#eventglm-100" class="anchor"></a>eventglm 1.0.0<small> Unreleased </small>
-</h1>
-<ul>
-<li>Initial release</li>
-</ul>
-</div>
-  </div>
+    <div class="ref-description">
+    <p>Assuming completely independent censoring, i.e., censoring does not
+depend on the survival time nor any covariates in the model, the pseudo
+observations are calculated with the standard jackknife approach</p>
+    </div>
 
+    <pre class="usage"><span class='fu'>pseudo_independent</span><span class='op'>(</span>
+  <span class='va'>formula</span>,
+  <span class='va'>time</span>,
+  cause <span class='op'>=</span> <span class='fl'>1</span>,
+  <span class='va'>data</span>,
+  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"cuminc"</span>, <span class='st'>"survival"</span>, <span class='st'>"rmean"</span><span class='op'>)</span>,
+  formula.censoring <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ipcw.method <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>formula</th>
+      <td><p>A formula specifying the model. The left hand side must be a
+<a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a> object specifying a right censored survival or
+competing risks outcome. The status indicator, normally 0=alive, 1=dead.
+Other choices are TRUE/FALSE (TRUE = death) or 1/2 (2=death). For competing
+risks, the event variable will be a factor, whose first level is treated as
+censoring. The right hand side is the usual linear combination of
+covariates.</p></td>
+    </tr>
+    <tr>
+      <th>time</th>
+      <td><p>Numeric constant specifying the time at which the cumulative
+incidence or survival probability effect estimates are desired.</p></td>
+    </tr>
+    <tr>
+      <th>cause</th>
+      <td><p>Numeric or character constant specifying the cause indicator of
+interest.</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>Data frame in which all variables of formula can be interpreted.</p></td>
+    </tr>
+    <tr>
+      <th>type</th>
+      <td><p>One of "survival", "cuminc", or "rmean"</p></td>
+    </tr>
+    <tr>
+      <th>formula.censoring</th>
+      <td><p>Not used with this method, see aareg or coxph</p></td>
+    </tr>
+    <tr>
+      <th>ipcw.method</th>
+      <td><p>Not used with this method</p></td>
+    </tr>
+    </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A vector of jackknife pseudo observations</p>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>POi</span> <span class='op'>&lt;-</span> <span class='fu'>pseudo_independent</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span><span class='op'>(</span><span class='va'>time</span>, <span class='va'>status</span><span class='op'>)</span> <span class='op'>~</span> <span class='fl'>1</span>, <span class='fl'>1500</span>, cause <span class='op'>=</span> <span class='fl'>1</span>, data <span class='op'>=</span> <span class='va'>colon</span>, type <span class='op'>=</span> <span class='st'>"survival"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>POi</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0.5980774</div><div class='input'>
+</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 

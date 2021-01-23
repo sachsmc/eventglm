@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -64,6 +64,9 @@
   <ul class="dropdown-menu" role="menu">
 <li>
       <a href="articles/example-analysis.html">Examples of using eventglm and interpreting the results</a>
+    </li>
+    <li>
+      <a href="articles/extenstions.html">Extending eventglm</a>
     </li>
     <li>
       <a href="articles/stata-sas-comparason.html">Comparison to other software</a>
@@ -119,8 +122,8 @@ remotes::install_github("sachsmc/eventglm")</a></code></pre>
 colon.cifit &lt;- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon)
 summary(colon.cifit)
 se.ci &lt;- sqrt(diag(vcov(colon.cifit, type = "robust")))
-b.ci &lt;- colon.cifit$coefficients</a></code></pre>
-<p>Check out the vignette for more examples.</p>
+b.ci &lt;- coefficients(colon.cifit)</a></code></pre>
+<p>Check out the vignettes for more examples and details.</p>
 </div>
 <div id="references" class="section level2">
 <h2 class="hasAnchor">

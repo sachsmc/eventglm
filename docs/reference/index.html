@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -95,6 +95,9 @@
   <ul class="dropdown-menu" role="menu">
     <li>
       <a href="../articles/example-analysis.html">Examples of using eventglm and interpreting the results</a>
+    </li>
+    <li>
+      <a href="../articles/extenstions.html">Extending eventglm</a>
     </li>
     <li>
       <a href="../articles/stata-sas-comparason.html">Comparison to other software</a>
@@ -139,8 +142,82 @@
     <tbody>
       <tr>
         <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
+          <h2 id="section-main-functions" class="hasAnchor"><a href="#section-main-functions" class="anchor"></a>Main functions</h2>
+          <p class="section-desc"><p>Most users will only need to use these functions.</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="cumincglm.html">cumincglm()</a></code> </p>
+        </td>
+        <td><p>Generalized linear models for cumulative incidence</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="rmeanglm.html">rmeanglm()</a></code> </p>
+        </td>
+        <td><p>Generalized linear models for the restricted mean survival</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="eventglm.html">eventglm</a></code> </p>
+        </td>
+        <td><p>Regression Models for Event History Outcomes</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-methods" class="hasAnchor"><a href="#section-methods" class="anchor"></a>Methods</h2>
+          <p class="section-desc"><p>S3 methods for objects returned by the main functions</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="print.pseudoglm.html">print(<i>&lt;pseudoglm&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Print method for pseudoglm</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="residuals.pseudoglm.html">residuals(<i>&lt;pseudoglm&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Pseudo-observation scaled residuals</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="summary.pseudoglm.html">summary(<i>&lt;pseudoglm&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Summary method</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="vcov.pseudoglm.html">vcov(<i>&lt;pseudoglm&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Compute covariance matrix of regression coefficient estimates</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="confint.pseudoglm.html">confint(<i>&lt;pseudoglm&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Confidence Intervals for pseudoglm Model Parameters</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-data" class="hasAnchor"><a href="#section-data" class="anchor"></a>Data</h2>
+          <p class="section-desc"><p>Built in datasets</p></p>
         </th>
       </tr>
       
@@ -157,22 +234,60 @@
       </tr><tr>
         
         <td>
-          <p><code><a href="confint.pseudoglm.html">confint(<i>&lt;pseudoglm&gt;</i>)</a></code> </p>
+          <p><code><a href="mgus2.html">mgus2</a></code> </p>
         </td>
-        <td><p>Confidence Intervals for pseudoglm Model Parameters</p></td>
+        <td><p>Monoclonal gammopathy data</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-pseudo-observation-modules" class="hasAnchor"><a href="#section-pseudo-observation-modules" class="anchor"></a>Pseudo observation modules</h2>
+          <p class="section-desc"><p>Functions implementing methods for computing pseudo observations</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
+        
+        <td>
+          <p><code><a href="pseudo_independent.html">pseudo_independent()</a></code> </p>
+        </td>
+        <td><p>Compute pseudo observations under independent censoring</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="cumincglm.html">cumincglm()</a></code> </p>
+          <p><code><a href="pseudo_stratified.html">pseudo_stratified()</a></code> </p>
         </td>
-        <td><p>Generalized linear models for cumulative incidence</p></td>
+        <td><p>Compute pseudo observations using stratified jackknife</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="eventglm.html">eventglm</a></code> </p>
+          <p><code><a href="pseudo_aareg.html">pseudo_aareg()</a></code> </p>
         </td>
-        <td><p>Regression Models for Event History Outcomes</p></td>
+        <td><p>Compute censoring weighted pseudo observations</p></td>
       </tr><tr>
+        
+        <td>
+          <p><code><a href="pseudo_coxph.html">pseudo_coxph()</a></code> </p>
+        </td>
+        <td><p>Compute censoring weighted pseudo observations</p></td>
+      </tr>
+    </tbody><tbody>
+      <tr>
+        <th colspan="2">
+          <h2 id="section-utilities" class="hasAnchor"><a href="#section-utilities" class="anchor"></a>Utilities</h2>
+          <p class="section-desc"><p>Utilities and internal functions</p></p>
+        </th>
+      </tr>
+      
+      
+    </tbody><tbody>
+      
+      
+      <tr>
         
         <td>
           <p><code><a href="get_pseudo_cuminc.html">get_pseudo_cuminc()</a></code> </p>
@@ -184,6 +299,24 @@
           <p><code><a href="get_pseudo_rmean.html">get_pseudo_rmean()</a></code> </p>
         </td>
         <td><p>Utility to get jackknife pseudo observations of restricted mean</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="calc_ipcw_pos.html">calc_ipcw_pos()</a></code> </p>
+        </td>
+        <td><p>Compute inverse probability of censoring weights pseudo observations</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="match_cause.html">match_cause()</a></code> </p>
+        </td>
+        <td><p>Match cause specification against model response</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="pseudo_rmst2.html">pseudo_rmst2()</a></code> </p>
+        </td>
+        <td><p>Compute pseudo-observations for the restricted mean survival</p></td>
       </tr><tr>
         
         <td>
@@ -220,48 +353,6 @@
           <p><code><a href="leaveOneOut.survival2.html">leaveOneOut.survival2()</a></code> </p>
         </td>
         <td><p>Compute leave one out jackknife contributions of the survival function</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="mgus2.html">mgus2</a></code> </p>
-        </td>
-        <td><p>Monoclonal gammopathy data</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="print.pseudoglm.html">print(<i>&lt;pseudoglm&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Print method for pseudoglm</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="pseudo_rmst2.html">pseudo_rmst2()</a></code> </p>
-        </td>
-        <td><p>Compute pseudo-observations for the restricted mean survival</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="residuals.pseudoglm.html">residuals(<i>&lt;pseudoglm&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Pseudo-observation scaled residuals</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="rmeanglm.html">rmeanglm()</a></code> </p>
-        </td>
-        <td><p>Generalized linear models for the restricted mean survival</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="summary.pseudoglm.html">summary(<i>&lt;pseudoglm&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Summary method</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="vcov.pseudoglm.html">vcov(<i>&lt;pseudoglm&gt;</i>)</a></code> </p>
-        </td>
-        <td><p>Compute covariance matrix of regression coefficient estimates</p></td>
       </tr>
     </tbody>
     </table>

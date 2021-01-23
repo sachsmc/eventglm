@@ -139,5 +139,5 @@ knitr::kable(sapply(list(infjack = fitinf, default = fitdefsurv),
 
 # Conclusion
 
-This opens up a lot of possibilities for future extensions of `eventglm`, and will also make it easier to maintain. Try it out with different methods, and let me know what methods you are using. 
+This opens up a lot of possibilities for future extensions of `eventglm`, and will also make it easier to maintain. Try it out with different methods, and let us know what methods you are using or would like to use. 
 

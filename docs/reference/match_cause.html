@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Changelog • eventglm</title>
+<title>Match cause specification against model response — match_cause • eventglm</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,8 @@
 
 
 
-<meta property="og:title" content="Changelog" />
+<meta property="og:title" content="Match cause specification against model response — match_cause" />
+<meta property="og:description" content="Match cause specification against model response" />
 
 
 
@@ -58,7 +59,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-news">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -128,53 +129,37 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/sachsmc/eventglm/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+    <h1>Match cause specification against model response</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sachsmc/eventglm/blob/master/R/utils.R'><code>R/utils.R</code></a></small>
+    <div class="hidden name"><code>match_cause.Rd</code></div>
     </div>
 
-    <div id="eventglm-110" class="section level1">
-<h1 class="page-header" data-toc-text="1.1.0">
-<a href="#eventglm-110" class="anchor"></a>eventglm 1.1.0<small> Unreleased </small>
-</h1>
-<p>New features and vignette:</p>
-<ul>
-<li>Methods for computing pseudo observations are now in modules.</li>
-<li>Users can define their own modules for computing pseudo observations</li>
-<li>Option to use survival instead of cumulative incidence in standard models</li>
-</ul>
-</div>
-    <div id="eventglm-102" class="section level1">
-<h1 class="page-header" data-toc-text="1.0.2">
-<a href="#eventglm-102" class="anchor"></a>eventglm 1.0.2<small> 2020-11-10 </small>
-</h1>
-<ul>
-<li>Update tests/jackknife-agree.R to do tolerance based comparison rather than floating point comparison</li>
-</ul>
-</div>
-    <div id="eventglm-101" class="section level1">
-<h1 class="page-header" data-toc-text="1.0.1">
-<a href="#eventglm-101" class="anchor"></a>eventglm 1.0.1<small> 2020-11-06 </small>
-</h1>
-<ul>
-<li>fix typos and add reference to DESCRIPTION</li>
-</ul>
-</div>
-    <div id="eventglm-100" class="section level1">
-<h1 class="page-header" data-toc-text="1.0.0">
-<a href="#eventglm-100" class="anchor"></a>eventglm 1.0.0<small> Unreleased </small>
-</h1>
-<ul>
-<li>Initial release</li>
-</ul>
-</div>
-  </div>
+    <div class="ref-description">
+    <p>Match cause specification against model response</p>
+    </div>
 
+    <pre class="usage"><span class='fu'>match_cause</span><span class='op'>(</span><span class='va'>mr</span>, <span class='va'>cause</span><span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>mr</th>
+      <td><p>model.response as returned by surv</p></td>
+    </tr>
+    <tr>
+      <th>cause</th>
+      <td><p>Numeric or string indicating the cause of interest</p></td>
+    </tr>
+    </table>
+
+
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
     </nav>
   </div>
-
 </div>
 
 

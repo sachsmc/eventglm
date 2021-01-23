@@ -32,10 +32,10 @@ reference:
     contents:
       - get_pseudo_cuminc
       - get_pseudo_rmean
+      - calc_ipcw_pos
+      - match_cause
       - pseudo_rmst2
-      - jackknife.competing.risks
       - jackknife.competing.risks2
-      - jackknife.survival
       - jackknife.survival2
       - leaveOneOut.competing.risks
       - leaveOneOut.competing.risks2

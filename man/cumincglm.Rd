@@ -126,7 +126,9 @@ estimating ratios, and any of the other link functions supported by
 The argument "model.censoring" determines how the pseudo observations
 are calculated. This can be the name of a function or the function itself, which
 must have arguments "formula", "time", "cause", "data", "type",
-"formula.censoring", and "ipcw.method". The function then must return a vector
+"formula.censoring", and "ipcw.method". If it is the name of a function, this code
+will look for a function with the prefix "pseudo_" first, to avoid clashes with
+related methods such as coxph. The function then must return a vector
 of pseudo observations, one for each subject in data which are used in subsequent
 calculations. For examples of the implementation, see the "pseudo-modules.R"
 file, or the vignette "Extending eventglm".
