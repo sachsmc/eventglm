@@ -32,7 +32,7 @@
 #'   correctly specified. If "independent", we assume completely independent
 #'   censoring, i.e., that the time to event and covariates are independent of
 #'   the censoring time. the censoring time is independent of the covariates in
-#'   the model.
+#'   the model. Can also be a custom function, see Details.
 #' @param formula.censoring A one sided formula (e.g., \code{~ x1 + x2})
 #'   specifying the model for the censoring distribution. If NULL, uses the same
 #'   mean model as for the outcome.
@@ -41,6 +41,8 @@
 #'   default, uses the number of observations as the denominator, while the
 #'   "hajek" method uses the sum of the weights as the denominator.
 #' @param data Data frame in which all variables of formula can be interpreted.
+#' @param survival Set to TRUE to use survival as the outcome. Not available for
+#'   competing risks models.
 #' @param weights an optional vector of 'prior weights' to be used in the
 #'   fitting process. Should be NULL or a numeric vector.
 #' @param subset an optional vector specifying a subset of observations to be
@@ -86,13 +88,14 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
                       model.censoring = "independent", formula.censoring = NULL,
                       ipcw.method = "binder",
                       data,
+                      survival = FALSE,
                       weights, subset,
                       na.action, offset,
                       control = list(...), model = FALSE,
                       x = TRUE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...) {
 
 
-    stopifnot(length(time) == 1)
+    stopifnot(length(time) == 1 & is.numeric(time))
     cal <- match.call()
 
     mr <- model.response(model.frame(update.formula(formula, . ~ 1), data = data))
@@ -120,8 +123,8 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
     }
 
     newdata <- do.call(rbind, lapply(1:length(time), function(i) data))
-    newdata$.Ci <- as.numeric(mr[, "status"] == 0)
-    newdata$.Tci <- mr[, "time"]
+    newdata$.Ci <- as.numeric(mr[, "status"] == 0)  # reserved variable name
+    newdata$.Tci <- mr[, "time"]                    # reserved variable name
 
 
     if(is.null(formula.censoring)) {
@@ -310,7 +313,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
     fit.lin$time <- time
     fit.lin$cause <- cause
     fit.lin$link <- link
-    fit.lin$type <- "cuminc"
+    fit.lin$type <- if(survival) "survival" else "cuminc"
 
     class(fit.lin) <- c("pseudoglm", class(fit.lin))
 

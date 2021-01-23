@@ -9,7 +9,9 @@
 #'
 print.pseudoglm <- function (x, digits = max(3L, getOption("digits") - 3L), ...)
 {
-    outcome <- switch(x$type, rmean = "restricted mean", cuminc = "cumulative incidence")
+    outcome <- switch(x$type, rmean = "restricted mean",
+                      cuminc = "cumulative incidence",
+                      survival = "survival")
     cat("\nCall:  ", paste(deparse(x$call), sep = "\n",
                            collapse = "\n"), "\n\n", sep = "")
     cat("\nModel for the", x$link, outcome, "of cause", x$cause, "at time", x$time, "\n\n")
@@ -40,7 +42,8 @@ print.pseudoglm <- function (x, digits = max(3L, getOption("digits") - 3L), ...)
 #'   \link{rmeanglm}.
 #' @param type The method to use for variance estimation; one of "corrected",
 #'   "robust", "naive", or "cluster"
-#' @param ... Arguments passed to \link[sandwich]{vcovHC}
+#' @param ... Arguments passed to \link[sandwich]{vcovHC} if type = "robust",
+#'   or to \link[sandwich]{vcovCL} if type = "cluster"
 #' @return A numeric matrix containing the variance-covariance estimates
 #'
 #' @details The "corrected" variance estimate is as described in Overgaard et
