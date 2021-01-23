@@ -7,7 +7,7 @@
 match_cause(mr, cause)
 }
 \arguments{
-\item{mr}{model.response as returned by \link{surv}}
+\item{mr}{model.response as returned by \link{Surv}}
 
 \item{cause}{Numeric or string indicating the cause of interest}
 }

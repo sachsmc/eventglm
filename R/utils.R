@@ -191,7 +191,7 @@ calc_ipcw_pos <- function(mr, time, causen, type, ipcw.method, Gi) {
 
 #' Match cause specification against model response
 #'
-#' @param mr model.response as returned by \link{surv}
+#' @param mr model.response as returned by \link{Surv}
 #' @param cause Numeric or string indicating the cause of interest
 #'
 
