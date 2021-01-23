@@ -21,6 +21,7 @@
 #' @param ipcw.method Not used with this method
 #'
 #' @return A vector of jackknife pseudo observations
+#' @export
 #'
 #' @examples
 #' POi <- pseudo_independent(Surv(time, status) ~ 1, 1500, cause = 1, data = colon, type = "survival")
@@ -33,6 +34,7 @@ pseudo_independent <- function(formula, time, cause = 1, data,
 
   margformula <- update.formula(formula, . ~ 1)
   mr <- model.response(model.frame(margformula, data = data))
+  stopifnot(attr(mr, "type") %in% c("right", "mright"))
   marginal.estimate <- survival::survfit(margformula, data = data)
 
   if(type == "cuminc") {
@@ -82,7 +84,7 @@ pseudo_independent <- function(formula, time, cause = 1, data,
 #' @param ipcw.method Not used with this method
 #'
 #' @return A vector of jackknife pseudo observations
-#'
+#' @export
 #' @examples
 #' POi <- pseudo_stratified(Surv(time, status) ~ 1, 1500, cause = 1,
 #'   data = colon, formula.censoring = ~ sex, type = "rmean")
@@ -95,6 +97,7 @@ pseudo_stratified <- function(formula, time, cause = 1, data,
 
   margformula <- update.formula(formula, . ~ 1)
   mr <- model.response(model.frame(margformula, data = data))
+  stopifnot(attr(mr, "type") %in% c("right", "mright"))
 
   if(type == "cuminc") {
 
@@ -168,7 +171,7 @@ pseudo_stratified <- function(formula, time, cause = 1, data,
 #'   "hajek" method uses the sum of the weights as the denominator.
 #'
 #' @return A vector of pseudo observations
-#'
+#' @export
 #' @examples
 #' POi <- pseudo_aareg(Surv(time, status) ~ 1, 1500, cause = 1,
 #'   data = colon, type = "rmean", formula.censoring = ~ sex + age,
@@ -183,6 +186,7 @@ pseudo_aareg <- function(formula, time, cause = 1, data,
 
   margformula <- update.formula(formula, . ~ 1)
   mr <- model.response(model.frame(margformula, data = data))
+  stopifnot(attr(mr, "type") %in% c("right", "mright"))
 
   matcau <- match_cause(mr, cause)
   causen <- matcau$causen
@@ -247,7 +251,7 @@ pseudo_aareg <- function(formula, time, cause = 1, data,
 #'   "hajek" method uses the sum of the weights as the denominator.
 #'
 #' @return A vector of pseudo observations
-#'
+#' @export
 #' @examples
 #' POi <- pseudo_coxph(Surv(time, status) ~ 1, 1500, cause = 1,
 #'   data = colon, type = "survival", formula.censoring = ~ sex + age,
@@ -262,6 +266,7 @@ pseudo_coxph <- function(formula, time, cause = 1, data,
 
   margformula <- update.formula(formula, . ~ 1)
   mr <- model.response(model.frame(margformula, data = data))
+  stopifnot(attr(mr, "type") %in% c("right", "mright"))
 
   matcau <- match_cause(mr, cause)
   causen <- matcau$causen

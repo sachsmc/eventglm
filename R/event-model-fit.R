@@ -130,6 +130,10 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
             pseudo_function <- get(model.censoring,
                                    mode = "function", envir = parent.frame())
         }
+    } else if(is.function(model.censoring)) {
+        pseudo_function <- model.censoring
+    } else {
+        stop("invalid model.censoring, it should be a function or name of a function")
     }
 
     check_pseudo_function <- names(formals(pseudo_function)) ==
@@ -356,6 +360,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
 
     otype <- "rmean"
 
+
     if(is.character(model.censoring)) {
         pseudo_function <- tryCatch(get(paste0("pseudo_", model.censoring),
                                         mode = "function", envir = parent.frame()),
@@ -365,6 +370,10 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
             pseudo_function <- get(model.censoring,
                                    mode = "function", envir = parent.frame())
         }
+    } else if(is.function(model.censoring)) {
+        pseudo_function <- model.censoring
+    } else {
+        stop("invalid model.censoring, it should be a function or name of a function")
     }
 
     check_pseudo_function <- names(formals(pseudo_function)) == c("formula", "time", "cause", "data", "type",

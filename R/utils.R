@@ -196,7 +196,7 @@ calc_ipcw_pos <- function(mr, time, causen, type, ipcw.method, Gi) {
 #'
 
 match_cause <- function(mr, cause) {
-    if (attr(mr, "type") == "mright") {
+    if (!is.null(attr(mr, "states"))) {
         states <- attr(mr, "states")
         if (is.numeric(cause)) {
             stopifnot(cause <= length(states))
@@ -207,13 +207,9 @@ match_cause <- function(mr, cause) {
             causen <- match(cause, states)[1]
             causec <- cause
         }
-    } else if (attr(mr, "type") == "right") {
+    } else {
         causen <- 1
         causec <- "dead"
-    } else {
-        stop("Survival outcome type ",
-             attr(mr, "type"),
-             " not supported.")
     }
     list(causen = causen, causec = causec)
 

@@ -1,0 +1,143 @@
+---
+title: "Extending eventglm"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Extending eventglm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(survival)
+library(eventglm)
+```
+
+
+# Pseudo observation computation modules
+
+As of version 1.1.0, `cumincglm` and `rmeanglm` expect the argument `model.censoring` to be a function. This function is the workhorse that does the computation of the pseudo observations that are later used in the generalized linear model. A number of computation methods are built in as "modules" in the file called "pseudo-modules.R". Let us take a look at an example: 
+
+```{r}
+eventglm::pseudo_independent
+```
+
+This function, and any pseudo observation module, must take the same named arguments (though they do not all have to be used), and return a vector of pseudo observations. 
+
+
+# Custom computation functions
+
+
+## Example: Parametric pseudo observations
+
+Let us see how to define a custom function for computation of pseudo observations. In this first example, we will fit a parametric survival model with `survreg` marginally and do jackknife leave one out estimates. This may be useful if there is interval censoring, for example. 
+
+```{r}
+pseudo_parametric <- function(formula, time, cause = 1, data,
+                        type = c("cuminc", "survival", "rmean"),
+                        formula.censoring = NULL, ipcw.method = NULL){
+
+  margformula <- update.formula(formula, . ~ 1)
+  mr <- model.response(model.frame(margformula, data = data))
+  
+  marginal.estimate <- survival::survreg(margformula, data = data, 
+                                         dist = "weibull")
+
+  theta <- pweibull(time, shape = 1 / marginal.estimate$scale, 
+                    scale = exp(marginal.estimate$coefficients[1]))
+  
+  theta.i <- sapply(1:nrow(data), function(i) {
+    
+    me <- survival::survreg(margformula, data = data[-i, ], dist = "weibull")
+    pweibull(time, shape = 1 / me$scale, 
+                    scale = exp(me$coefficients[1]))
+  
+    
+  })
+  
+  POi <- theta  + (nrow(data) - 1) * (theta - theta.i)
+  POi
+
+}
+
+```
+
+
+Now let us try it out by passing it to the `cumincglm` function and compare to the default independence estimator: 
+
+```{r}
+fitpara <- cumincglm(Surv(time, status) ~ rx + sex + age, time = 2500, 
+                  model.censoring = pseudo_parametric, 
+                  data = colon)
+
+fitdef <- cumincglm(Surv(time, status) ~ rx + sex + age, time = 2500, 
+                  model.censoring = "independent", 
+                  data = colon)
+
+knitr::kable(sapply(list(parametric = fitpara, default = fitdef), 
+       coefficients))
+```
+
+You can also refer to the function with a string, omitting the "pseudo_" prefix, if you wish, e.g., 
+
+```{r, eval = FALSE}
+fit1 <- cumincglm(Surv(time, status) ~ rx + sex + age, time = 2500, 
+                  model.censoring = "parametric", 
+                  data = colon)
+```
+
+
+## Example 2: infinitesimal jackknife
+
+When the survival package version 3.0 was released, it became possible to get the influence function values returned from some estimation functions. These efficient influence functions are used in the variance calculations, and they are related to pseudo observations. More information is available in the "pseudo.Rnw" vignette of the development version of survival. We can use this feature to create a custom function for infinitesimal jackknife pseudo observations: 
+
+```{r}
+pseudo_infjack <- function(formula, time, cause = 1, data,
+                        type = c("cuminc", "survival", "rmean"),
+                        formula.censoring = NULL, ipcw.method = NULL) {
+  
+  marginal.estimate2 <- survival::survfit(update.formula(formula, . ~ 1),
+                                             data = data, influence = TRUE)
+
+     tdex <- sapply(time, function(x) max(which(marginal.estimate2$time <= x)))
+
+     pstate <- marginal.estimate2$surv[tdex]
+
+
+     ## S(t) + (n)[S(t) -S_{-i}(t)]
+     POi <- matrix(pstate, nrow = marginal.estimate2$n, ncol = length(time), byrow = TRUE) +
+         (marginal.estimate2$n) *
+         (marginal.estimate2$influence.surv[, tdex + 1])
+     
+     POi
+
+}
+```
+
+Note that this computes pseudo observations for survival, rather than the cumulative incidence, so to compare we can use the survival = TRUE option. Now we try it out
+
+```{r}
+fitinf <- cumincglm(Surv(time, status) ~ rx + sex + age, time = 2500, 
+                  model.censoring = "infjack", 
+                  data = colon)
+
+fitdefsurv <- cumincglm(Surv(time, status) ~ rx + sex + age, time = 2500, 
+                  survival = TRUE,
+                  data = colon)
+
+
+knitr::kable(sapply(list(infjack = fitinf, default = fitdefsurv), 
+       coefficients))
+```
+
+
+# Conclusion
+
+This opens up a lot of possibilities for future extensions of `eventglm`, and will also make it easier to maintain. Try it out with different methods, and let me know what methods you are using. 
+
