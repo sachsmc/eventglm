@@ -13,7 +13,8 @@
 \item{type}{The method to use for variance estimation; one of "corrected",
 "robust", "naive", or "cluster"}
 
-\item{...}{Arguments passed to \link[sandwich]{vcovHC}}
+\item{...}{Arguments passed to \link[sandwich]{vcovHC} if type = "robust",
+or to \link[sandwich]{vcovCL} if type = "cluster"}
 }
 \value{
 A numeric matrix containing the variance-covariance estimates

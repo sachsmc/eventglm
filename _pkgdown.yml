@@ -1,1 +1,43 @@
 destination: docs
+reference:
+  - title: "Main functions"
+    desc: >
+      Most users will only need to use these functions.
+    contents:
+      - cumincglm
+      - rmeanglm
+      - eventglm
+  - title: "Methods"
+    desc: "S3 methods for objects returned by the main functions"
+    contents:
+      - print.pseudoglm
+      - residuals.pseudoglm
+      - summary.pseudoglm
+      - vcov.pseudoglm
+      - confint.pseudoglm
+  - title: "Data"
+    desc: "Built in datasets"
+    contents:
+      - colon
+      - mgus2
+  - title: "Pseudo observation modules"
+    desc: "Functions implementing methods for computing pseudo observations"
+    contents:
+      - pseudo_independent
+      - pseudo_stratified
+      - pseudo_aareg
+      - pseudo_coxph
+  - title: "Utilities"
+    desc: "Utilities and internal functions"
+    contents:
+      - get_pseudo_cuminc
+      - get_pseudo_rmean
+      - pseudo_rmst2
+      - jackknife.competing.risks
+      - jackknife.competing.risks2
+      - jackknife.survival
+      - jackknife.survival2
+      - leaveOneOut.competing.risks
+      - leaveOneOut.competing.risks2
+      - leaveOneOut.survival
+      - leaveOneOut.survival2

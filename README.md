@@ -33,7 +33,7 @@ se.ci <- sqrt(diag(vcov(colon.cifit, type = "robust")))
 b.ci <- colon.cifit$coefficients
 ```
 
-Check out the vignette for more examples.
+Check out the vignettes for more examples and details.
 
 ## References
 

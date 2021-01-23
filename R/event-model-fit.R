@@ -32,7 +32,8 @@
 #'   correctly specified. If "independent", we assume completely independent
 #'   censoring, i.e., that the time to event and covariates are independent of
 #'   the censoring time. the censoring time is independent of the covariates in
-#'   the model. Can also be a custom function, see Details.
+#'   the model. Can also be a custom function, see Details and the
+#'   "Extending eventglm" vignette.
 #' @param formula.censoring A one sided formula (e.g., \code{~ x1 + x2})
 #'   specifying the model for the censoring distribution. If NULL, uses the same
 #'   mean model as for the outcome.
@@ -73,7 +74,15 @@
 #' @param ... Other arguments passed to \link[stats]{glm.fit}
 #'
 #'
-#' @details
+#' @details The argument "model.censoring" determines how the pseudo observations
+#' are calculated. This can be the name of a function or the function itself, which
+#' must have arguments "formula", "time", "cause", "data", "type",
+#' "formula.censoring", and "ipcw.method". If it is the name of a function, this code
+#' will look for a function with the prefix "pseudo_" first, to avoid clashes with
+#' related methods such as coxph. The function then must return a vector
+#' of pseudo observations, one for each subject in data which are used in subsequent
+#' calculations. For examples of the implementation, see the "pseudo-modules.R"
+#' file, or the vignette "Extending eventglm".
 #'
 #'
 #' @export
@@ -123,7 +132,8 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         }
     }
 
-    check_pseudo_function <- names(formals(pseudo_function)) == c("formula", "time", "cause", "data", "type",
+    check_pseudo_function <- names(formals(pseudo_function)) ==
+        c("formula", "time", "cause", "data", "type",
                                          "formula.censoring", "ipcw.method")
 
     if(!all(check_pseudo_function)) {
@@ -261,7 +271,8 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #'   correctly specified. If "independent", we assume completely independent
 #'   censoring, i.e., that the time to event and covariates are independent of
 #'   the censoring time. the censoring time is independent of the covariates in
-#'   the model.
+#'   the model. Can also be a custom function, see Details and the
+#'   "Extending eventglm" vignette.
 #' @param formula.censoring A one sided formula (e.g., \code{~ x1 + x2})
 #'   specifying the model for the censoring distribution. If NULL, uses the same
 #'   mean model as for the outcome.
@@ -301,6 +312,17 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #'
 #'
 #' @export
+#'
+#' @details The argument "model.censoring" determines how the pseudo observations
+#' are calculated. This can be the name of a function or the function itself, which
+#' must have arguments "formula", "time", "cause", "data", "type",
+#' "formula.censoring", and "ipcw.method". If it is the name of a function, this code
+#' will look for a function with the prefix "pseudo_" first, to avoid clashes with
+#' related methods such as coxph. The function then must return a vector
+#' of pseudo observations, one for each subject in data which are used in subsequent
+#' calculations. For examples of the implementation, see the "pseudo-modules.R"
+#' file, or the vignette "Extending eventglm".
+
 #'
 #' @examples
 #'     cumincipcw <- rmeanglm(Surv(etime, event) ~ age + sex,
