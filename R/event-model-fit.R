@@ -41,8 +41,8 @@
 #'   default, uses the number of observations as the denominator, while the
 #'   "hajek" method uses the sum of the weights as the denominator.
 #' @param data Data frame in which all variables of formula can be interpreted.
-#' @param survival Set to TRUE to use survival as the outcome. Not available for
-#'   competing risks models.
+#' @param survival Set to TRUE to use survival (one minus the cumulative incidence)
+#'   as the outcome. Not available for competing risks models.
 #' @param weights an optional vector of 'prior weights' to be used in the
 #'   fitting process. Should be NULL or a numeric vector.
 #' @param subset an optional vector specifying a subset of observations to be
@@ -72,6 +72,10 @@
 #'   \link[stats]{model.matrix.default}.
 #' @param ... Other arguments passed to \link[stats]{glm.fit}
 #'
+#'
+#' @details
+#'
+#'
 #' @export
 #'
 #' @examples
@@ -100,138 +104,39 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
     mr <- model.response(model.frame(update.formula(formula, . ~ 1), data = data))
 
-    ## match cause
-    if(attr(mr, "type") == "mright") {
-    states <- attr(mr, "states")
-    if(is.numeric(cause)) {
-        stopifnot(cause <= length(states))
-        causec <- states[cause]
-        causen <- cause
-    } else {
-        stopifnot(length(match(cause, states)) > 0)
-        causen <- match(cause, states)[1]
-        causec <- cause
-    }
-    } else if(attr(mr, "type") == "right") {
-        causen <- 1
-    } else {
-        stop("Survival outcome type ", attr(mr, "type"), " not supported.")
-    }
-
-    if(max(mr[mr[,"status"] != 0, "time"]) < time){
-        stop("Requested time is greater than largest observed event time")
-    }
-
     newdata <- do.call(rbind, lapply(1:length(time), function(i) data))
-    newdata$.Ci <- as.numeric(mr[, "status"] == 0)  # reserved variable name
-    newdata$.Tci <- mr[, "time"]                    # reserved variable name
 
+    matcau <- match_cause(mr, cause)
+    causec <- matcau$causec
+    causen <- matcau$causen
 
-    if(is.null(formula.censoring)) {
-        cens.formula <- update.formula(formula, survival::Surv(.Tci, .Ci) ~ .)
-        formula.censoring <- formula[-2]
-    } else {
-        cens.formula <- update.formula(formula.censoring, survival::Surv(.Tci, .Ci) ~ .)
+    otype <- if(survival) "survival" else "cuminc"
+
+    if(is.character(model.censoring)) {
+        pseudo_function <- tryCatch(get(paste0("pseudo_", model.censoring),
+                               mode = "function", envir = parent.frame()),
+                               error = function(e) NULL)
+
+        if(is.null(pseudo_function)) { # try without the pseudo prefix
+            pseudo_function <- get(model.censoring,
+                                   mode = "function", envir = parent.frame())
+        }
     }
 
-    if(model.censoring == "independent") {
+    check_pseudo_function <- names(formals(pseudo_function)) == c("formula", "time", "cause", "data", "type",
+                                         "formula.censoring", "ipcw.method")
 
-        marginal.estimate <- survival::survfit(update.formula(formula, . ~ 1), data = data)
+    if(!all(check_pseudo_function)) {
 
-       POi <- get_pseudo_cuminc(marginal.estimate, time, cause, mr)
-
-
-    } else if(model.censoring == "stratified") {
-
-        strata <- interaction(model.frame(formula.censoring, data = data))
-        orig.order <- 1:length(strata)
-        new.order <- rep(NA, length(strata))
-        stratified.jacks <- rep(NA, length(strata))
-        chunk <- 1
-        for(i in levels(strata)) {
-
-            thisset <- orig.order[strata == i]
-            new.order[chunk:(chunk + length(thisset) - 1)] <- thisset
-            mest.i <- survival::survfit(update.formula(formula, . ~ 1), data = data[thisset, ])
-            jres.i <- get_pseudo_cuminc(mest.i, time, cause, mr[thisset, ])
-
-            stratified.jacks[chunk:(chunk + length(thisset) - 1)] <- jres.i
-            chunk <- chunk + length(thisset)
-        }
-
-        POi <- stratified.jacks[order(new.order)]
-
-
-
-    } else if(model.censoring == "aareg") {
-
-        predmat <- model.matrix(cens.formula, data = newdata)
-
-        fitcens <- survival::aareg(cens.formula, data = newdata)
-
-        tdex <- sapply(pmin(newdata$.Tci, time), function(t) max(c(1, which(fitcens$times <= t))))
-        Gi <- rep(NA, length(tdex))
-        for(i in 1:length(tdex)) {
-
-            Gi[i] <- prod(1 - c(fitcens$coefficient[1:tdex[i], ] %*% t(predmat[i, , drop = FALSE])))
-
-        }
-        Vi <- as.numeric(mr[, "time"] < time & mr[, "status"] == causen)
-        Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
-
-        nn <- length(Vi)
-        theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
-
-        XXi <- Vi * Ii / Gi
-        if(ipcw.method == "binder") {
-
-            POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
-
-
-        } else if(ipcw.method == "hajek") {
-
-            POi <- nn * theta.n - (nn - 1) *
-                (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
-
-
-        } else {
-            stop("Weighting method ", ipcw.method, " not available, options are 'binder' or 'hajek'")
-        }
-
-    } else if(model.censoring == "coxph") {
-
-        fitcens <- survival::coxph(cens.formula, data = newdata, x = TRUE)
-        coxsurv <- survival::survfit(fitcens, newdata = newdata)
-        tdex <- sapply(pmin(newdata$.Tci, time), function(t) max(c(1, which(coxsurv$time <= t))))
-        Gi <- coxsurv$surv[cbind(tdex,1:ncol(coxsurv$surv))]
-        Vi <- as.numeric(mr[, "time"] < time & mr[, "status"] == causen)
-        Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
-
-        nn <- length(Vi)
-        theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
-
-        XXi <- Vi * Ii / Gi
-        if(ipcw.method == "binder") {
-
-            POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
-
-
-        } else if(ipcw.method == "hajek") {
-
-            POi <- nn * theta.n - (nn - 1) *
-                (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
-
-
-        } else {
-            stop("Weighting method ", ipcw.method, " not available, options are 'binder' or 'hajek'")
-        }
-
-
-    } else {
-
-        stop("Model censoring type '", model.censoring, "' not supported. Options are 'independent', 'stratified', 'aareg' or 'coxph'.")
+        missargs <- c("formula", "time", "cause", "data", "type",
+                      "formula.censoring", "ipcw.method")[!check_pseudo_function]
+        stop("Arguments", paste(missargs, collapse = ", "), "are missing from model.censoring function")
 
     }
+
+    POi <- pseudo_function(formula = formula, time = time, cause = cause,
+                           data = data, type = otype, formula.censoring = formula.censoring,
+                           ipcw.method = ipcw.method)
 
     nn <- length(POi)
 
@@ -421,154 +326,41 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
 
     mr <- model.response(model.frame(update.formula(formula, . ~ 1), data = data))
 
-    ## match cause
-    if(attr(mr, "type") == "mright") {
-        states <- attr(mr, "states")
-        if(is.numeric(cause)) {
-            stopifnot(cause <= length(states))
-            causec <- states[cause]
-            causen <- cause
-        } else {
-            stopifnot(length(match(cause, states)) > 0)
-            causen <- match(cause, states)[1]
-            causec <- cause
-        }
-    } else if(attr(mr, "type") == "right") {
-        causen <- 1
-    } else {
-        stop("Survival outcome type ", attr(mr, "type"), " not supported.")
-    }
-
-    if(max(mr[mr[,"status"] != 0, "time"]) < time){
-        stop("Requested time is greater than largest observed event time")
-    }
-
     newdata <- do.call(rbind, lapply(1:length(time), function(i) data))
-    newdata$.Ci <- as.numeric(mr[, "status"] == 0)
-    newdata$.Tci <- mr[, "time"]
 
+    matcau <- match_cause(mr, cause)
+    causec <- matcau$causec
+    causen <- matcau$causen
 
-    if(is.null(formula.censoring)) {
-        cens.formula <- update.formula(formula, survival::Surv(.Tci, .Ci) ~ .)
-        formula.censoring <- formula[-2]
-    } else {
-        cens.formula <- update.formula(formula.censoring, survival::Surv(.Tci, .Ci) ~ .)
+    otype <- "rmean"
+
+    if(is.character(model.censoring)) {
+        pseudo_function <- tryCatch(get(paste0("pseudo_", model.censoring),
+                                        mode = "function", envir = parent.frame()),
+                                    error = function(e) NULL)
+
+        if(is.null(pseudo_function)) { # try without the pseudo prefix
+            pseudo_function <- get(model.censoring,
+                                   mode = "function", envir = parent.frame())
+        }
     }
 
-    if(model.censoring == "independent") {
+    check_pseudo_function <- names(formals(pseudo_function)) == c("formula", "time", "cause", "data", "type",
+                                                                  "formula.censoring", "ipcw.method")
 
-        marginal.estimate <- survival::survfit(update.formula(formula, . ~ 1), data = data)
-        POi <- get_pseudo_rmean(marginal.estimate, time, cause, mr)
+    if(!all(check_pseudo_function)) {
 
-
-    }  else if(model.censoring == "stratified") {
-
-        strata <- interaction(model.frame(formula.censoring, data = data))
-        orig.order <- 1:length(strata)
-        new.order <- rep(NA, length(strata))
-        stratified.jacks <- rep(NA, length(strata))
-        chunk <- 1
-        for(i in levels(strata)) {
-
-            thisset <- orig.order[strata == i]
-            new.order[chunk:(chunk + length(thisset) - 1)] <- thisset
-            mest.i <- survival::survfit(update.formula(formula, . ~ 1), data = data[thisset, ])
-            jres.i <- get_pseudo_rmean(mest.i, time, cause, mr[thisset, ])
-
-            stratified.jacks[chunk:(chunk + length(thisset) - 1)] <- jres.i
-            chunk <- chunk + length(thisset)
-        }
-
-        POi <- stratified.jacks[order(new.order)]
-
-    } else if(model.censoring == "aareg") {
-
-        predmat <- model.matrix(cens.formula, data = newdata)
-
-        fitcens <- survival::aareg(cens.formula, data = newdata)
-
-        tdex <- sapply(pmin(newdata$.Tci, time), function(t) max(c(1, which(fitcens$times <= t))))
-        Gi <- rep(NA, length(tdex))
-        for(i in 1:length(tdex)) {
-
-            Gi[i] <- prod(1 - c(fitcens$coefficient[1:tdex[i], ] %*% t(predmat[i, , drop = FALSE])))
-
-        }
-        if(attr(mr, "type") == "mright") {
-            Vi <- (time - pmin(mr[, "time"], time)) * as.numeric(mr[, "status"] == causen)
-
-        } else {
-            Vi <- pmin(mr[, "time"], time)
-
-        }
-
-        Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
-
-        nn <- length(Vi)
-        theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
-
-        XXi <- Vi * Ii / Gi
-
-        if(ipcw.method == "binder") {
-
-            POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
-
-
-        } else if(ipcw.method == "hajek") {
-
-            POi <- nn * theta.n - (nn - 1) *
-                (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
-
-
-        } else {
-            stop("Weighting method ", ipcw.method, " not available, options are 'binder' or 'hajek'")
-        }
-
-
-    } else if(model.censoring == "coxph") {
-
-        fitcens <- survival::coxph(cens.formula, data = newdata, x = TRUE)
-        coxsurv <- survival::survfit(fitcens, newdata = newdata)
-        tdex <- sapply(pmin(newdata$.Tci, time), function(t) max(c(1, which(coxsurv$time <= t))))
-        Gi <- coxsurv$surv[cbind(tdex,1:ncol(coxsurv$surv))]
-
-        if(attr(mr, "type") == "mright") {
-            Vi <- (time - pmin(mr[, "time"], time)) * as.numeric(mr[, "status"] == causen)
-
-        } else {
-            Vi <- pmin(mr[, "time"], time)
-
-        }
-
-        Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
-
-        nn <- length(Vi)
-        theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
-
-        XXi <- Vi * Ii / Gi
-
-        if(ipcw.method == "binder") {
-
-            POi <- theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i) mean(XXi[-i])))
-
-
-        } else if(ipcw.method == "hajek") {
-
-            POi <- nn * theta.n - (nn - 1) *
-                (sapply(1:length(XXi), function(i) sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
-
-
-        } else {
-            stop("Weighting method ", ipcw.method, " not available, options are 'binder' or 'hajek'")
-        }
-
-    } else {
-
-        stop("Model censoring type '", model.censoring, "' not supported. Options are 'independent', 'stratified', 'aareg' or 'coxph'.")
+        missargs <- c("formula", "time", "cause", "data", "type",
+                      "formula.censoring", "ipcw.method")[!check_pseudo_function]
+        stop("Arguments", paste(missargs, collapse = ", "), "are missing from model.censoring function")
 
     }
 
+    POi <- pseudo_function(formula = formula, time = time, cause = cause,
+                           data = data, type = otype, formula.censoring = formula.censoring,
+                           ipcw.method = ipcw.method)
 
+    nn <- length(POi)
 
     newdata[["pseudo.vals"]] <- c(POi)
     newdata[["pseudo.time"]] <- rep(time, each = length(POi))
