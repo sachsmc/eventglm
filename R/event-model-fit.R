@@ -121,34 +121,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
     otype <- if(survival) "survival" else "cuminc"
 
-    if(is.character(model.censoring)) {
-        pseudo_function <- tryCatch(get(paste0("pseudo_", model.censoring),
-                               mode = "function", envir = parent.frame()),
-                               error = function(e) NULL)
-
-        if(is.null(pseudo_function)) { # try without the pseudo prefix
-            pseudo_function <- get(model.censoring,
-                                   mode = "function", envir = parent.frame())
-        }
-    } else if(is.function(model.censoring)) {
-        pseudo_function <- model.censoring
-    } else {
-        stop("invalid model.censoring, it should be a function or name of a function")
-    }
-
-    needargs <- c("formula", "time", "cause", "data", "type",
-                  "formula.censoring", "ipcw.method")
-    check_pseudo_function <- length(names(formals(pseudo_function))) ==
-        length(needargs) && names(formals(pseudo_function)) == needargs
-
-
-    if(!all(check_pseudo_function)) {
-
-        missargs <- c("formula", "time", "cause", "data", "type",
-                      "formula.censoring", "ipcw.method")[!check_pseudo_function]
-        stop("Arguments ", paste(missargs, collapse = ", "), " are missing from given model.censoring function")
-
-    }
+    pseudo_function <- check_mod_cens(model.censoring)
 
     POi <- pseudo_function(formula = formula, time = time, cause = cause,
                            data = data, type = otype, formula.censoring = formula.censoring,
@@ -156,12 +129,16 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
     nn <- length(POi)
 
-    newdata[["pseudo.vals"]] <- c(POi)
+    oldnames <- names(newdata)
+    newnames <- make.unique(c(oldnames, "pseudo.vals"))
+
+    po.nme <- newnames[length(newnames)]
+    newdata[[po.nme]] <- c(POi)
    # newdata[["pseudo.time"]] <- rep(time, each = nn)
 
 
     ## get stuff ready for glm.fit
-    formula2 <- update.formula(formula, pseudo.vals ~ .)
+    formula2 <- update.formula(formula, as.formula(paste(po.nme, "~ .")))
 
     mf <- match.call(expand.dots = FALSE)
     m <- match(c("formula", "data", "subset",
@@ -362,32 +339,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
 
     otype <- "rmean"
 
-
-    if(is.character(model.censoring)) {
-        pseudo_function <- tryCatch(get(paste0("pseudo_", model.censoring),
-                                        mode = "function", envir = parent.frame()),
-                                    error = function(e) NULL)
-
-        if(is.null(pseudo_function)) { # try without the pseudo prefix
-            pseudo_function <- get(model.censoring,
-                                   mode = "function", envir = parent.frame())
-        }
-    } else if(is.function(model.censoring)) {
-        pseudo_function <- model.censoring
-    } else {
-        stop("invalid model.censoring, it should be a function or name of a function")
-    }
-
-    check_pseudo_function <- names(formals(pseudo_function)) == c("formula", "time", "cause", "data", "type",
-                                                                  "formula.censoring", "ipcw.method")
-
-    if(!all(check_pseudo_function)) {
-
-        missargs <- c("formula", "time", "cause", "data", "type",
-                      "formula.censoring", "ipcw.method")[!check_pseudo_function]
-        stop("Arguments", paste(missargs, collapse = ", "), "are missing from model.censoring function")
-
-    }
+    pseudo_function <- check_mod_cens(model.censoring)
 
     POi <- pseudo_function(formula = formula, time = time, cause = cause,
                            data = data, type = otype, formula.censoring = formula.censoring,

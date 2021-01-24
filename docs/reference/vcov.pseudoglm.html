@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1</span>
       </span>
     </div>
 
@@ -166,15 +166,16 @@ or to <a href='http://sandwich.R-Forge.R-project.org//reference/vcovCL.html'>vco
     <p>A numeric matrix containing the variance-covariance estimates</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The "corrected" variance estimate is as described in Overgaard et
-  al. (2017) &lt;doi:10.1214/16-AOS1516&gt;, with code adapted from Overgaard's
-  Stata program. This method does not handle ties and only has
-  marginal benefits in reasonable sample sizes. The default is "robust" which
-  uses a sandwich estimator as implemented in the sandwich package. "cluster"
-  is another option if you have clustered observations. Finally "naive" uses
-  the same method as glm to compute the variance, and is known to be
-  anti-conservative. The bootstrap is another recommended option that can be
-  implemented using other tools; there is an example in the vignette.</p>
+    <p>The "corrected" variance estimate for the cumulative incidence is as
+  described in Overgaard et al. (2017) &lt;doi:10.1214/16-AOS1516&gt;, with code
+  adapted from Overgaard's Stata program. This method does not handle ties
+  and only has marginal benefits in reasonable sample sizes. The default is
+  "robust" which uses a sandwich estimator as implemented in the sandwich
+  package. "cluster" is another option if you have clustered observations.
+  Finally "naive" uses the same method as glm to compute the variance, and is
+  known to be anti-conservative. The bootstrap is another recommended option
+  that can be implemented using other tools; there is an example in the
+  vignette.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Overgaard, Morten; Parner, Erik Thorlund; Pedersen, Jan.

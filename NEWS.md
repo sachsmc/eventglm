@@ -1,3 +1,10 @@
+# eventglm 1.1.1
+
+
+Bug fixes:
+  - Check and fix name clashes for reserved variables pseudo.vals, .Tci, and .Ci
+  - Small efficiency updates in corrected covariance estimation
+
 # eventglm 1.1.0
 
 New features and vignette: 

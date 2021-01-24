@@ -192,21 +192,31 @@ pseudo_aareg <- function(formula, time, cause = 1, data,
   causen <- matcau$causen
   causec <- matcau$causec
 
-  data$.Ci <- as.numeric(mr[, "status"] == 0)
-  data$.Tci <- mr[, "time"]
+  .Ci <- as.numeric(mr[, "status"] == 0)
+  .Tci <- mr[, "time"]
+
+  oldnames <- names(data)
+  newnames <- make.unique(c(oldnames, c(".Ci", ".Tci")))
+
+  add.nme <- newnames[length(newnames) - 1:0]
+  data[[add.nme[1]]] <- c(.Ci)
+  data[[add.nme[2]]] <- c(.Tci)
+
 
   if(is.null(formula.censoring)) {
-    cens.formula <- update.formula(formula, survival::Surv(.Tci, .Ci) ~ .)
+    cens.formula <- update.formula(formula,
+                                   as.formula(sprintf("survival::Surv(%s, %s) ~ .", add.nme[2], add.nme[1])))
     formula.censoring <- formula[-2]
   } else {
-    cens.formula <- update.formula(formula.censoring, survival::Surv(.Tci, .Ci) ~ .)
+    cens.formula <- update.formula(formula.censoring,
+                                   as.formula(sprintf("survival::Surv(%s, %s) ~ .", add.nme[2], add.nme[1])))
   }
 
   predmat <- model.matrix(cens.formula, data = data)
 
   fitcens <- survival::aareg(cens.formula, data = data)
 
-  tdex <- sapply(pmin(data$.Tci, time), function(t) max(c(1, which(fitcens$times <= t))))
+  tdex <- sapply(pmin(data[[add.nme[2]]], time), function(t) max(c(1, which(fitcens$times <= t))))
   Gi <- numeric(length(tdex))
   for(i in 1:length(tdex)) {
 
@@ -272,21 +282,32 @@ pseudo_coxph <- function(formula, time, cause = 1, data,
   causen <- matcau$causen
   causec <- matcau$causec
 
-  data$.Ci <- as.numeric(mr[, "status"] == 0)
-  data$.Tci <- mr[, "time"]
+  .Ci <- as.numeric(mr[, "status"] == 0)
+  .Tci <- mr[, "time"]
+
+  oldnames <- names(data)
+  newnames <- make.unique(c(oldnames, c(".Ci", ".Tci")))
+
+  add.nme <- newnames[length(newnames) - 1:0]
+  data[[add.nme[1]]] <- c(.Ci)
+  data[[add.nme[2]]] <- c(.Tci)
+
 
   if(is.null(formula.censoring)) {
-    cens.formula <- update.formula(formula, survival::Surv(.Tci, .Ci) ~ .)
+    cens.formula <- update.formula(formula,
+                                   as.formula(sprintf("survival::Surv(%s, %s) ~ .", add.nme[2], add.nme[1])))
     formula.censoring <- formula[-2]
   } else {
-    cens.formula <- update.formula(formula.censoring, survival::Surv(.Tci, .Ci) ~ .)
+    cens.formula <- update.formula(formula.censoring,
+                                   as.formula(sprintf("survival::Surv(%s, %s) ~ .", add.nme[2], add.nme[1])))
   }
+
 
   predmat <- model.matrix(cens.formula, data = data)
 
   fitcens <- survival::coxph(cens.formula, data = data, x = TRUE)
   coxsurv <- survival::survfit(fitcens, newdata = data)
-  tdex <- sapply(pmin(data$.Tci, time), function(t) max(c(1, which(coxsurv$time <= t))))
+  tdex <- sapply(pmin(data[[add.nme[2]]], time), function(t) max(c(1, which(coxsurv$time <= t))))
   Gi <- coxsurv$surv[cbind(tdex,1:ncol(coxsurv$surv))]
 
   POi <- calc_ipcw_pos(mr, time, causen, type, ipcw.method, Gi)

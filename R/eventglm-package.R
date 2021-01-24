@@ -10,7 +10,7 @@
 #' @docType package
 #' @name eventglm
 #' @useDynLib eventglm, .registration=TRUE
-#' @importFrom stats coef model.frame model.matrix model.response .getXlevels model.offset model.weights naprint pnorm predict quasi residuals residuals.glm terms update update.formula vcov qnorm setNames
+#' @importFrom stats coef model.frame model.matrix model.response .getXlevels model.offset model.weights naprint pnorm predict quasi residuals residuals.glm terms update as.formula update.formula vcov qnorm setNames coefficients
 NULL
 
 #' @importFrom survival Surv

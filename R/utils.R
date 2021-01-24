@@ -214,3 +214,49 @@ match_cause <- function(mr, cause) {
     list(causen = causen, causec = causec)
 
 }
+
+
+#' Error check censoring model
+#'
+#' Censoring model must take the same named arguments as the predefined modules
+#' (though they do not all have to be used), and return a vector of pseudo observations.
+#'
+#' @param model.censoring censoring model specification as character or function
+#'
+
+check_mod_cens <- function(model.censoring) {
+
+
+    if(is.character(model.censoring)) {
+        pseudo_function <- tryCatch(get(paste0("pseudo_", model.censoring),
+                                        mode = "function", envir = parent.frame()),
+                                    error = function(e) NULL)
+
+        if(is.null(pseudo_function)) { # try without the pseudo prefix
+            pseudo_function <- get(model.censoring,
+                                   mode = "function", envir = parent.frame())
+        }
+    } else if(is.function(model.censoring)) {
+        pseudo_function <- model.censoring
+    } else {
+        stop("invalid model.censoring, it should be a function or name of a function")
+    }
+
+    needargs <- c("formula", "time", "cause", "data", "type",
+                  "formula.censoring", "ipcw.method")
+
+    stopifnot(length(names(formals(pseudo_function))) == length(needargs))
+
+    check_pseudo_function <- names(formals(pseudo_function)) == needargs
+
+    if(!all(check_pseudo_function)) {
+
+        missargs <- c("formula", "time", "cause", "data", "type",
+                      "formula.censoring", "ipcw.method")[!check_pseudo_function]
+        stop("Arguments ", paste(missargs, collapse = ", "), " are missing from given model.censoring function")
+
+    }
+
+    pseudo_function
+
+}

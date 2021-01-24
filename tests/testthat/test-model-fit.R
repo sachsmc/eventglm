@@ -101,14 +101,20 @@ test_that("variable names clash", {
     goodest <- cumincglm(Surv(time, status) ~ rx + surg, time = 2500, data = colon)
     clash <- cumincglm(Surv(time, status) ~ rx + pseudo.vals, time = 2500, data = colon)
 
+    expect_equal(unname(coef(goodest)), unname(coef(clash)))
+
     good2 <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon,
                        model.censoring = "coxph", formula.censoring = ~ surg)
     clash2 <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon,
                         model.censoring = "coxph", formula.censoring = ~ .Tci)
 
+    expect_equal(unname(coef(good2)), unname(coef(clash2)))
+
     good3 <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon,
                        model.censoring = "aareg", formula.censoring = ~ surg)
     clash3 <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon,
                         model.censoring = "aareg", formula.censoring = ~ .Tci)
+
+    expect_equal(unname(coef(good3)), unname(coef(clash3)))
 
 })
