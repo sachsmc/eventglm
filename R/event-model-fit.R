@@ -136,15 +136,17 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         stop("invalid model.censoring, it should be a function or name of a function")
     }
 
-    check_pseudo_function <- names(formals(pseudo_function)) ==
-        c("formula", "time", "cause", "data", "type",
-                                         "formula.censoring", "ipcw.method")
+    needargs <- c("formula", "time", "cause", "data", "type",
+                  "formula.censoring", "ipcw.method")
+    check_pseudo_function <- length(names(formals(pseudo_function))) ==
+        length(needargs) && names(formals(pseudo_function)) == needargs
+
 
     if(!all(check_pseudo_function)) {
 
         missargs <- c("formula", "time", "cause", "data", "type",
                       "formula.censoring", "ipcw.method")[!check_pseudo_function]
-        stop("Arguments", paste(missargs, collapse = ", "), "are missing from model.censoring function")
+        stop("Arguments ", paste(missargs, collapse = ", "), " are missing from given model.censoring function")
 
     }
 
