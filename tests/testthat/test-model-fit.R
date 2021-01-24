@@ -90,3 +90,25 @@ test_that("ipcw works", {
     expect_true(all(sqrt(diag(vcov(rmeanipcw1, type = "robust"))) > 0))
 
 })
+
+
+test_that("variable names clash", {
+
+    colon$pseudo.vals <- colon$surg
+    colon$.Tci <- colon$surg
+    colon$.Ci <- colon$surg
+
+    goodest <- cumincglm(Surv(time, status) ~ rx + surg, time = 2500, data = colon)
+    clash <- cumincglm(Surv(time, status) ~ rx + pseudo.vals, time = 2500, data = colon)
+
+    good2 <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon,
+                       model.censoring = "coxph", formula.censoring = ~ surg)
+    clash2 <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon,
+                        model.censoring = "coxph", formula.censoring = ~ .Tci)
+
+    good3 <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon,
+                       model.censoring = "aareg", formula.censoring = ~ surg)
+    clash3 <- cumincglm(Surv(time, status) ~ rx, time = 2500, data = colon,
+                        model.censoring = "aareg", formula.censoring = ~ .Tci)
+
+})

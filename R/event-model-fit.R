@@ -157,7 +157,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
     nn <- length(POi)
 
     newdata[["pseudo.vals"]] <- c(POi)
-    newdata[["pseudo.time"]] <- rep(time, each = nn)
+   # newdata[["pseudo.time"]] <- rep(time, each = nn)
 
 
     ## get stuff ready for glm.fit
@@ -396,7 +396,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
     nn <- length(POi)
 
     newdata[["pseudo.vals"]] <- c(POi)
-    newdata[["pseudo.time"]] <- rep(time, each = length(POi))
+   # newdata[["pseudo.time"]] <- rep(time, each = length(POi))
 
     ## get stuff ready for glm.fit
     formula2 <- update.formula(formula, pseudo.vals ~ .)
