@@ -58,3 +58,6 @@ POi <- pseudo_coxph(Surv(time, status) ~ 1, 1500, cause = 1,
 mean(POi)
 
 }
+\seealso{
+\link[survival]{coxph}
+}

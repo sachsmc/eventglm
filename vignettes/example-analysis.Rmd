@@ -235,10 +235,10 @@ colon.ci.cen3 <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500,
                            data = colon, model.censoring = "aareg", 
                            formula.censoring = ~ rx + age + node4)
 
-knitr::kable(cbind("indep" = colon.ci.adj$coefficients, 
-      "strat" = colon.ci.cen1$coefficients, 
-      "coxipcw" = colon.ci.cen2$coefficients, 
-      "aalenipcw" = colon.ci.cen3$coefficients), digits = 3)
+round(cbind("indep" = coef(colon.ci.adj),
+  "strat" = coef(colon.ci.cen1),
+  "coxipcw" = coef(colon.ci.cen2),
+  "aalenipcw" = coef(colon.ci.cen3)), 3)
 ```
 
 # Relative survival/net survival

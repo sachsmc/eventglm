@@ -33,7 +33,8 @@ interest.}
 
 \item{type}{One of "survival", "cuminc", or "rmean"}
 
-\item{formula.censoring}{Not used with this method, see \link{aareg} or \link{coxph}}
+\item{formula.censoring}{Not used with this method, see
+\link{pseudo_stratified}, \link{pseudo_aareg} or \link{pseudo_coxph}}
 
 \item{ipcw.method}{Not used with this method}
 }
@@ -41,9 +42,9 @@ interest.}
 A vector of jackknife pseudo observations
 }
 \description{
-Assuming completely independent censoring, i.e., censoring does not
-depend on the survival time nor any covariates in the model, the pseudo
-observations are calculated with the standard jackknife approach
+Assuming completely independent censoring, i.e., censoring does not depend on
+the survival time nor any covariates in the model, the pseudo observations
+are calculated with the standard jackknife approach
 }
 \examples{
 POi <- pseudo_independent(Surv(time, status) ~ 1, 1500, cause = 1, data = colon, type = "survival")

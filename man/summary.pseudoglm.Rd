@@ -21,7 +21,7 @@
 
 \item{type}{The method to use for variance estimation; one of "corrected", "robust", "naive", or "cluster"}
 
-\item{...}{Additional arguments passed to \link{vcov.pseudoglm}}
+\item{...}{Not used}
 }
 \value{
 An object of class \link[stats]{summary.glm}

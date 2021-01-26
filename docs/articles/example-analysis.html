@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.1</span>
       </span>
     </div>
 
@@ -453,25 +453,25 @@
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">3.918</td>
+<td align="right">4.036</td>
 <td align="right">3.874</td>
 <td align="right">4.749</td>
 </tr>
 <tr class="even">
 <td align="left">sexM</td>
-<td align="right">1.040</td>
+<td align="right">0.943</td>
 <td align="right">0.992</td>
 <td align="right">1.012</td>
 </tr>
 <tr class="odd">
 <td align="left">age</td>
-<td align="right">0.032</td>
+<td align="right">0.028</td>
 <td align="right">0.029</td>
 <td align="right">0.041</td>
 </tr>
 <tr class="even">
 <td align="left">hgb</td>
-<td align="right">0.224</td>
+<td align="right">0.253</td>
 <td align="right">0.251</td>
 <td align="right">0.253</td>
 </tr>
@@ -518,56 +518,16 @@
                            data <span class="op">=</span> <span class="va">colon</span>, model.censoring <span class="op">=</span> <span class="st">"aareg"</span>, 
                            formula.censoring <span class="op">=</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span><span class="op">)</span>
 
-<span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="st">"indep"</span> <span class="op">=</span> <span class="va">colon.ci.adj</span><span class="op">$</span><span class="va">coefficients</span>, 
-      <span class="st">"strat"</span> <span class="op">=</span> <span class="va">colon.ci.cen1</span><span class="op">$</span><span class="va">coefficients</span>, 
-      <span class="st">"coxipcw"</span> <span class="op">=</span> <span class="va">colon.ci.cen2</span><span class="op">$</span><span class="va">coefficients</span>, 
-      <span class="st">"aalenipcw"</span> <span class="op">=</span> <span class="va">colon.ci.cen3</span><span class="op">$</span><span class="va">coefficients</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></pre></div>
-<table class="table">
-<thead><tr class="header">
-<th align="left"></th>
-<th align="right">indep</th>
-<th align="right">strat</th>
-<th align="right">coxipcw</th>
-<th align="right">aalenipcw</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">(Intercept)</td>
-<td align="right">0.318</td>
-<td align="right">0.314</td>
-<td align="right">0.535</td>
-<td align="right">0.596</td>
-</tr>
-<tr class="even">
-<td align="left">rxLev</td>
-<td align="right">-0.034</td>
-<td align="right">-0.035</td>
-<td align="right">-0.034</td>
-<td align="right">-0.036</td>
-</tr>
-<tr class="odd">
-<td align="left">rxLev+5FU</td>
-<td align="right">-0.127</td>
-<td align="right">-0.128</td>
-<td align="right">-0.127</td>
-<td align="right">-0.127</td>
-</tr>
-<tr class="even">
-<td align="left">age</td>
-<td align="right">0.002</td>
-<td align="right">0.002</td>
-<td align="right">0.002</td>
-<td align="right">0.002</td>
-</tr>
-<tr class="odd">
-<td align="left">node4</td>
-<td align="right">0.332</td>
-<td align="right">0.334</td>
-<td align="right">0.335</td>
-<td align="right">0.334</td>
-</tr>
-</tbody>
-</table>
+<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="st">"indep"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.adj</span><span class="op">)</span>,
+  <span class="st">"strat"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.cen1</span><span class="op">)</span>,
+  <span class="st">"coxipcw"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.cen2</span><span class="op">)</span>,
+  <span class="st">"aalenipcw"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.cen3</span><span class="op">)</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>
+<span class="co">#&gt;              indep  strat coxipcw aalenipcw</span>
+<span class="co">#&gt; (Intercept)  0.318  0.314   0.535     0.596</span>
+<span class="co">#&gt; rxLev       -0.034 -0.035  -0.034    -0.036</span>
+<span class="co">#&gt; rxLev+5FU   -0.127 -0.128  -0.127    -0.127</span>
+<span class="co">#&gt; age          0.002  0.002   0.002     0.002</span>
+<span class="co">#&gt; node4        0.332  0.334   0.335     0.334</span></pre></div>
 </div>
 <div id="relative-survivalnet-survival" class="section level1">
 <h1 class="hasAnchor">
@@ -679,7 +639,7 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">0.20</td>
+<td align="right">0.27</td>
 <td align="right">0.21</td>
 </tr>
 <tr class="even">
@@ -694,17 +654,17 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 </tr>
 <tr class="even">
 <td align="left">factor(subsite)2</td>
-<td align="right">0.06</td>
+<td align="right">0.02</td>
 <td align="right">0.06</td>
 </tr>
 <tr class="odd">
 <td align="left">factor(subsite)3</td>
-<td align="right">-0.01</td>
+<td align="right">-0.03</td>
 <td align="right">0.00</td>
 </tr>
 <tr class="even">
 <td align="left">factor(subsite)4</td>
-<td align="right">0.03</td>
+<td align="right">-0.01</td>
 <td align="right">0.00</td>
 </tr>
 </tbody>

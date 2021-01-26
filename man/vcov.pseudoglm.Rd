@@ -13,8 +13,7 @@
 \item{type}{The method to use for variance estimation; one of "corrected",
 "robust", "naive", or "cluster"}
 
-\item{...}{Arguments passed to \link[sandwich]{vcovHC} if type = "robust",
-or to \link[sandwich]{vcovCL} if type = "cluster"}
+\item{...}{Not used}
 }
 \value{
 A numeric matrix containing the variance-covariance estimates
@@ -27,12 +26,12 @@ The "corrected" variance estimate for the cumulative incidence is as
   described in Overgaard et al. (2017) <doi:10.1214/16-AOS1516>, with code
   adapted from Overgaard's Stata program. This method does not handle ties
   and only has marginal benefits in reasonable sample sizes. The default is
-  "robust" which uses a sandwich estimator as implemented in the sandwich
-  package. "cluster" is another option if you have clustered observations.
-  Finally "naive" uses the same method as glm to compute the variance, and is
-  known to be anti-conservative. The bootstrap is another recommended option
-  that can be implemented using other tools; there is an example in the
-  vignette.
+  "robust" which uses the sandwich estimator vcovHC as implemented in the
+  sandwich package. "cluster" is another option if you have clustered
+  observations that uses the vcovCL function in sandwich. Finally "naive"
+  uses the same method as glm to compute the variance, and is known to be
+  anti-conservative. The bootstrap is another recommended option that can be
+  implemented using other tools; there is an example in the vignette.
 }
 \references{
 Overgaard, Morten; Parner, Erik Thorlund; Pedersen, Jan.
@@ -41,5 +40,5 @@ Overgaard, Morten; Parner, Erik Thorlund; Pedersen, Jan.
   <doi:10.1214/16-AOS1516>.
 }
 \seealso{
-\link[sandwich]{vcovHC}
+\link[sandwich]{vcovHC}, \link[sandwich]{vcovCL}
 }

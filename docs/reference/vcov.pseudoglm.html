@@ -156,8 +156,7 @@
     </tr>
     <tr>
       <th>...</th>
-      <td><p>Arguments passed to <a href='http://sandwich.R-Forge.R-project.org//reference/vcovHC.html'>vcovHC</a> if type = "robust",
-or to <a href='http://sandwich.R-Forge.R-project.org//reference/vcovCL.html'>vcovCL</a> if type = "cluster"</p></td>
+      <td><p>Not used</p></td>
     </tr>
     </table>
 
@@ -170,12 +169,12 @@ or to <a href='http://sandwich.R-Forge.R-project.org//reference/vcovCL.html'>vco
   described in Overgaard et al. (2017) &lt;doi:10.1214/16-AOS1516&gt;, with code
   adapted from Overgaard's Stata program. This method does not handle ties
   and only has marginal benefits in reasonable sample sizes. The default is
-  "robust" which uses a sandwich estimator as implemented in the sandwich
-  package. "cluster" is another option if you have clustered observations.
-  Finally "naive" uses the same method as glm to compute the variance, and is
-  known to be anti-conservative. The bootstrap is another recommended option
-  that can be implemented using other tools; there is an example in the
-  vignette.</p>
+  "robust" which uses the sandwich estimator vcovHC as implemented in the
+  sandwich package. "cluster" is another option if you have clustered
+  observations that uses the vcovCL function in sandwich. Finally "naive"
+  uses the same method as glm to compute the variance, and is known to be
+  anti-conservative. The bootstrap is another recommended option that can be
+  implemented using other tools; there is an example in the vignette.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Overgaard, Morten; Parner, Erik Thorlund; Pedersen, Jan.
@@ -184,7 +183,7 @@ or to <a href='http://sandwich.R-Forge.R-project.org//reference/vcovCL.html'>vco
   &lt;doi:10.1214/16-AOS1516&gt;.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><a href='http://sandwich.R-Forge.R-project.org//reference/vcovHC.html'>vcovHC</a></p></div>
+    <div class='dont-index'><p><a href='http://sandwich.R-Forge.R-project.org//reference/vcovHC.html'>vcovHC</a>, <a href='http://sandwich.R-Forge.R-project.org//reference/vcovCL.html'>vcovCL</a></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

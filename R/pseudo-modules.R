@@ -1,8 +1,8 @@
 #' Compute pseudo observations under independent censoring
 #'
-#' Assuming completely independent censoring, i.e., censoring does not
-#' depend on the survival time nor any covariates in the model, the pseudo
-#' observations are calculated with the standard jackknife approach
+#' Assuming completely independent censoring, i.e., censoring does not depend on
+#' the survival time nor any covariates in the model, the pseudo observations
+#' are calculated with the standard jackknife approach
 #'
 #' @param formula A formula specifying the model. The left hand side must be a
 #'   \link[survival]{Surv} object specifying a right censored survival or
@@ -17,7 +17,8 @@
 #'   interest.
 #' @param data Data frame in which all variables of formula can be interpreted.
 #' @param type One of "survival", "cuminc", or "rmean"
-#' @param formula.censoring Not used with this method, see \link{aareg} or \link{coxph}
+#' @param formula.censoring Not used with this method, see
+#'   \link{pseudo_stratified}, \link{pseudo_aareg} or \link{pseudo_coxph}
 #' @param ipcw.method Not used with this method
 #'
 #' @return A vector of jackknife pseudo observations
@@ -80,7 +81,7 @@ pseudo_independent <- function(formula, time, cause = 1, data,
 #' @param data Data frame in which all variables of formula can be interpreted.
 #' @param type One of "survival", "cuminc", or "rmean"
 #' @param formula.censoring A right-sided formula specifying which variables to
-#'   stratify on.
+#'   stratify on. All variables in this formula must be categorical.
 #' @param ipcw.method Not used with this method
 #'
 #' @return A vector of jackknife pseudo observations
@@ -171,6 +172,7 @@ pseudo_stratified <- function(formula, time, cause = 1, data,
 #'   "hajek" method uses the sum of the weights as the denominator.
 #'
 #' @return A vector of pseudo observations
+#' @seealso \link[survival]{aareg}
 #' @export
 #' @examples
 #' POi <- pseudo_aareg(Surv(time, status) ~ 1, 1500, cause = 1,
@@ -261,6 +263,7 @@ pseudo_aareg <- function(formula, time, cause = 1, data,
 #'   "hajek" method uses the sum of the weights as the denominator.
 #'
 #' @return A vector of pseudo observations
+#' @seealso \link[survival]{coxph}
 #' @export
 #' @examples
 #' POi <- pseudo_coxph(Surv(time, status) ~ 1, 1500, cause = 1,

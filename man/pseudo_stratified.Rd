@@ -34,7 +34,7 @@ interest.}
 \item{type}{One of "survival", "cuminc", or "rmean"}
 
 \item{formula.censoring}{A right-sided formula specifying which variables to
-stratify on.}
+stratify on. All variables in this formula must be categorical.}
 
 \item{ipcw.method}{Not used with this method}
 }
