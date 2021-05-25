@@ -1,3 +1,8 @@
+# eventglm 1.2.0
+
+New features:
+  - Time vector allowed in cumincglm. Use this to model multiple timepoints simultaneously, and allow for time varying covariate effects using tdc() in the right side of the formula. 
+
 # eventglm 1.1.1
 
 

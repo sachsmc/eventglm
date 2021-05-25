@@ -129,4 +129,11 @@ test_that("Multiple times work", {
 
     expect_lt(sum(coef(cuminctest)[1] + c(0, coef(cuminctest)[-1]) - stab$pstate[, 2]), 1e-6)
 
+    cuminctest2 <- cumincglm(Surv(etime, event) ~ tdc(sex),
+                            time = c(50, 100, 200), cause = "pcm", link = "identity", data = mgus2)
+    stest2 <- survival::survfit(Surv(etime, event) ~ sex, data = mgus2)
+    stab2 <- summary(stest2, times = c(50, 100, 200))
+    survests <- stab2$pstate[4:6, 2] - stab2$pstate[1:3, 2]
+    expect_lt(sum(coef(cuminctest2)[4:6] - survests), 1e-4)
+
 })
