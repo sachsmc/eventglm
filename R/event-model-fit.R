@@ -126,6 +126,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
     newdata <- do.call(rbind, lapply(1:length(time), function(i) data))
 
+
     matcau <- match_cause(mr, cause)
     causec <- matcau$causec
     causen <- matcau$causen
@@ -143,13 +144,14 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
     nn <- length(POi) / length(time)
 
     oldnames <- names(newdata)
-    newnames <- make.unique(c(oldnames, "pseudo.vals", "pseudo.time"))
+    newnames <- make.unique(c(oldnames, "pseudo.vals", "pseudo.time", "pseudo.id"))
 
-    po.nme <- newnames[length(newnames) - 1]
-    pot.nme <- newnames[length(newnames)]
+    po.nme <- newnames[length(newnames) - 2]
+    pot.nme <- newnames[length(newnames) - 1]
+    po.id <- newnames[length(newnames)]
     newdata[[po.nme]] <- c(POi)
     newdata[[pot.nme]] <- rep(time, each = nn)
-
+    newdata[[newnames[length(newnames)]]] <- rep(1:nrow(data), length(time))
 
     ## get stuff ready for glm.fit
     if(length(time) > 1) {
@@ -176,6 +178,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
     mf[[1L]] <- quote(stats::model.frame)
     mf[["formula"]] <- formula2
     mf[["data"]] <- newdata
+    mf[[po.id]] <- newdata[[po.id]]
     mf <- eval(mf, parent.frame())
     mt <- attr(mf, "terms")
     control <- do.call("glm.control", control)
@@ -206,13 +209,29 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
             stop(gettextf("number of offsets is %d should equal %d (number of observations)",
                           length(offset), NROW(Y)), domain = NA)
     }
-    mustart <- rep(mean(newdata$pseudo.vals), nrow(mf))
+    mustart <- rep(mean(newdata[[po.nme]]), nrow(mf))
 
 
     fit <- stats::glm.fit(X, Y, weights = weights,
                           family = quasi(link = link, variance = "constant"),
                           mustart = mustart,
                           intercept = attr(mt, "intercept") > 0L, singular.ok = singular.ok)
+
+    if(length(time) > 1) {
+
+        newdatasrt <- newdata[order(newdata[[po.id]]),]
+        fitgee <- geepack::geese(formula2, id = newdatasrt[[po.id]],
+                                 data = newdatasrt,
+                                 mean.link = link, variance = "gaussian",
+                                 corstr = "independence")
+
+        fit$coefficients <- fitgee$beta
+        fit$cluster.id <- mf[[po.id]]
+        fit$sandcov <- fitgee$vbeta
+        colnames(fit$sandcov) <- rownames(fit$sandcov) <- names(fit$coefficients)
+        fit$converged <- !as.logical(fitgee$error)
+
+    }
 
     if (model) {
         fit$model <- mf
