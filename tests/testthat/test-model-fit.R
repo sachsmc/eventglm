@@ -118,3 +118,15 @@ test_that("variable names clash", {
     expect_equal(unname(coef(good3)), unname(coef(clash3)))
 
 })
+
+
+test_that("Multiple times work", {
+
+    cuminctest <- cumincglm(Surv(etime, event) ~ 1,
+                            time = c(50, 100, 200), cause = "pcm", link = "identity", data = mgus2)
+    stest <- survival::survfit(Surv(etime, event) ~ 1, data = mgus2)
+    stab <- summary(stest, times = c(50, 100, 200))
+
+    expect_lt(sum(coef(cuminctest)[1] + c(0, coef(cuminctest)[-1]) - stab$pstate[, 2]), 1e-6)
+
+})

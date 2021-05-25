@@ -36,7 +36,7 @@ risks, the event variable will be a factor, whose first level is treated as
 censoring. The right hand side is the usual linear combination of
 covariates.}
 
-\item{time}{Numeric constant specifying the time at which the cumulative
+\item{time}{Numeric vector specifying the times at which the cumulative
 incidence or survival probability effect estimates are desired.}
 
 \item{cause}{Numeric or character constant specifying the cause indicator of
@@ -116,7 +116,7 @@ A pseudoglm object, with its own methods for print, summary, and
 \description{
 Using pseudo observations for the cumulative incidence, this function then
 runs a generalized linear model and estimates the parameters representing
-contrasts in the cumulative incidence at a particular time (specified by the
+contrasts in the cumulative incidence at a particular set of times (specified by the
 \code{time} argument) across covariate values. The link function can be
 "identity" for estimating differences in the cumulative incidence, "log" for
 estimating ratios, and any of the other link functions supported by
@@ -142,4 +142,8 @@ file, or the vignette "Extending eventglm".
                          time = 200, cause = "pcm", link = "identity",
                          model.censoring = "stratified",
                          formula.censoring = ~ sex, data = mgus2)
+# multiple time points
+cuminct2 <- cumincglm(Surv(etime, event) ~ age + sex,
+         time = c(50, 100, 200), cause = "pcm", link = "identity",
+         model.censoring = "independent", data = mgus2)
 }

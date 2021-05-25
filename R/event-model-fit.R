@@ -2,7 +2,7 @@
 #'
 #' Using pseudo observations for the cumulative incidence, this function then
 #' runs a generalized linear model and estimates the parameters representing
-#' contrasts in the cumulative incidence at a particular time (specified by the
+#' contrasts in the cumulative incidence at a particular set of times (specified by the
 #' \code{time} argument) across covariate values. The link function can be
 #' "identity" for estimating differences in the cumulative incidence, "log" for
 #' estimating ratios, and any of the other link functions supported by
@@ -18,7 +18,7 @@
 #'   risks, the event variable will be a factor, whose first level is treated as
 #'   censoring. The right hand side is the usual linear combination of
 #'   covariates.
-#' @param time Numeric constant specifying the time at which the cumulative
+#' @param time Numeric vector specifying the times at which the cumulative
 #'   incidence or survival probability effect estimates are desired.
 #' @param cause Numeric or character constant specifying the cause indicator of
 #'   interest.
@@ -96,6 +96,10 @@
 #'                          time = 200, cause = "pcm", link = "identity",
 #'                          model.censoring = "stratified",
 #'                          formula.censoring = ~ sex, data = mgus2)
+#' # multiple time points
+#' cuminct2 <- cumincglm(Surv(etime, event) ~ age + sex,
+#'          time = c(50, 100, 200), cause = "pcm", link = "identity",
+#'          model.censoring = "independent", data = mgus2)
 
 cumincglm <- function(formula, time, cause = 1, link = "identity",
                       model.censoring = "independent", formula.censoring = NULL,
@@ -108,7 +112,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
                       x = TRUE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...) {
 
 
-    stopifnot(length(time) == 1 & is.numeric(time))
+    stopifnot(is.numeric(time))
     cal <- match.call()
 
     mr <- model.response(model.frame(update.formula(formula, . ~ 1), data = data))
@@ -123,22 +127,30 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
     pseudo_function <- check_mod_cens(model.censoring)
 
-    POi <- pseudo_function(formula = formula, time = time, cause = cause,
+    POi <- unlist(lapply(time, function(tt) {
+        pseudo_function(formula = formula, time = tt, cause = cause,
                            data = data, type = otype, formula.censoring = formula.censoring,
                            ipcw.method = ipcw.method)
+    }))
 
-    nn <- length(POi)
+    nn <- length(POi) / length(time)
 
     oldnames <- names(newdata)
-    newnames <- make.unique(c(oldnames, "pseudo.vals"))
+    newnames <- make.unique(c(oldnames, "pseudo.vals", "pseudo.time"))
 
-    po.nme <- newnames[length(newnames)]
+    po.nme <- newnames[length(newnames) - 1]
+    pot.nme <- newnames[length(newnames)]
     newdata[[po.nme]] <- c(POi)
-   # newdata[["pseudo.time"]] <- rep(time, each = nn)
+    newdata[[pot.nme]] <- rep(time, each = nn)
 
 
     ## get stuff ready for glm.fit
-    formula2 <- update.formula(formula, as.formula(paste(po.nme, "~ .")))
+    if(length(time) > 1) {
+        formula2 <- update.formula(formula, as.formula(paste0(po.nme,
+        "~ factor(", pot.nme, ") + .")))
+    } else {
+        formula2 <- update.formula(formula, as.formula(paste(po.nme, "~ .")))
+    }
 
     mf <- match.call(expand.dots = FALSE)
     m <- match(c("formula", "data", "subset",

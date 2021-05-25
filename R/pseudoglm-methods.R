@@ -70,6 +70,10 @@ vcov.pseudoglm <- function(object, type = "robust", ...) {
             stop("Corrected variance estimator not available for", object$type)
         }
 
+        if(length(object$time) > 1) {
+            stop("Corrected variance estimator not available for multiple time points.")
+        }
+
         if(is.null(object$x)) {
             stop("Corrected variance requires 'x = TRUE' in the model fit.")
         }
