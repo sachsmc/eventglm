@@ -2,6 +2,7 @@
 
 New features:
   - Time vector allowed in cumincglm. Use this to model multiple timepoints simultaneously, and allow for time varying covariate effects using tdc() in the right side of the formula. 
+  - Inverse probability of censoring weights are returned by the fitting functions.
 
 # eventglm 1.1.1
 

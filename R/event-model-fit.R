@@ -136,11 +136,21 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
     pseudo_function <- check_mod_cens(model.censoring)
 
-    POi <- unlist(lapply(time, function(tt) {
+    POi <- lapply(time, function(tt) {
         pseudo_function(formula = formula, time = tt, cause = cause,
                            data = data, type = otype, formula.censoring = formula.censoring,
                            ipcw.method = ipcw.method)
+    })
+
+    ipcw.weights <- do.call(cbind, lapply(POi, function(pp) {
+        if(is.null(attr(pp, "ipcw.weights"))) {
+            rep(1, length(pp))
+        } else {
+            attr(pp, "ipcw.weights")
+        }
     }))
+
+    POi <- unlist(POi)
 
     nn <- length(POi) / length(time)
 
@@ -269,6 +279,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
     fit.lin$cause <- cause
     fit.lin$link <- link
     fit.lin$type <- if(survival) "survival" else "cuminc"
+    fit.lin$ipcw.weights <- ipcw.weights
 
     class(fit.lin) <- c("pseudoglm", class(fit.lin))
 
@@ -403,6 +414,11 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
                            data = data, type = otype, formula.censoring = formula.censoring,
                            ipcw.method = ipcw.method)
 
+    if(is.null(attr(POi, "ipcw.weights"))) {
+        ipcw.weights <- rep(1, length(POi))
+    } else {
+        ipcw.weights <- attr(POi, "ipcw.weights")
+    }
     nn <- length(POi)
 
     oldnames <- names(newdata)
@@ -489,6 +505,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
     fit.lin$cause <- cause
     fit.lin$link <- link
     fit.lin$type <- "rmean"
+    fit.lin$ipcw.weights <- ipcw.weights
 
     class(fit.lin) <- c("pseudoglm", class(fit.lin))
 

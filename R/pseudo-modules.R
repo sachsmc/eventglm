@@ -227,7 +227,7 @@ pseudo_aareg <- function(formula, time, cause = 1, data,
   }
 
   POi <- calc_ipcw_pos(mr, time, causen, type, ipcw.method, Gi)
-
+  attr(POi, "ipcw.weights") <- Gi
   POi
 
 
@@ -315,6 +315,7 @@ pseudo_coxph <- function(formula, time, cause = 1, data,
 
   POi <- calc_ipcw_pos(mr, time, causen, type, ipcw.method, Gi)
 
+  attr(POi, "ipcw.weights") <- Gi
   POi
 
 
