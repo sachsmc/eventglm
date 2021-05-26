@@ -90,7 +90,8 @@ included in the linear predictor during fitting. This should be NULL or a
 numeric vector of length equal to the number of cases. One or more
 \link[stats]{offset} terms can be included in the formula instead or as
 well, and if more than one is specified their sum is used. See
-\link[stats]{model.offset}.}
+\link[stats]{model.offset}. If length(time) > 1, then any offset terms must
+appear in the formula.}
 
 \item{control}{a list of parameters for controlling the fitting process. This
 is passed to \link[stats]{glm.control}.}

@@ -61,7 +61,8 @@
 #'   numeric vector of length equal to the number of cases. One or more
 #'   \link[stats]{offset} terms can be included in the formula instead or as
 #'   well, and if more than one is specified their sum is used. See
-#'   \link[stats]{model.offset}.
+#'   \link[stats]{model.offset}. If length(time) > 1, then any offset terms must
+#'   appear in the formula.
 #' @param control a list of parameters for controlling the fitting process. This
 #'   is passed to \link[stats]{glm.control}.
 #' @param model a logical value indicating whether model frame should be
@@ -155,20 +156,26 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
     ## get stuff ready for glm.fit
     if(length(time) > 1) {
-        formula2a <- update.formula(formula, as.formula(paste0(po.nme,
+        formula2 <- update.formula(formula, as.formula(paste0(po.nme,
         "~ factor(", pot.nme, ") + .")))
         ## special terms
-        Terms <- terms(formula2a, specials = c("tdc"))
-        termvect <- attr(Terms, "term.labels")
-        tochange <- termvect[attr(Terms, "specials")$tdc - 1]
+        Terms <- terms(formula2, specials = c("tdc"))
+        termvect <- rownames(attr(Terms, "factors"))
+        tochange <- termvect[attr(Terms, "specials")$tdc]
         changed <- gsub("(tdc\\()(.*)(\\))", paste0("\\2 : factor(", pot.nme, ")"), tochange)
-        termvect[attr(Terms, "specials")$tdc - 1] <- changed
+        termvect[attr(Terms, "specials")$tdc] <- changed
 
-        formula2 <- reformulate(termvect, response = po.nme)
+        formula2[[3]] <- reformulate(termvect[-1], response = termvect[1])[[3]]
+        formula2i <- reformulate(termvect[-1], response = termvect[1])
 
     } else {
         formula2 <- update.formula(formula, as.formula(paste(po.nme, "~ .")))
+        Terms <- terms(formula2, specials = c("tdc"))
+        if(!is.null(attr(Terms, "specials")$tdc)) {
+            stop("Special term 'tdc' not available if length(time) == 1")
+        }
     }
+
 
     mf <- match.call(expand.dots = FALSE)
     m <- match(c("formula", "data", "subset",
@@ -214,14 +221,15 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
     fit <- stats::glm.fit(X, Y, weights = weights,
                           family = quasi(link = link, variance = "constant"),
-                          mustart = mustart,
+                          mustart = mustart, offset = offset,
                           intercept = attr(mt, "intercept") > 0L, singular.ok = singular.ok)
 
+    fit.method <- "glm.fit"
     if(length(time) > 1) {
 
         newdatasrt <- newdata[order(newdata[[po.id]]),]
-        fitgee <- geepack::geese(formula2, id = newdatasrt[[po.id]],
-                                 data = newdatasrt,
+        fitgee <- geepack::geese(formula2i, id = newdatasrt[[po.id]],
+                                 data = newdatasrt, weights = weights,
                                  mean.link = link, variance = "gaussian",
                                  corstr = "independence")
 
@@ -230,6 +238,8 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         fit$sandcov <- fitgee$vbeta
         colnames(fit$sandcov) <- rownames(fit$sandcov) <- names(fit$coefficients)
         fit$converged <- !as.logical(fitgee$error)
+
+        fit.method <- "geese"
 
     }
 
@@ -244,7 +254,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         fit$y <- NULL
     }
     fit.lin <- structure(c(fit, list(call = cal, formula = formula, terms = mt,
-                      data = data, offset = offset, control = list(), method = "glm.fit",
+                      data = data, offset = offset, control = list(), method = fit.method,
                       contrasts = attr(X, "contrasts"), xlevels = .getXlevels(mt,
                                                                               mf))),
                       class = c(fit$class, c("glm", "lm")))
@@ -374,6 +384,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
                      x = TRUE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...) {
 
     stopifnot(length(time) == 1)
+    stopifnot(is.numeric(time))
     cal <- match.call()
 
     mr <- model.response(model.frame(update.formula(formula, . ~ 1), data = data))
@@ -394,11 +405,14 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
 
     nn <- length(POi)
 
-    newdata[["pseudo.vals"]] <- c(POi)
-   # newdata[["pseudo.time"]] <- rep(time, each = length(POi))
+    oldnames <- names(newdata)
+    newnames <- make.unique(c(oldnames, "pseudo.vals"))
+
+    po.nme <- newnames[length(newnames)]
+    newdata[[po.nme]] <- c(POi)
 
     ## get stuff ready for glm.fit
-    formula2 <- update.formula(formula, pseudo.vals ~ .)
+    formula2 <- update.formula(formula, as.formula(paste(po.nme, "~ .")))
 
     mf <- match.call(expand.dots = FALSE)
     m <- match(c("formula", "data", "subset",
@@ -438,12 +452,12 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
             stop(gettextf("number of offsets is %d should equal %d (number of observations)",
                           length(offset), NROW(Y)), domain = NA)
     }
-    mustart <- rep(mean(newdata$pseudo.vals), nrow(mf))
+    mustart <- rep(mean(newdata[[po.nme]]), nrow(mf))
 
 
     fit <- stats::glm.fit(X, Y, weights = weights,
                           family = quasi(link = link, variance = "constant"),
-                          mustart = mustart,
+                          mustart = mustart, offset = offset,
                           intercept = attr(mt, "intercept") > 0L, singular.ok = singular.ok)
 
     if (model) {
