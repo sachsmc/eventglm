@@ -12,9 +12,18 @@ print.pseudoglm <- function (x, digits = max(3L, getOption("digits") - 3L), ...)
     outcome <- switch(x$type, rmean = "restricted mean",
                       cuminc = "cumulative incidence",
                       survival = "survival")
+    junc <- "of"
+    if(outcome == "restricted mean" & x$competing) {
+        outcome <- "restricted mean time lost"
+        junc <- "due to"
+    }
     cat("\nCall:  ", paste(deparse(x$call), sep = "\n",
                            collapse = "\n"), "\n\n", sep = "")
-    cat("\nModel for the", x$link, outcome, "of cause", x$cause, "at time", x$time, "\n\n")
+    if(x$competing) {
+        cat("\nModel for the", x$link, outcome, junc, "cause", x$cause, "at time", x$time, "\n\n")
+    } else {
+        cat("\nModel for the", x$link, outcome, "at time", x$time, "\n\n")
+    }
     if (length(coef(x))) {
         cat("Coefficients")
         if (is.character(co <- x$contrasts))

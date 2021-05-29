@@ -129,7 +129,7 @@ test_that("Multiple times work", {
 
     expect_lt(sum(coef(cuminctest)[1] + c(0, coef(cuminctest)[-1]) - stab$pstate[, 2]), 1e-6)
 
-    cuminctest2 <- cumincglm(Surv(etime, event) ~ tdc(sex),
+    cuminctest2 <- cumincglm(Surv(etime, event) ~ tve(sex),
                             time = c(50, 100, 200), cause = "pcm", link = "identity", data = mgus2)
     stest2 <- survival::survfit(Surv(etime, event) ~ sex, data = mgus2)
     stab2 <- summary(stest2, times = c(50, 100, 200))
@@ -168,13 +168,13 @@ test_that("Glm features work", {
 
     #multitime
 
-    fitbas <- cumincglm(Surv(time, status) ~ tdc(rx), time = c(500, 1000, 2500), data = colonx,
+    fitbas <- cumincglm(Surv(time, status) ~ tve(rx), time = c(500, 1000, 2500), data = colonx,
                         model.censoring = "independent", formula.censoring = ~ surg)
 
-    fit1 <- cumincglm(Surv(time, status) ~ tdc(rx) + offset(ooo), time = c(500, 1000, 2500), data = colonx,
+    fit1 <- cumincglm(Surv(time, status) ~ tve(rx) + offset(ooo), time = c(500, 1000, 2500), data = colonx,
                       model.censoring = "independent", formula.censoring = ~ surg)
 
-    fit1b <- cumincglm(Surv(time, status) ~ tdc(rx), time =  c(500, 1000, 2500), data = colonx,
+    fit1b <- cumincglm(Surv(time, status) ~ tve(rx), time =  c(500, 1000, 2500), data = colonx,
                        offset = ooo,
                        model.censoring = "independent", formula.censoring = ~ surg)
 
@@ -183,14 +183,14 @@ test_that("Glm features work", {
     expect_true(sum(abs(fit1b$coefficients - fit1$coefficients)) > .1)
 
 
-    fit2 <- cumincglm(Surv(time, status) ~ tdc(rx), time =  c(500, 1000, 2500), data = colonx,
+    fit2 <- cumincglm(Surv(time, status) ~ tve(rx), time =  c(500, 1000, 2500), data = colonx,
                       weights = www,
                       model.censoring = "independent", formula.censoring = ~ surg)
 
     expect_true(all(fit2$weights != 1))
     expect_true(sum(abs(fitbas$coefficients - fit2$coefficients)) > .05)
 
-    fitbass <- cumincglm(Surv(time, status) ~ tdc(rx), time = c(500, 1000, 2500), data = colonx,
+    fitbass <- cumincglm(Surv(time, status) ~ tve(rx), time = c(500, 1000, 2500), data = colonx,
                         model.censoring = "independent", survival = TRUE, formula.censoring = ~ surg)
 
 

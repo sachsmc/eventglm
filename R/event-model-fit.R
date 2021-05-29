@@ -17,9 +17,9 @@
 #'   Other choices are TRUE/FALSE (TRUE = death) or 1/2 (2=death). For competing
 #'   risks, the event variable will be a factor, whose first level is treated as
 #'   censoring. The right hand side is the usual linear combination of
-#'   covariates. If there are multiple time points, the special term "tdc(.)"
+#'   covariates. If there are multiple time points, the special term "tve(.)"
 #'   can be used to specify that the effect of the variable inside the
-#'   parentheses will be time dependent. In the output this will be represented
+#'   parentheses will be time varying. In the output this will be represented
 #'   as the interaction between the time points and the variable.
 #' @param time Numeric vector specifying the times at which the cumulative
 #'   incidence or survival probability effect estimates are desired.
@@ -105,7 +105,7 @@
 #' cuminct2 <- cumincglm(Surv(etime, event) ~ age + sex,
 #'          time = c(50, 100, 200), cause = "pcm", link = "identity",
 #'          model.censoring = "independent", data = mgus2)
-#'  cuminct3 <- cumincglm(Surv(etime, event) ~ age + tdc(sex),
+#'  cuminct3 <- cumincglm(Surv(etime, event) ~ age + tve(sex),
 #'          time = c(50, 100, 200), cause = "pcm", link = "identity",
 #'          model.censoring = "independent", data = mgus2)
 
@@ -169,20 +169,20 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         formula2 <- update.formula(formula, as.formula(paste0(po.nme,
         "~ factor(", pot.nme, ") + .")))
         ## special terms
-        Terms <- terms(formula2, specials = c("tdc"))
+        Terms <- terms(formula2, specials = c("tve"))
         termvect <- rownames(attr(Terms, "factors"))
-        tochange <- termvect[attr(Terms, "specials")$tdc]
-        changed <- gsub("(tdc\\()(.*)(\\))", paste0("\\2 : factor(", pot.nme, ")"), tochange)
-        termvect[attr(Terms, "specials")$tdc] <- changed
+        tochange <- termvect[attr(Terms, "specials")$tve]
+        changed <- gsub("(tve\\()(.*)(\\))", paste0("\\2 : factor(", pot.nme, ")"), tochange)
+        termvect[attr(Terms, "specials")$tve] <- changed
 
         formula2[[3]] <- reformulate(termvect[-1], response = termvect[1])[[3]]
         formula2i <- reformulate(termvect[-1], response = termvect[1])
 
     } else {
         formula2 <- update.formula(formula, as.formula(paste(po.nme, "~ .")))
-        Terms <- terms(formula2, specials = c("tdc"))
-        if(!is.null(attr(Terms, "specials")$tdc)) {
-            stop("Special term 'tdc' not available if length(time) == 1")
+        Terms <- terms(formula2, specials = c("tve"))
+        if(!is.null(attr(Terms, "specials")$tve)) {
+            stop("Special term 'tve' not available if length(time) == 1")
         }
     }
 
@@ -241,7 +241,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         fitgee <- geepack::geese(formula2i, id = newdatasrt[[po.id]],
                                  data = newdatasrt, weights = weights,
                                  mean.link = link, variance = "gaussian",
-                                 corstr = "independence")
+                                 corstr = "independence", b = fit$coef)
 
         fit$coefficients <- fitgee$beta
         fit$cluster.id <- mf[[po.id]]
@@ -280,6 +280,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
     fit.lin$link <- link
     fit.lin$type <- if(survival) "survival" else "cuminc"
     fit.lin$ipcw.weights <- ipcw.weights
+    fit.lin$competing <- length(unique(mr[, "status"])) > 2
 
     class(fit.lin) <- c("pseudoglm", class(fit.lin))
 
@@ -506,6 +507,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
     fit.lin$link <- link
     fit.lin$type <- "rmean"
     fit.lin$ipcw.weights <- ipcw.weights
+    fit.lin$competing <- length(unique(mr[, "status"])) > 2
 
     class(fit.lin) <- c("pseudoglm", class(fit.lin))
 

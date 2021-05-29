@@ -34,9 +34,9 @@ competing risks outcome. The status indicator, normally 0=alive, 1=dead.
 Other choices are TRUE/FALSE (TRUE = death) or 1/2 (2=death). For competing
 risks, the event variable will be a factor, whose first level is treated as
 censoring. The right hand side is the usual linear combination of
-covariates. If there are multiple time points, the special term "tdc(.)"
+covariates. If there are multiple time points, the special term "tve(.)"
 can be used to specify that the effect of the variable inside the
-parentheses will be time dependent. In the output this will be represented
+parentheses will be time varying. In the output this will be represented
 as the interaction between the time points and the variable.}
 
 \item{time}{Numeric vector specifying the times at which the cumulative
@@ -151,7 +151,7 @@ The argument "model.censoring" determines how the pseudo
 cuminct2 <- cumincglm(Surv(etime, event) ~ age + sex,
          time = c(50, 100, 200), cause = "pcm", link = "identity",
          model.censoring = "independent", data = mgus2)
- cuminct3 <- cumincglm(Surv(etime, event) ~ age + tdc(sex),
+ cuminct3 <- cumincglm(Surv(etime, event) ~ age + tve(sex),
          time = c(50, 100, 200), cause = "pcm", link = "identity",
          model.censoring = "independent", data = mgus2)
 }
