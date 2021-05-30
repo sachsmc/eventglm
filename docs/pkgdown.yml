@@ -1,9 +1,9 @@
-pandoc: 2.7.3
+pandoc: 2.11.4
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   example-analysis: example-analysis.html
   extenstions: extenstions.html
   stata-sas-comparason: stata-sas-comparason.html
-last_built: 2021-01-26T09:47Z
+last_built: 2021-05-30T11:37Z
 

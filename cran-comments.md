@@ -1,5 +1,6 @@
-This is a resubmission to fix errors in the CRAN checks on solaris. 
+This is a resubmission that includes some new features and bugfixes. 
 
-- I reproduced the errors using the solaris platforms on Rhub
-- Updated the tests to correctly compare floating point numbers (sorry!)
-- Confirmed that the check passes on solaris using Rhub (R-release and R-release Oracle developer studio 12.6)
+Test environments: 
+
+- Win builder (release and dev)
+- Ubuntu 16.04.6 LTS (R version 4.0.2)
