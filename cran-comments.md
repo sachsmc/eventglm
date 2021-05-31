@@ -3,4 +3,8 @@ This is a resubmission that includes some new features and bugfixes.
 Test environments: 
 
 - Win builder (release and dev)
-- Ubuntu 16.04.6 LTS (R version 4.0.2)
+- On Rhub:
+    + Ubuntu 20.04, R-release
+    + Fedora, R-devel
+    + Debian R-devel
+    
