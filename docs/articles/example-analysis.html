@@ -292,12 +292,155 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Degrees of Freedom: 928 Total (i.e. Null);  926 Residual</span></code></pre></div>
 </div>
+<div id="multiple-time-points-new-in-version-1-2-0" class="section level2">
+<h2 class="hasAnchor">
+<a href="#multiple-time-points-new-in-version-1-2-0" class="anchor"></a>Multiple time points (New in version 1.2.0)</h2>
+<p>Now you can specify a vector of times in <code>cumincglm</code> to get a model that assumes the effect of the covariate is constant over those times.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mvtfit1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">rx</span>, 
+        time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fl">1000</span>, <span class="fl">1500</span>, <span class="fl">2000</span>, <span class="fl">2500</span><span class="op">)</span>,
+        data <span class="op">=</span> <span class="va">colon</span>, survival <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">mvtfit1</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Call:</span>
+<span class="co">#&gt; cumincglm(formula = Surv(time, status) ~ rx, time = c(500, 1000, </span>
+<span class="co">#&gt;     1500, 2000, 2500), data = colon, survival = TRUE)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Deviance Residuals: </span>
+<span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span>
+<span class="co">#&gt;                                         </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Coefficients:</span>
+<span class="co">#&gt;                          Estimate Std. Error z value Pr(&gt;|z|)    </span>
+<span class="co">#&gt; (Intercept)              0.829127   0.021793  38.046  &lt; 2e-16 ***</span>
+<span class="co">#&gt; factor(pseudo.time)1000 -0.170283   0.012340 -13.800  &lt; 2e-16 ***</span>
+<span class="co">#&gt; factor(pseudo.time)1500 -0.263039   0.014456 -18.196  &lt; 2e-16 ***</span>
+<span class="co">#&gt; factor(pseudo.time)2000 -0.314852   0.015290 -20.592  &lt; 2e-16 ***</span>
+<span class="co">#&gt; factor(pseudo.time)2500 -0.351750   0.016423 -21.419  &lt; 2e-16 ***</span>
+<span class="co">#&gt; rxLev                    0.003942   0.032530   0.121  0.90355    </span>
+<span class="co">#&gt; rxLev+5FU                0.093737   0.031979   2.931  0.00338 ** </span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; (Dispersion parameter for quasi family taken to be 1)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     Null deviance: 1091.5  on 4644  degrees of freedom</span>
+<span class="co">#&gt; Residual deviance: 1009.4  on 4638  degrees of freedom</span>
+<span class="co">#&gt; AIC: NA</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Number of Fisher Scoring iterations: 2</span></code></pre></div>
+<p>In this model, the intercept is the survival probability in the Obs arm at time 500 (the reference time). The terms labeled <code>factor(pseudo.time)t</code> represent the change in the intercept associated with the time <code>t</code>. So, for example, the survival probability in the Obs arm at time 1000 is 0.83 + -0.17 = 0.66.</p>
+<p>Looking at the survival curves in the figure above, the assumption of a constant treatment effect on the survival difference scale may be questionable. We can allow covariate effects to be time dependent by wrapping them in the special term <code>tve()</code> in the right side of the formula.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mvtfit2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="fu">tve</span><span class="op">(</span><span class="va">rx</span><span class="op">)</span>, 
+        time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fl">1000</span>, <span class="fl">1500</span>, <span class="fl">2000</span>, <span class="fl">2500</span><span class="op">)</span>,
+        data <span class="op">=</span> <span class="va">colon</span>, survival <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">mvtfit2</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Call:</span>
+<span class="co">#&gt; cumincglm(formula = Surv(time, status) ~ tve(rx), time = c(500, </span>
+<span class="co">#&gt;     1000, 1500, 2000, 2500), data = colon, survival = TRUE)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Deviance Residuals: </span>
+<span class="co">#&gt;    Min      1Q  Median      3Q     Max  </span>
+<span class="co">#&gt;                                         </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Coefficients:</span>
+<span class="co">#&gt;                                    Estimate Std. Error z value Pr(&gt;|z|)    </span>
+<span class="co">#&gt; (Intercept)                        0.850710   0.020078  42.370  &lt; 2e-16 ***</span>
+<span class="co">#&gt; factor(pseudo.time)1000           -0.178401   0.021560  -8.275  &lt; 2e-16 ***</span>
+<span class="co">#&gt; factor(pseudo.time)1500           -0.289898   0.025561 -11.341  &lt; 2e-16 ***</span>
+<span class="co">#&gt; factor(pseudo.time)2000           -0.345379   0.026875 -12.851  &lt; 2e-16 ***</span>
+<span class="co">#&gt; factor(pseudo.time)2500           -0.394161   0.028857 -13.659  &lt; 2e-16 ***</span>
+<span class="co">#&gt; factor(pseudo.time)500:rxLev       0.004138   0.028347   0.146  0.88395    </span>
+<span class="co">#&gt; factor(pseudo.time)1000:rxLev     -0.017500   0.037805  -0.463  0.64343    </span>
+<span class="co">#&gt; factor(pseudo.time)1500:rxLev     -0.002754   0.039739  -0.069  0.94474    </span>
+<span class="co">#&gt; factor(pseudo.time)2000:rxLev      0.006751   0.040132   0.168  0.86641    </span>
+<span class="co">#&gt; factor(pseudo.time)2500:rxLev      0.029075   0.041596   0.699  0.48456    </span>
+<span class="co">#&gt; factor(pseudo.time)500:rxLev+5FU   0.027581   0.027476   1.004  0.31546    </span>
+<span class="co">#&gt; factor(pseudo.time)1000:rxLev+5FU  0.074455   0.036360   2.048  0.04059 *  </span>
+<span class="co">#&gt; factor(pseudo.time)1500:rxLev+5FU  0.116689   0.038753   3.011  0.00260 ** </span>
+<span class="co">#&gt; factor(pseudo.time)2000:rxLev+5FU  0.118203   0.039667   2.980  0.00288 ** </span>
+<span class="co">#&gt; factor(pseudo.time)2500:rxLev+5FU  0.131758   0.041722   3.158  0.00159 ** </span>
+<span class="co">#&gt; ---</span>
+<span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; (Dispersion parameter for quasi family taken to be 1)</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt;     Null deviance: 1091.5  on 4644  degrees of freedom</span>
+<span class="co">#&gt; Residual deviance: 1007.9  on 4630  degrees of freedom</span>
+<span class="co">#&gt; AIC: NA</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Number of Fisher Scoring iterations: 2</span></code></pre></div>
+<p>Now the coefficients labeled <code>factor(pseudo.time)t:Covariate</code> represent the covariate effect at time <code>t</code>. So, for example, the difference in survival probabilities of Levamisole plus 5-FU to Observation at time 1500 is</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">mvtfit2</span><span class="op">)</span><span class="op">$</span><span class="va">coefficients</span><span class="op">[</span><span class="fl">13</span>,, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>,<span class="fl">2</span><span class="op">)</span>
+<span class="co">#&gt;                                   Estimate Std. Error z value Pr(&gt;|z|)</span>
+<span class="co">#&gt; factor(pseudo.time)1500:rxLev+5FU     0.12       0.04    3.01        0</span></code></pre></div>
+<p>Compare with the estimate from survfit:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">sfit</span>, times <span class="op">=</span> <span class="fl">1500</span><span class="op">)</span><span class="op">$</span><span class="va">surv</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span> <span class="op">-</span> 
+  <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">sfit</span>, times <span class="op">=</span> <span class="fl">1500</span><span class="op">)</span><span class="op">$</span><span class="va">surv</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">2</span><span class="op">)</span>
+<span class="co">#&gt; [1] 0.12</span></code></pre></div>
+<p>The key advantage of the regression approach is that we can adjust for covariates, do inference directly, and have more flexible models. The <code>tve</code> term allows you to have a mix of time-varying and time-constant effects. Just apply it to any covariate that you want to be time-varying.</p>
+</div>
+</div>
+<div id="censoring-assumptions" class="section level1">
+<h1 class="hasAnchor">
+<a href="#censoring-assumptions" class="anchor"></a>Censoring assumptions</h1>
+<p>By default, we assume that time to censoring is independent of the time to the event, and of all covariates in the model. This is more restrictive than parametric survival models, or Cox regression, which only assumes that censoring time is conditionally independent of event time given the covariates in the model. We provide several options to relax that assumption using the <code>model.censoring</code> and <code>formula.censoring</code> options. The first is to compute stratified pseudo observations, which assumes that the censoring is independent given a set of categorical covariates:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">colon.ci.cen1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span>, time <span class="op">=</span> <span class="fl">2500</span>, 
+                           data <span class="op">=</span> <span class="va">colon</span>, model.censoring <span class="op">=</span> <span class="st">"stratified"</span>, 
+                           formula.censoring <span class="op">=</span> <span class="op">~</span> <span class="va">rx</span><span class="op">)</span></code></pre></div>
+<p>Next, we can assume that the time to censoring follows a Cox model given a set of covariates. By default, the same covariate formula (right hand side) as the main model is used, but any formula can be specified. We can also use Aalens additive hazards model instead of a Cox model for the censoring distribution. Then inverse probability of censoring weighted pseudo observations are used <span class="citation">(Overgaard, Parner, and Pedersen 2019)</span>. According to our simulation study, the stratified option works quite well even when the censoring model is misspecified, and the Aalen additive model tends to work better than the Cox model.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">colon.ci.cen2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span>, time <span class="op">=</span> <span class="fl">2500</span>, 
+                           data <span class="op">=</span> <span class="va">colon</span>, model.censoring <span class="op">=</span> <span class="st">"coxph"</span>, 
+                           formula.censoring <span class="op">=</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span><span class="op">)</span>
+<span class="va">colon.ci.cen3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span>, time <span class="op">=</span> <span class="fl">2500</span>, 
+                           data <span class="op">=</span> <span class="va">colon</span>, model.censoring <span class="op">=</span> <span class="st">"aareg"</span>, 
+                           formula.censoring <span class="op">=</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="st">"indep"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.adj</span><span class="op">)</span>,
+  <span class="st">"strat"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.cen1</span><span class="op">)</span>,
+  <span class="st">"coxipcw"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.cen2</span><span class="op">)</span>,
+  <span class="st">"aalenipcw"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.cen3</span><span class="op">)</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>
+<span class="co">#&gt;              indep  strat coxipcw aalenipcw</span>
+<span class="co">#&gt; (Intercept)  0.318  0.314   0.535     0.596</span>
+<span class="co">#&gt; rxLev       -0.034 -0.035  -0.034    -0.036</span>
+<span class="co">#&gt; rxLev+5FU   -0.127 -0.128  -0.127    -0.127</span>
+<span class="co">#&gt; age          0.002  0.002   0.002     0.002</span>
+<span class="co">#&gt; node4        0.332  0.334   0.335     0.334</span></code></pre></div>
+<p>In these models, the IPCW weights are returned in the element called “ipcw.weights.” If there are multiple time points, this will be a matrix with one column per time point.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">colon.ci.cen2b</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span>, 
+                            time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">500</span>, <span class="fl">1000</span>, <span class="fl">2500</span><span class="op">)</span>, 
+                           data <span class="op">=</span> <span class="va">colon</span>, model.censoring <span class="op">=</span> <span class="st">"coxph"</span>, 
+                           formula.censoring <span class="op">=</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">colon.ci.cen2b</span><span class="op">$</span><span class="va">ipcw.weights</span><span class="op">)</span>
+<span class="co">#&gt;           [,1]      [,2]      [,3]</span>
+<span class="co">#&gt; [1,] 0.9988156 0.9988156 0.9936251</span>
+<span class="co">#&gt; [2,] 0.9988733 0.9988733 0.3867807</span>
+<span class="co">#&gt; [3,] 0.9983923 0.9983923 0.9983923</span>
+<span class="co">#&gt; [4,] 1.0000000 1.0000000 1.0000000</span>
+<span class="co">#&gt; [5,] 0.9984112 0.9984112 0.9984112</span>
+<span class="co">#&gt; [6,] 0.9987135 0.9987135 0.9911426</span>
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">colon.ci.cen2b</span><span class="op">$</span><span class="va">ipcw.weights</span><span class="op">)</span>
+<span class="co">#&gt;        V1               V2               V3        </span>
+<span class="co">#&gt;  Min.   :0.9983   Min.   :0.9983   Min.   :0.2702  </span>
+<span class="co">#&gt;  1st Qu.:0.9987   1st Qu.:0.9987   1st Qu.:0.4832  </span>
+<span class="co">#&gt;  Median :0.9988   Median :0.9988   Median :0.9094  </span>
+<span class="co">#&gt;  Mean   :0.9989   Mean   :0.9989   Mean   :0.7680  </span>
+<span class="co">#&gt;  3rd Qu.:0.9989   3rd Qu.:0.9989   3rd Qu.:0.9988  </span>
+<span class="co">#&gt;  Max.   :1.0000   Max.   :1.0000   Max.   :1.0000</span></code></pre></div>
 </div>
 <div id="monoclonal-gammopathy-data-competing-risks" class="section level1">
 <h1 class="hasAnchor">
 <a href="#monoclonal-gammopathy-data-competing-risks" class="anchor"></a>Monoclonal gammopathy data (Competing risks)</h1>
 <p>Our next example involves the <code>mgus2</code> dataset, included in the package:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co">## ?mgus2</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">mgus2</span><span class="op">)</span>
 <span class="co">#&gt;   id age sex dxyr  hgb creat mspike ptime pstat futime death etime event</span>
@@ -308,7 +451,7 @@
 <span class="co">#&gt; 5  5  90   F 1973 10.7   0.8    1.0     8     0      8     1     8 death</span>
 <span class="co">#&gt; 6  6  90   M 1990 12.9   1.0    0.5     4     0      4     1     4 death</span></code></pre></div>
 <p>This dataset has a number of covariates, and the time until progression to plasma cell malignancy (PCM), or death. Here the event PCM is of primary interest, with death being a competing event. The data are described and analyzed in the survival vignette (section 2.3.2):</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">crfit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/survfit.html">survfit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">etime</span>, <span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span>, <span class="fu">eventglm</span><span class="fu">::</span><span class="va"><a href="../reference/mgus2.html">mgus2</a></span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">crfit</span>, times <span class="op">=</span> <span class="fl">120</span><span class="op">)</span>
 <span class="co">#&gt; Call: survfit(formula = Surv(etime, event) ~ sex, data = eventglm::mgus2)</span>
@@ -338,9 +481,9 @@
 <span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span><span class="op">(</span><span class="fl">240</span>, <span class="fl">.65</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Female, death"</span>, <span class="st">"Male, death"</span>, <span class="st">"malignancy"</span>, <span class="st">"(s0)"</span><span class="op">)</span>,
        lty<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">3</span><span class="op">)</span>, col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">1</span>,<span class="fl">1</span><span class="op">)</span>, bty<span class="op">=</span><span class="st">'n'</span>, lwd<span class="op">=</span><span class="fl">2</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="fl">120</span>, lty <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<p><img src="example-analysis_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
+<p><img src="example-analysis_files/figure-html/unnamed-chunk-21-1.png" width="672"></p>
 <p>We can get similar estimates for the cumulative incidence of pcm at 10 years and the expected lifetime lost due to pcm up to 10 years with similar commands as above. Note the <code>cause</code> option to specify the cause of interest.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mgfitci</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">etime</span>, <span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span>, cause <span class="op">=</span> <span class="st">"pcm"</span>, time <span class="op">=</span> <span class="fl">120</span>, 
                    data <span class="op">=</span> <span class="va">mgus2</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">mgfitci</span><span class="op">)</span>
@@ -395,7 +538,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Number of Fisher Scoring iterations: 2</span></code></pre></div>
 <p>Sex may be an important predictor of time to pcm, what about the other variables?</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mgfitci2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">etime</span>, <span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">hgb</span>, cause <span class="op">=</span> <span class="st">"pcm"</span>, 
                       time <span class="op">=</span> <span class="fl">120</span>, data <span class="op">=</span> <span class="va">mgus2</span><span class="op">)</span>
 <span class="va">mgfitrmean2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rmeanglm.html">rmeanglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">etime</span>, <span class="va">event</span><span class="op">)</span> <span class="op">~</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">hgb</span>, cause <span class="op">=</span> <span class="st">"pcm"</span>, 
@@ -426,7 +569,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Number of Fisher Scoring iterations: 2</span></code></pre></div>
 <p>The objects returned by <code>cumincglm</code> and <code>rmeanglm</code> inherit from <code>glm</code>, so many methods are available. First, the <code>vcov</code> function has several options for calculation of the estimated variance of the estimated regression parameters. By default, the <code>robust</code> variance estimates are used, based on the Huber-White estimator. Other options are naive, and corrected, which are the corrected estimators suggested by <span class="citation">Overgaard et al. (2017)</span> which are based on a second order Von-Mises expansion. We can also use the bootstrap. This recalculated the pseudo-observations every time, but it is still pretty fast because of the C code. Let’s compare:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">nboot</span> <span class="op">&lt;-</span> <span class="fl">100</span> <span class="co"># use a bigger number for real</span>
 <span class="va">bootests</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="cn">NA</span>, nrow <span class="op">=</span> <span class="va">nboot</span>, ncol <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>
 <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">nboot</span><span class="op">)</span> <span class="op">{</span>
@@ -451,13 +594,13 @@
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">4.235</td>
+<td align="right">3.629</td>
 <td align="right">3.874</td>
 <td align="right">4.749</td>
 </tr>
 <tr class="even">
 <td align="left">sexM</td>
-<td align="right">0.835</td>
+<td align="right">0.947</td>
 <td align="right">0.992</td>
 <td align="right">1.012</td>
 </tr>
@@ -469,7 +612,7 @@
 </tr>
 <tr class="even">
 <td align="left">hgb</td>
-<td align="right">0.248</td>
+<td align="right">0.236</td>
 <td align="right">0.251</td>
 <td align="right">0.253</td>
 </tr>
@@ -477,11 +620,11 @@
 </table>
 <p>The corrected estimator fails pretty often, because it doesn’t handle ties, and the benefits are negligible, and thus may be removed from the package in the future.</p>
 <p>Residuals also work, using the scaling factor suggested by <span class="citation">Perme and Andersen (2008)</span>, as do predictions. Predicted restricted means give a possible method to predict individual event times, while the predicted cumulative incidence should be probabilities. Note that with the identity link, the predicted cumulative incidence is not guaranteed to be between 0 and 1.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">mgfitrmean2</span>, newdata <span class="op">=</span> <span class="va">mgus2</span><span class="op">)</span>, 
      xlab <span class="op">=</span> <span class="st">"Predicted lifetime lost due to PCM"</span>, main <span class="op">=</span> <span class="st">""</span><span class="op">)</span></code></pre></div>
-<p><img src="example-analysis_files/figure-html/unnamed-chunk-18-1.png" width="672"></p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<p><img src="example-analysis_files/figure-html/unnamed-chunk-25-1.png" width="672"></p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">mgus2</span><span class="op">$</span><span class="va">prob.pcm10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">mgfitci2</span>, newdata <span class="op">=</span> <span class="va">mgus2</span><span class="op">)</span>
 <span class="va">mgus2</span><span class="op">$</span><span class="va">pseudo.ci</span> <span class="op">&lt;-</span> <span class="va">mgfitci</span><span class="op">$</span><span class="va">y</span>
@@ -497,41 +640,13 @@
 
 <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">obs.p</span> <span class="op">~</span> <span class="va">pred.p</span>, xlab <span class="op">=</span> <span class="st">"predicted"</span>, ylab <span class="op">=</span> <span class="st">"observed"</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/abline.html">abline</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span></code></pre></div>
-<p><img src="example-analysis_files/figure-html/unnamed-chunk-18-2.png" width="672"></p>
-</div>
-<div id="censoring-assumptions" class="section level1">
-<h1 class="hasAnchor">
-<a href="#censoring-assumptions" class="anchor"></a>Censoring assumptions</h1>
-<p>By default, we assume that time to censoring is independent of the time to the event, and of all covariates in the model. This is more restrictive than parametric survival models, or Cox regression, which only assumes that censoring time is conditionally independent of event time given the covariates in the model. We provide several options to relax that assumption using the <code>model.censoring</code> and <code>formula.censoring</code> options. The first is to compute stratified pseudo observations, which assumes that the censoring is independent given a set of categorical covariates:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">colon.ci.cen1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span>, time <span class="op">=</span> <span class="fl">2500</span>, 
-                           data <span class="op">=</span> <span class="va">colon</span>, model.censoring <span class="op">=</span> <span class="st">"stratified"</span>, 
-                           formula.censoring <span class="op">=</span> <span class="op">~</span> <span class="va">rx</span><span class="op">)</span></code></pre></div>
-<p>Next, we can assume that the time to censoring follows a Cox model given a set of covariates. By default, the same covariate formula (right hand side) as the main model is used, but any formula can be specified. We can also use Aalens additive hazards model instead of a Cox model for the censoring distribution. Then inverse probability of censoring weighted pseudo observations are used <span class="citation">(Overgaard, Parner, and Pedersen 2019)</span>. According to our simulation study, the stratified option works quite well even when the censoring model is misspecified, and the Aalen additive model tends to work better than the Cox model.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">colon.ci.cen2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span>, time <span class="op">=</span> <span class="fl">2500</span>, 
-                           data <span class="op">=</span> <span class="va">colon</span>, model.censoring <span class="op">=</span> <span class="st">"coxph"</span>, 
-                           formula.censoring <span class="op">=</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span><span class="op">)</span>
-<span class="va">colon.ci.cen3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span>, time <span class="op">=</span> <span class="fl">2500</span>, 
-                           data <span class="op">=</span> <span class="va">colon</span>, model.censoring <span class="op">=</span> <span class="st">"aareg"</span>, 
-                           formula.censoring <span class="op">=</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">age</span> <span class="op">+</span> <span class="va">node4</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="st">"indep"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.adj</span><span class="op">)</span>,
-  <span class="st">"strat"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.cen1</span><span class="op">)</span>,
-  <span class="st">"coxipcw"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.cen2</span><span class="op">)</span>,
-  <span class="st">"aalenipcw"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/coef.html">coef</a></span><span class="op">(</span><span class="va">colon.ci.cen3</span><span class="op">)</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>
-<span class="co">#&gt;              indep  strat coxipcw aalenipcw</span>
-<span class="co">#&gt; (Intercept)  0.318  0.314   0.535     0.596</span>
-<span class="co">#&gt; rxLev       -0.034 -0.035  -0.034    -0.036</span>
-<span class="co">#&gt; rxLev+5FU   -0.127 -0.128  -0.127    -0.127</span>
-<span class="co">#&gt; age          0.002  0.002   0.002     0.002</span>
-<span class="co">#&gt; node4        0.332  0.334   0.335     0.334</span></code></pre></div>
+<p><img src="example-analysis_files/figure-html/unnamed-chunk-25-2.png" width="672"></p>
 </div>
 <div id="relative-survivalnet-survival" class="section level1">
 <h1 class="hasAnchor">
 <a href="#relative-survivalnet-survival" class="anchor"></a>Relative survival/net survival</h1>
 <p>Following Professor Paul Lambert’s example here: <a href="https://pclambert.net/software/stpp/using_stpp/" class="uri">https://pclambert.net/software/stpp/using_stpp/</a> , let’s load the datasets:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com">data.table</a></span><span class="op">)</span>
 
 <span class="co"># from https://pclambert.net/data/colon.dta</span>
@@ -548,7 +663,7 @@
 RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)}, 
 \]</span></p>
 <p>where <span class="math inline">\(S_{P}(t | D)\)</span> is the survival probability based on the life tables for the demographics <span class="math inline">\(D\)</span> of patient <span class="math inline">\(i\)</span>, and <span class="math inline">\(PO_i(t)\)</span> are the pseudo observations for time <span class="math inline">\(t\)</span>. We get the survival probability by merging with the life table estimates, and the pseudo observations from our package. The <code>prob</code> from the life tables is the probability of surviving one year, so to get the probability of surviving 5 and 10 years, we need to calculate the cumulative product estimates.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
 <span class="va">lifetab</span><span class="op">[</span>, <span class="va">prob.5</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/prod.html">prod</a></span><span class="op">(</span><span class="va">lifetab</span><span class="op">[</span><span class="va">`_age`</span> <span class="op">%in%</span> <span class="va">.BY</span><span class="op">[[</span><span class="st">"_age"</span><span class="op">]</span><span class="op">]</span><span class="op">:</span><span class="op">(</span><span class="va">.BY</span><span class="op">[[</span><span class="st">"_age"</span><span class="op">]</span><span class="op">]</span><span class="op">+</span><span class="fl">4</span><span class="op">)</span> <span class="op">&amp;</span> 
                               <span class="va">`_year`</span> <span class="op">%in%</span> <span class="va">.BY</span><span class="op">[[</span><span class="st">"_year"</span><span class="op">]</span><span class="op">]</span><span class="op">:</span><span class="op">(</span><span class="va">.BY</span><span class="op">[[</span><span class="st">"_year"</span><span class="op">]</span><span class="op">]</span><span class="op">+</span><span class="fl">4</span><span class="op">)</span> <span class="op">&amp;</span> 
@@ -612,7 +727,7 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 <h1 class="hasAnchor">
 <a href="#case-cohort-sampling" class="anchor"></a>Case cohort sampling</h1>
 <p><span class="citation">Parner, Andersen, and Overgaard (2020)</span> describe how to fit regression models with pseudo-observations that account for case-cohort sampling. The basic idea is weighted estimating equations, which we can implement easily with the <code>weights</code> argument that gets passed to <code>glm.fit</code>. First let’s create a case-cohort sample of the <code>colon2</code> dataset by sampling the cancer deaths (<code>status == 1</code>) with probability 0.8, and a random subcohort with probability 0.1.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">colon2</span><span class="op">$</span><span class="va">status2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fifelse.html">ifelse</a></span><span class="op">(</span><span class="va">colon2</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="fl">4</span>, <span class="fl">0</span>, <span class="va">colon2</span><span class="op">$</span><span class="va">status</span><span class="op">)</span>, 
                          labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"censored"</span>, <span class="st">"cancer death"</span>, <span class="st">"other death"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">subc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">colon2</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1</span>, p <span class="op">=</span> <span class="fl">.2</span><span class="op">)</span>
@@ -620,7 +735,7 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 <span class="va">colon.cc</span> <span class="op">&lt;-</span> <span class="va">colon2</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/logical.html">as.logical</a></span><span class="op">(</span><span class="va">samp.ind</span><span class="op">)</span>, <span class="op">]</span>
 <span class="va">colon.cc</span><span class="op">$</span><span class="va">samp.wt</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">/</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fifelse.html">ifelse</a></span><span class="op">(</span><span class="va">colon.cc</span><span class="op">$</span><span class="va">status</span> <span class="op">==</span> <span class="fl">1</span>, <span class="fl">.2</span> <span class="op">+</span> <span class="fl">.8</span> <span class="op">*</span> <span class="fl">.9</span>, <span class="fl">.2</span><span class="op">)</span></code></pre></div>
 <p>Now, the weighted regression model should give similar results as the unweighted one in the full sample:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cfit.cc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">surv_mm</span>, <span class="va">status2</span><span class="op">)</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">subsite</span><span class="op">)</span>, 
                      cause <span class="op">=</span> <span class="st">"cancer death"</span>, time <span class="op">=</span> <span class="fl">5</span> <span class="op">*</span> <span class="fl">12</span>, data <span class="op">=</span> <span class="va">colon.cc</span>, 
                      weights <span class="op">=</span> <span class="va">samp.wt</span><span class="op">)</span>
@@ -637,7 +752,7 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">0.17</td>
+<td align="right">0.20</td>
 <td align="right">0.21</td>
 </tr>
 <tr class="even">
@@ -652,17 +767,17 @@ RS(t) = n^{-1}\sum_{i = 1}^n\frac{PO_i(t)}{S_{P}(t | D)},
 </tr>
 <tr class="even">
 <td align="left">factor(subsite)2</td>
-<td align="right">0.08</td>
+<td align="right">0.06</td>
 <td align="right">0.06</td>
 </tr>
 <tr class="odd">
 <td align="left">factor(subsite)3</td>
-<td align="right">0.02</td>
+<td align="right">0.01</td>
 <td align="right">0.00</td>
 </tr>
 <tr class="even">
 <td align="left">factor(subsite)4</td>
-<td align="right">0.06</td>
+<td align="right">0.02</td>
 <td align="right">0.00</td>
 </tr>
 </tbody>

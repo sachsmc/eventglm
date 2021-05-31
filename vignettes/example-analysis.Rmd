@@ -127,6 +127,84 @@ cumincglm(Surv(time, status) ~ rx, time = 2500,
                       data = colon, survival = TRUE)
 ```
 
+
+## Multiple time points (New in version 1.2.0)
+
+Now you can specify a vector of times in `cumincglm` to get a model that assumes the effect of the covariate is constant over those times. 
+
+```{r}
+mvtfit1 <- cumincglm(Surv(time, status) ~ rx, 
+        time = c(500, 1000, 1500, 2000, 2500),
+        data = colon, survival = TRUE)
+summary(mvtfit1)
+```
+
+In this model, the intercept is the survival probability in the Obs arm at time 500 (the reference time). The terms labeled `factor(pseudo.time)t` represent the change in the intercept associated with the time `t`. So, for example, the survival probability in the Obs arm at time 1000 is `r round(coef(mvtfit1)[1], 2)` + `r round(coef(mvtfit1)[2], 2)` = `r round(sum(coef(mvtfit1)[1:2]), 2)`.
+
+Looking at the survival curves in the figure above, the assumption of a constant treatment effect on the survival difference scale may be questionable. We can allow covariate effects to be time dependent by wrapping them in the special term `tve()` in the right side of the formula. 
+
+
+```{r}
+mvtfit2 <- cumincglm(Surv(time, status) ~ tve(rx), 
+        time = c(500, 1000, 1500, 2000, 2500),
+        data = colon, survival = TRUE)
+summary(mvtfit2)
+```
+
+Now the coefficients labeled `factor(pseudo.time)t:Covariate` represent the covariate effect at time `t`. So, for example, the difference in survival probabilities of Levamisole plus 5-FU to Observation at time 1500 is 
+
+```{r} 
+round(summary(mvtfit2)$coefficients[13,, drop = FALSE],2)
+``` 
+
+Compare with the estimate from survfit: 
+
+```{r}
+round(summary(sfit, times = 1500)$surv[3] - 
+  summary(sfit, times = 1500)$surv[1], 2)
+```
+
+The key advantage of the regression approach is that we can adjust for covariates, do inference directly, and have more flexible models. The `tve` term allows you to have a mix of time-varying and time-constant effects. Just apply it to any covariate that you want to be time-varying.
+
+
+# Censoring assumptions
+
+By default, we assume that time to censoring is independent of the time to the event, and of all covariates in the model. This is more restrictive than parametric survival models, or Cox regression, which only assumes that censoring time is conditionally independent of event time given the covariates in the model. We provide several options to relax that assumption using the `model.censoring` and `formula.censoring` options. The first is to compute stratified pseudo observations, which assumes that the censoring is independent given a set of categorical covariates: 
+
+```{r}
+colon.ci.cen1 <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, 
+                           data = colon, model.censoring = "stratified", 
+                           formula.censoring = ~ rx)
+```
+
+Next, we can assume that the time to censoring follows a Cox model given a set of covariates. By default, the same covariate formula (right hand side) as the main model is used, but any formula can be specified. We can also use Aalens additive hazards model instead of a Cox model for the censoring distribution. Then inverse probability of censoring weighted pseudo observations are used [@overgaard2019pseudo]. According to our simulation study, the stratified option works quite well even when the censoring model is misspecified, and the Aalen additive model tends to work better than the Cox model. 
+
+```{r}
+colon.ci.cen2 <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, 
+                           data = colon, model.censoring = "coxph", 
+                           formula.censoring = ~ rx + age + node4)
+colon.ci.cen3 <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, 
+                           data = colon, model.censoring = "aareg", 
+                           formula.censoring = ~ rx + age + node4)
+
+round(cbind("indep" = coef(colon.ci.adj),
+  "strat" = coef(colon.ci.cen1),
+  "coxipcw" = coef(colon.ci.cen2),
+  "aalenipcw" = coef(colon.ci.cen3)), 3)
+```
+
+In these models, the IPCW weights are returned in the element called "ipcw.weights". If there are multiple time points, this will be a matrix with one column per time point. 
+
+```{r}
+colon.ci.cen2b <- cumincglm(Surv(time, status) ~ rx + age + node4, 
+                            time = c(500, 1000, 2500), 
+                           data = colon, model.censoring = "coxph", 
+                           formula.censoring = ~ rx + age + node4)
+
+head(colon.ci.cen2b$ipcw.weights)
+summary(colon.ci.cen2b$ipcw.weights)
+```
+
 # Monoclonal gammopathy data (Competing risks)
 
 Our next example involves the `mgus2` dataset, included in the package: 
@@ -215,31 +293,6 @@ plot(obs.p ~ pred.p, xlab = "predicted", ylab = "observed")
 abline(0, 1)
 ```
 
-# Censoring assumptions
-
-By default, we assume that time to censoring is independent of the time to the event, and of all covariates in the model. This is more restrictive than parametric survival models, or Cox regression, which only assumes that censoring time is conditionally independent of event time given the covariates in the model. We provide several options to relax that assumption using the `model.censoring` and `formula.censoring` options. The first is to compute stratified pseudo observations, which assumes that the censoring is independent given a set of categorical covariates: 
-
-```{r}
-colon.ci.cen1 <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, 
-                           data = colon, model.censoring = "stratified", 
-                           formula.censoring = ~ rx)
-```
-
-Next, we can assume that the time to censoring follows a Cox model given a set of covariates. By default, the same covariate formula (right hand side) as the main model is used, but any formula can be specified. We can also use Aalens additive hazards model instead of a Cox model for the censoring distribution. Then inverse probability of censoring weighted pseudo observations are used [@overgaard2019pseudo]. According to our simulation study, the stratified option works quite well even when the censoring model is misspecified, and the Aalen additive model tends to work better than the Cox model. 
-
-```{r}
-colon.ci.cen2 <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, 
-                           data = colon, model.censoring = "coxph", 
-                           formula.censoring = ~ rx + age + node4)
-colon.ci.cen3 <- cumincglm(Surv(time, status) ~ rx + age + node4, time = 2500, 
-                           data = colon, model.censoring = "aareg", 
-                           formula.censoring = ~ rx + age + node4)
-
-round(cbind("indep" = coef(colon.ci.adj),
-  "strat" = coef(colon.ci.cen1),
-  "coxipcw" = coef(colon.ci.cen2),
-  "aalenipcw" = coef(colon.ci.cen3)), 3)
-```
 
 # Relative survival/net survival
 
