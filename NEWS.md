@@ -1,4 +1,4 @@
-# eventglm 1.2.0
+# eventglm 1.2.1
 
 - Remove tidyverse lifecycle badge
 
