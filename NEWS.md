@@ -1,5 +1,9 @@
 # eventglm 1.2.0
 
+- Remove tidyverse lifecycle badge
+
+# eventglm 1.2.0
+
 New features:
   - Time vector allowed in cumincglm. Use this to model multiple timepoints simultaneously, and allow for time varying covariate effects using tve() (for time varying effect) in the right side of the formula. 
   - Inverse probability of censoring weights are returned by the fitting functions in the list element called "ipcw.weights".

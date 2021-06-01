@@ -1,10 +1,2 @@
-This is a resubmission that includes some new features and bugfixes. 
+This is a resubmission that removes an invalid URL from the README.
 
-Test environments: 
-
-- Win builder (release and dev)
-- On Rhub:
-    + Ubuntu 20.04, R-release
-    + Fedora, R-devel
-    + Debian R-devel
-    

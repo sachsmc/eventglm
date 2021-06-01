@@ -1,4 +1,3 @@
-[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://www.tidyverse.org/lifecycle/#stable)
 [![CRAN Status](https://www.r-pkg.org/badges/version/eventglm)](https://cran.r-project.org/package=eventglm)
 [![Travis build status](https://travis-ci.org/sachsmc/eventglm.svg?branch=master)](https://travis-ci.org/sachsmc/eventglm)
 
