@@ -1,2 +1,1 @@
-This is a resubmission that removes an invalid URL from the README.
-
+This is a resubmission that adds references to a soon-to-be published Journal of Statistical Software paper. The DOI in the CITATION is for a new JSS publication that will be registered after publication on CRAN.

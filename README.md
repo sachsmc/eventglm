@@ -36,4 +36,8 @@ Check out the vignettes for more examples and details.
 
 ## References
 
-Per Kragh Andersen and Maja Pohar Perme. Pseudo-observations in survival analysis. Statistical Methods in Medical Research, 19(1):71–99, February 2010. doi: 10.1177/0962280209105020. http://journals.sagepub.com/doi/10.1177/0962280209105020
+Sachs MC, Gabriel EE (2022). “Event History Regression with Pseudo-Observations:
+Computational Approaches and an Implementation in R.” _Journal of Statistical Software_,
+*102*(9), 1-34. doi: 10.18637/jss.v102.i09 (URL: https://doi.org/10.18637/jss.v102.i09).
+
+Per Kragh Andersen and Maja Pohar Perme. Pseudo-observations in survival analysis. Statistical Methods in Medical Research, 19(1):71–99, February 2010. doi: 10.1177/0962280209105020 (URL: http://journals.sagepub.com/doi/10.1177/0962280209105020)

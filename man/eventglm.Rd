@@ -12,3 +12,6 @@ The interface uses the well known formulation of a generalized linear model and 
 for features including plotting of residuals, the use of sampling weights, and corrected
 variance estimation.
 }
+\references{
+Sachs MC, Gabriel EE (2022). "Event History Regression with Pseudo-Observations: Computational Approaches and an Implementation in R." Journal of Statistical Software, 102(9), 1-34. <doi:10.18637/jss.v102.i09>
+}

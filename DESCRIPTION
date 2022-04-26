@@ -1,8 +1,8 @@
 Package: eventglm
 Type: Package
 Title: Regression Models for Event History Outcomes
-Version: 1.2.1
-Date: 2021-05-31
+Version: 1.2.2
+Date: 2022-04-26
 Authors@R: 
     c(person(given = "Michael C",
              family = "Sachs",
@@ -24,7 +24,8 @@ Description: A user friendly, easy to understand way of doing event
     including the cumulative incidence and the restricted mean
     survival, using the pseudo observation framework for 
     estimation. For a review of the methodology, see Andersen and
-    Pohar Perme (2010) <doi:10.1177/0962280209105020>. The
+    Pohar Perme (2010) <doi:10.1177/0962280209105020> or Sachs 
+    and Gabriel (2022) <doi:10.18637/jss.v102.i09>. The
     interface uses the well known formulation of a generalized
     linear model and allows for features including plotting of 
     residuals, the use of sampling weights, and corrected

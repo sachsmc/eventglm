@@ -1,3 +1,7 @@
+# eventglm 1.2.2
+
+- Add references to JSS publication
+
 # eventglm 1.2.1
 
 - Remove tidyverse lifecycle badge

@@ -1,0 +1,16 @@
+bibentry(bibtype = "Article",
+  title        = "Event History Regression with Pseudo-Observations: Computational Approaches and an Implementation in {R}",
+  author       = c(person(given = c("Michael", "C."),
+                          family = "Sachs",
+                          email = "michael.sachs@ki.se"),
+                   person(given = c("Erin", "E."),
+                          family = "Gabriel")),
+  journal      = "Journal of Statistical Software",
+  year         = "2022",
+  volume       = "102",
+  number       = "9",
+  pages        = "1--34",
+  doi          = "10.18637/jss.v102.i09",
+  header       = "To cite eventglm in publications use:"
+)
+
