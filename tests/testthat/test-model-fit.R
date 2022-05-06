@@ -139,6 +139,27 @@ test_that("Multiple times work", {
 })
 
 
+test_that("Clustered data works", {
+
+  cuminctest <- cumincglm(Surv(etime, event) ~ 1,
+                          time = c(50, 100, 200), cause = "pcm", link = "identity",
+                          id = id, data = mgus2)
+  stest <- survival::survfit(Surv(etime, event) ~ 1, data = mgus2)
+  stab <- summary(stest, times = c(50, 100, 200))
+
+  expect_lt(sum(coef(cuminctest)[1] + c(0, coef(cuminctest)[-1]) - stab$pstate[, 2]), 1e-6)
+
+  cuminctest2 <- cumincglm(Surv(stop, event) ~ tve(rx), time = c(10, 25),
+                           link = "identity", id = id, data = survival::bladder)
+  rmeantest2 <- rmeanglm(Surv(stop, event) ~ rx, time = 25,
+                           link = "identity", id = id, data = survival::bladder)
+
+  expect_true(rmeantest2$method == "geese")
+
+
+})
+
+
 test_that("Glm features work", {
 
     set.seed(202105)
@@ -171,7 +192,8 @@ test_that("Glm features work", {
     fitbas <- cumincglm(Surv(time, status) ~ tve(rx), time = c(500, 1000, 2500), data = colonx,
                         model.censoring = "independent", formula.censoring = ~ surg)
 
-    fit1 <- cumincglm(Surv(time, status) ~ tve(rx) + offset(ooo), time = c(500, 1000, 2500), data = colonx,
+    fit1 <- cumincglm(Surv(time, status) ~ tve(rx) + offset(ooo),
+                      time = c(500, 1000, 2500), data = colonx,
                       model.censoring = "independent", formula.censoring = ~ surg)
 
     fit1b <- cumincglm(Surv(time, status) ~ tve(rx), time =  c(500, 1000, 2500), data = colonx,
@@ -180,7 +202,7 @@ test_that("Glm features work", {
 
     expect_true(!is.null(fit1$offset))
     expect_true(sum(abs(fitbas$coefficients - fit1$coefficients)) > .05)
-    expect_true(sum(abs(fit1b$coefficients - fit1$coefficients)) > .1)
+    expect_true(sum(abs(fit1b$coefficients - fit1$coefficients)) < .01)
 
 
     fit2 <- cumincglm(Surv(time, status) ~ tve(rx), time =  c(500, 1000, 2500), data = colonx,

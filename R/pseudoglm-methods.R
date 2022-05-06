@@ -73,7 +73,7 @@ print.pseudoglm <- function (x, digits = max(3L, getOption("digits") - 3L), ...)
 #' @export
 vcov.pseudoglm <- function(object, type = "robust", ...) {
 
-    if(length(object$time) > 1) {
+    if(object$method == "geese") {
         if(type != "robust") {
             message("Only robust variance estimate available for multiple time points.")
         }

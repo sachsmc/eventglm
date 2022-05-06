@@ -1,8 +1,8 @@
 Package: eventglm
 Type: Package
 Title: Regression Models for Event History Outcomes
-Version: 1.2.2
-Date: 2022-04-26
+Version: 1.3.0
+Date: 2022-05-05
 Authors@R: 
     c(person(given = "Michael C",
              family = "Sachs",

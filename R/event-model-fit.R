@@ -48,7 +48,7 @@
 #' @param survival Set to TRUE to use survival (one minus the cumulative
 #'   incidence) as the outcome. Not available for competing risks models.
 #' @param weights an optional vector of 'prior weights' to be used in the
-#'   fitting process. Should be NULL or a numeric vector.
+#'   fitting process. Should be NULL or a numeric vector found in data.
 #' @param subset an optional vector specifying a subset of observations to be
 #'   used in the fitting process.
 #' @param na.action a function which indicates what should happen when the data
@@ -75,6 +75,10 @@
 #' @param singular.ok logical; if FALSE a singular fit is an error.
 #' @param contrasts an optional list. See the contrasts.arg of
 #'   \link[stats]{model.matrix.default}.
+#' @param id An optional integer vector of subject identifiers, found in data.
+#'   If this is present, then generalized estimating equations will be used
+#'   to fit the model. This can be used, for example, if there are multiple
+#'   observations per individual represented as multiple rows in data.
 #' @param ... Other arguments passed to \link[stats]{glm.fit}
 #'
 #'
@@ -117,7 +121,8 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
                       weights, subset,
                       na.action, offset,
                       control = list(...), model = FALSE,
-                      x = TRUE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...) {
+                      x = TRUE, y = TRUE, singular.ok = TRUE, contrasts = NULL,
+                      id, ...) {
 
 
     stopifnot(is.numeric(time))
@@ -164,7 +169,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
     newdata[[pot.nme]] <- rep(time, each = nn)
     newdata[[newnames[length(newnames)]]] <- rep(1:nrow(data), length(time))
 
-    ## get stuff ready for glm.fit
+    ## get stuff ready for glm.fit or geese.fit
     if(length(time) > 1) {
         formula2 <- update.formula(formula, as.formula(paste0(po.nme,
         "~ factor(", pot.nme, ") + .")))
@@ -176,10 +181,12 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         termvect[attr(Terms, "specials")$tve] <- changed
 
         formula2[[3]] <- reformulate(termvect[-1], response = termvect[1])[[3]]
-        formula2i <- reformulate(termvect[-1], response = termvect[1])
+        formula2i <- reformulate(termvect[-1], response = termvect[1],
+                                 env = environment(formula2))
 
     } else {
         formula2 <- update.formula(formula, as.formula(paste(po.nme, "~ .")))
+        formula2i <- formula2
         Terms <- terms(formula2, specials = c("tve"))
         if(!is.null(attr(Terms, "specials")$tve)) {
             stop("Special term 'tve' not available if length(time) == 1")
@@ -189,11 +196,11 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
     mf <- match.call(expand.dots = FALSE)
     m <- match(c("formula", "data", "subset",
-                 "weights", "na.action", "offset"), names(mf), 0L)
+                 "weights", "na.action", "offset", "id"), names(mf), 0L)
     mf <- mf[c(1L, m)]
     mf$drop.unused.levels <- TRUE
     mf[[1L]] <- quote(stats::model.frame)
-    mf[["formula"]] <- formula2
+    mf[["formula"]] <- formula2i
     mf[["data"]] <- newdata
     mf[[po.id]] <- newdata[[po.id]]
     mf <- eval(mf, parent.frame())
@@ -225,26 +232,43 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         if (length(offset) != NROW(Y))
             stop(gettextf("number of offsets is %d should equal %d (number of observations)",
                           length(offset), NROW(Y)), domain = NA)
+    } else {
+      offset <- rep(0, nrow(mf))
     }
     mustart <- rep(mean(newdata[[po.nme]]), nrow(mf))
-
 
     fit <- stats::glm.fit(X, Y, weights = weights,
                           family = quasi(link = link, variance = "constant"),
                           mustart = mustart, offset = offset,
-                          intercept = attr(mt, "intercept") > 0L, singular.ok = singular.ok)
+                          intercept = attr(mt, "intercept") > 0L,
+                          singular.ok = singular.ok,
+                          control = list(...))
 
     fit.method <- "glm.fit"
-    if(length(time) > 1) {
+    if(length(time) > 1 | !missing(id)) {
 
-        newdatasrt <- newdata[order(newdata[[po.id]]),]
-        fitgee <- geepack::geese(formula2i, id = newdatasrt[[po.id]],
-                                 data = newdatasrt, weights = weights,
-                                 mean.link = link, variance = "gaussian",
-                                 corstr = "independence", b = fit$coef)
+        if(!missing(id)) {
+          thisid <- mf[["(id)"]]
+        } else {
+          thisid <- newdata[[po.id]]
+        }
+
+
+      idord <- order(thisid)
+      newdatasrt <- newdata[idord,]
+      thisidsrt <- thisid[idord]
+
+        fitgee <- geepack::geese.fit(x = X[idord,], y = Y[idord], id = thisidsrt,
+                                     offset = offset[idord],
+                                     w = weights[idord], waves = NULL,
+                                     control = geepack::geese.control(...),
+                                     b = fit$coef, alpha = NULL,
+                                     gm = NULL, family = gaussian(),
+                                    mean.link = link, variance = "gaussian",
+                                 corstr = "independence")
 
         fit$coefficients <- fitgee$beta
-        fit$cluster.id <- mf[[po.id]]
+        fit$cluster.id <- thisid
         fit$sandcov <- fitgee$vbeta
         colnames(fit$sandcov) <- rownames(fit$sandcov) <- names(fit$coefficients)
         fit$converged <- !as.logical(fitgee$error)
@@ -360,6 +384,10 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #' @param singular.ok logical; if FALSE a singular fit is an error.
 #' @param contrasts an optional list. See the contrasts.arg of
 #'   \link[stats]{model.matrix.default}.
+#' @param id An optional integer vector of subject identifiers, found in data.
+#'   If this is present, then generalized estimating equations will be used
+#'   to fit the model. This can be used, for example, if there are multiple
+#'   observations per individual represented as multiple rows in data.
 #' @param ... Other arguments passed to \link[stats]{glm.fit}
 #'
 #'
@@ -377,11 +405,11 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 
 #'
 #' @examples
-#'     cumincipcw <- rmeanglm(Surv(etime, event) ~ age + sex,
+#'     rmeanipcw <- rmeanglm(Surv(etime, event) ~ age + sex,
 #'          time = 200, cause = "pcm", link = "identity",
 #'          model.censoring = "independent", data = mgus2)
 #' # stratified on only the categorical covariate
-#'      cumincipcw2 <- rmeanglm(Surv(etime, event) ~ age + sex,
+#'      rmeanipcw2 <- rmeanglm(Surv(etime, event) ~ age + sex,
 #'                          time = 200, cause = "pcm", link = "identity",
 #'                          model.censoring = "stratified",
 #'                          formula.censoring = ~ sex, data = mgus2)
@@ -393,7 +421,8 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
                      weights, subset,
                      na.action, offset,
                      control = list(...), model = FALSE,
-                     x = TRUE, y = TRUE, singular.ok = TRUE, contrasts = NULL, ...) {
+                     x = TRUE, y = TRUE, singular.ok = TRUE, contrasts = NULL,
+                     id, ...) {
 
     stopifnot(length(time) == 1)
     stopifnot(is.numeric(time))
@@ -433,7 +462,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
 
     mf <- match.call(expand.dots = FALSE)
     m <- match(c("formula", "data", "subset",
-                 "weights", "na.action", "offset"), names(mf), 0L)
+                 "weights", "na.action", "offset", "id"), names(mf), 0L)
     mf <- mf[c(1L, m)]
     mf$drop.unused.levels <- TRUE
     mf[[1L]] <- quote(stats::model.frame)
@@ -468,14 +497,51 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
         if (length(offset) != NROW(Y))
             stop(gettextf("number of offsets is %d should equal %d (number of observations)",
                           length(offset), NROW(Y)), domain = NA)
+    } else {
+      offset <- rep(0, nrow(mf))
     }
     mustart <- rep(mean(newdata[[po.nme]]), nrow(mf))
 
+    fit.method <- "glm.fit"
 
     fit <- stats::glm.fit(X, Y, weights = weights,
                           family = quasi(link = link, variance = "constant"),
                           mustart = mustart, offset = offset,
-                          intercept = attr(mt, "intercept") > 0L, singular.ok = singular.ok)
+                          intercept = attr(mt, "intercept") > 0L, singular.ok = singular.ok,
+                          control = list(...))
+
+    if(!missing(id)) {
+
+      if(!missing(id)) {
+        thisid <- mf[["(id)"]]
+      } else {
+        thisid <- newdata[[po.id]]
+      }
+
+
+      idord <- order(thisid)
+      newdatasrt <- newdata[idord,]
+      thisidsrt <- thisid[idord]
+
+      fitgee <- geepack::geese.fit(x = X[idord,], y = Y[idord], id = thisidsrt,
+                                   offset = offset[idord],
+                                   w = weights[idord], waves = NULL,
+                                   control = geepack::geese.control(...),
+                                   b = fit$coef, alpha = NULL,
+                                   gm = NULL, family = gaussian(),
+                                   mean.link = link, variance = "gaussian",
+                                   corstr = "independence")
+
+      fit$coefficients <- fitgee$beta
+      fit$cluster.id <- thisid
+      fit$sandcov <- fitgee$vbeta
+      colnames(fit$sandcov) <- rownames(fit$sandcov) <- names(fit$coefficients)
+      fit$converged <- !as.logical(fitgee$error)
+
+      fit.method <- "geese"
+
+    }
+
 
     if (model) {
         fit$model <- mf
@@ -488,7 +554,8 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
         fit$y <- NULL
     }
     fit.lin <- structure(c(fit, list(call = cal, formula = formula, terms = mt,
-                                     data = data, offset = offset, control = list(), method = "glm.fit",
+                                     data = data, offset = offset, control = list(...),
+                                     method = fit.method,
                                      contrasts = attr(X, "contrasts"), xlevels = .getXlevels(mt,
                                                                                              mf))),
                          class = c(fit$class, c("glm", "lm")))
