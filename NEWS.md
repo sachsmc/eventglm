@@ -3,6 +3,7 @@
 New features: 
 
 - Allow id argument in cumincglm and rmeanglm. When id is present, geese.fit will be used instead of glm.fit, with clusters indicated by the id. This is to account for clustered data, for example.
+- Informative error message if there is missing data in the censoring model
 
 # eventglm 1.2.2
 

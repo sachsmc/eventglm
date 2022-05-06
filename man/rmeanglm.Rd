@@ -58,7 +58,8 @@ the model. Can also be a custom function, see Details and the
 
 \item{formula.censoring}{A one sided formula (e.g., \code{~ x1 + x2})
 specifying the model for the censoring distribution. If NULL, uses the same
-mean model as for the outcome.}
+mean model as for the outcome. Missing values in any covariates for the
+censoring model will cause an error.}
 
 \item{ipcw.method}{Which method to use for calculation of inverse
 probability of censoring weighted pseudo observations. "binder" the

@@ -89,6 +89,27 @@ test_that("ipcw works", {
     expect_true(all(sqrt(diag(vcov(rmeanipcw1, type = "naive"))) > 0))
     expect_true(all(sqrt(diag(vcov(rmeanipcw1, type = "robust"))) > 0))
 
+    mgus2$age[1:20] <- NA
+
+    expect_error(cumincglm(Surv(etime, event) ~ age + sex,
+                             time = 200, cause = "pcm", link = "identity",
+                             model.censoring = "coxph",
+                             data = mgus2))
+
+    expect_error(cumincglm(Surv(etime, event) ~ age + sex,
+                           time = 200, cause = "pcm", link = "identity",
+                           model.censoring = "aareg",
+                           data = mgus2))
+
+    mgus2$sex[1:20] <- NA
+    expect_error(cumincglm(Surv(etime, event) ~ sex,
+                           time = 200, cause = "pcm", link = "identity",
+                           model.censoring = "stratified",
+                           formula.censoring = ~ sex,
+                           data = mgus2))
+
+
+
 })
 
 

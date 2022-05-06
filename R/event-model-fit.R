@@ -39,7 +39,8 @@
 #'   eventglm" vignette.
 #' @param formula.censoring A one sided formula (e.g., \code{~ x1 + x2})
 #'   specifying the model for the censoring distribution. If NULL, uses the same
-#'   mean model as for the outcome.
+#'   mean model as for the outcome. Missing values in any covariates for the
+#'   censoring model will cause an error.
 #' @param ipcw.method Which method to use for calculation of inverse probability
 #'   of censoring weighted pseudo observations. "binder" the default, uses the
 #'   number of observations as the denominator, while the "hajek" method uses
@@ -351,7 +352,8 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
 #'   "Extending eventglm" vignette.
 #' @param formula.censoring A one sided formula (e.g., \code{~ x1 + x2})
 #'   specifying the model for the censoring distribution. If NULL, uses the same
-#'   mean model as for the outcome.
+#'   mean model as for the outcome. Missing values in any covariates for the
+#'   censoring model will cause an error.
 #' @param ipcw.method Which method to use for calculation of inverse
 #'   probability of censoring weighted pseudo observations. "binder" the
 #'   default, uses the number of observations as the denominator, while the

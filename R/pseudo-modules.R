@@ -120,8 +120,11 @@ pseudo_stratified <- function(formula, time, cause = 1, data,
 
   }
 
-
-  strata <- interaction(model.frame(formula.censoring, data = data))
+  mfout <- model.frame(formula.censoring, data = data)
+  if(!is.null(mfout$na.action)){
+    stop("Missing data not allowed for covariates in the censoring model")
+  }
+  strata <- interaction(mfout)
   orig.order <- 1:length(strata)
   new.order <- integer(length(strata))
   stratified.jacks <- numeric(length(strata))
@@ -218,6 +221,10 @@ pseudo_aareg <- function(formula, time, cause = 1, data,
 
   fitcens <- survival::aareg(cens.formula, data = data)
 
+  if(!is.null(fitcens$na.action)) {
+    stop("Missing data not allowed for covariates in the censoring model")
+  }
+
   tdex <- sapply(pmin(data[[add.nme[2]]], time), function(t) max(c(1, which(fitcens$times <= t))))
   Gi <- numeric(length(tdex))
   for(i in 1:length(tdex)) {
@@ -309,6 +316,10 @@ pseudo_coxph <- function(formula, time, cause = 1, data,
   predmat <- model.matrix(cens.formula, data = data)
 
   fitcens <- survival::coxph(cens.formula, data = data, x = TRUE)
+  if(!is.null(fitcens$na.action)) {
+    stop("Missing data not allowed for covariates in the censoring model")
+  }
+
   coxsurv <- survival::survfit(fitcens, newdata = data)
   tdex <- sapply(pmin(data[[add.nme[2]]], time), function(t) max(c(1, which(coxsurv$time <= t))))
   Gi <- coxsurv$surv[cbind(tdex,1:ncol(coxsurv$surv))]
