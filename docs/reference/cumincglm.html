@@ -78,7 +78,7 @@ quasi." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -170,6 +170,7 @@ for estimating ratios, and any of the other link functions supported by
   y <span class='op'>=</span> <span class='cn'>TRUE</span>,
   singular.ok <span class='op'>=</span> <span class='cn'>TRUE</span>,
   contrasts <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>id</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -221,7 +222,8 @@ eventglm" vignette.</p></td>
       <th>formula.censoring</th>
       <td><p>A one sided formula (e.g., <code>~ x1 + x2</code>)
 specifying the model for the censoring distribution. If NULL, uses the same
-mean model as for the outcome.</p></td>
+mean model as for the outcome. Missing values in any covariates for the
+censoring model will cause an error.</p></td>
     </tr>
     <tr>
       <th>ipcw.method</th>
@@ -242,7 +244,7 @@ incidence) as the outcome. Not available for competing risks models.</p></td>
     <tr>
       <th>weights</th>
       <td><p>an optional vector of 'prior weights' to be used in the
-fitting process. Should be NULL or a numeric vector.</p></td>
+fitting process. Should be NULL or a numeric vector found in data.</p></td>
     </tr>
     <tr>
       <th>subset</th>
@@ -296,6 +298,13 @@ components of the returned value.</p></td>
       <th>contrasts</th>
       <td><p>an optional list. See the contrasts.arg of
 <a href='https://rdrr.io/r/stats/model.matrix.html'>model.matrix.default</a>.</p></td>
+    </tr>
+    <tr>
+      <th>id</th>
+      <td><p>An optional integer vector of subject identifiers, found in data.
+If this is present, then generalized estimating equations will be used
+to fit the model. This can be used, for example, if there are multiple
+observations per individual represented as multiple rows in data.</p></td>
     </tr>
     <tr>
       <th>...</th>

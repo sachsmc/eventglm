@@ -113,7 +113,7 @@ pseudo_infjack <- function(formula, time, cause = 1, data,
      ## S(t) + (n)[S(t) -S_{-i}(t)]
      POi <- matrix(pstate, nrow = marginal.estimate2$n, ncol = length(time), byrow = TRUE) +
          (marginal.estimate2$n) *
-         (marginal.estimate2$influence.surv[, tdex + 1])
+         (marginal.estimate2$influence.surv[, tdex])
      
      POi
 

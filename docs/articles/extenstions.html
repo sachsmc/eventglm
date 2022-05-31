@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
       </span>
     </div>
 
@@ -142,7 +142,7 @@
 <span class="co">#&gt;   POi</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x000000001c90cf58&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x0000000012576ea0&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:eventglm&gt;</span></code></pre></div>
 <p>This function, and any pseudo observation module, must take the same named arguments (though they do not all have to be used), and return a vector of pseudo observations.</p>
 </div>
@@ -251,7 +251,7 @@
      <span class="co">## S(t) + (n)[S(t) -S_{-i}(t)]</span>
      <span class="va">POi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="va">pstate</span>, nrow <span class="op">=</span> <span class="va">marginal.estimate2</span><span class="op">$</span><span class="va">n</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span>
          <span class="op">(</span><span class="va">marginal.estimate2</span><span class="op">$</span><span class="va">n</span><span class="op">)</span> <span class="op">*</span>
-         <span class="op">(</span><span class="va">marginal.estimate2</span><span class="op">$</span><span class="va">influence.surv</span><span class="op">[</span>, <span class="va">tdex</span> <span class="op">+</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span>
+         <span class="op">(</span><span class="va">marginal.estimate2</span><span class="op">$</span><span class="va">influence.surv</span><span class="op">[</span>, <span class="va">tdex</span><span class="op">]</span><span class="op">)</span>
      
      <span class="va">POi</span>
 
@@ -278,27 +278,27 @@
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">0.5108264</td>
+<td align="right">0.4891736</td>
 <td align="right">0.5108945</td>
 </tr>
 <tr class="even">
 <td align="left">rxLev</td>
-<td align="right">0.0292609</td>
+<td align="right">-0.0292609</td>
 <td align="right">0.0292873</td>
 </tr>
 <tr class="odd">
 <td align="left">rxLev+5FU</td>
-<td align="right">0.1326361</td>
+<td align="right">-0.1326361</td>
 <td align="right">0.1326516</td>
 </tr>
 <tr class="even">
 <td align="left">sex</td>
-<td align="right">0.0102568</td>
+<td align="right">-0.0102568</td>
 <td align="right">0.0102263</td>
 </tr>
 <tr class="odd">
 <td align="left">age</td>
-<td align="right">-0.0010036</td>
+<td align="right">0.0010036</td>
 <td align="right">-0.0010047</td>
 </tr>
 </tbody>

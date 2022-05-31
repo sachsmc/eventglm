@@ -27,6 +27,7 @@ reference:
       - pseudo_stratified
       - pseudo_aareg
       - pseudo_coxph
+      - pseudo_infjack
   - title: "Utilities"
     desc: "Utilities and internal functions"
     contents:

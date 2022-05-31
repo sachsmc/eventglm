@@ -264,7 +264,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
                                      w = weights[idord], waves = NULL,
                                      control = geepack::geese.control(...),
                                      b = fit$coef, alpha = NULL,
-                                     gm = NULL, family = gaussian(),
+                                     gm = NULL, family = stats::gaussian(),
                                     mean.link = link, variance = "gaussian",
                                  corstr = "independence")
 
@@ -294,11 +294,15 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
                                                                               mf))),
                       class = c(fit$class, c("glm", "lm")))
 
-    datamat <- cbind(mr[, "time"],
-                     mr[, "status"] != 0, ## not censored indicator
-                     mr[, "status"] == causen,
-                     mr[, "status"] == 0 )## censored indicator
+    if(attr(mr, "type") %in% c("right", "mright")) {
+      datamat <- cbind(mr[, "time"],
+                       mr[, "status"] != 0, ## not censored indicator
+                       mr[, "status"] == causen,
+                       mr[, "status"] == 0 )## censored indicator
 
+    } else {
+      datamat <- NULL
+    }
     fit.lin$datamat <- datamat
     fit.lin$time <- time
     fit.lin$cause <- cause
@@ -517,7 +521,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
       if(!missing(id)) {
         thisid <- mf[["(id)"]]
       } else {
-        thisid <- newdata[[po.id]]
+        thisid <- 1:nrow(newdata)
       }
 
 
@@ -530,7 +534,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
                                    w = weights[idord], waves = NULL,
                                    control = geepack::geese.control(...),
                                    b = fit$coef, alpha = NULL,
-                                   gm = NULL, family = gaussian(),
+                                   gm = NULL, family = stats::gaussian(),
                                    mean.link = link, variance = "gaussian",
                                    corstr = "independence")
 

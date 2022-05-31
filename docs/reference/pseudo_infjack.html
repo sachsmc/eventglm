@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Compute leave one out jackknife contributions of the survival function — leaveOneOut.survival • eventglm</title>
+<title>Compute infinitesimal jackknife pseudo observations — pseudo_infjack • eventglm</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,15 @@
 
 
 
-<meta property="og:title" content="Compute leave one out jackknife contributions of the survival function — leaveOneOut.survival" />
-<meta property="og:description" content="For each subject, the survival function is recomputed leaving that subject out.
-This one does the calculation for all observed times, for calculation of the restricted mean" />
+<meta property="og:title" content="Compute infinitesimal jackknife pseudo observations — pseudo_infjack" />
+<meta property="og:description" content="Assuming that the censoring depends on covariates with a finite set of levels,
+the pseudo observations are calculated with the infinitesimal jackknife approach
+stratified on those covariates. If no covariates are specified in the censoring model,
+then the pseudo observations are calculated under the completely independent censoring
+assumption. This function allows survival objects with entry and exit times, thus
+multi-state models, recurrent events, and delayed entry/left truncation. With
+delayed entry, the pseudo observation approach theoretically works under the assumption
+that the entry time is independent of covariates." />
 
 
 
@@ -130,44 +136,89 @@ This one does the calculation for all observed times, for calculation of the res
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Compute leave one out jackknife contributions of the survival function</h1>
-    <small class="dont-index">Source: <a href='https://github.com/sachsmc/eventglm/blob/master/R/jackknife-cuminc.R'><code>R/jackknife-cuminc.R</code></a></small>
-    <div class="hidden name"><code>leaveOneOut.survival.Rd</code></div>
+    <h1>Compute infinitesimal jackknife pseudo observations</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sachsmc/eventglm/blob/master/R/pseudo-modules.R'><code>R/pseudo-modules.R</code></a></small>
+    <div class="hidden name"><code>pseudo_infjack.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>For each subject, the survival function is recomputed leaving that subject out.
-This one does the calculation for all observed times, for calculation of the restricted mean</p>
+    <p>Assuming that the censoring depends on covariates with a finite set of levels,
+the pseudo observations are calculated with the infinitesimal jackknife approach
+stratified on those covariates. If no covariates are specified in the censoring model,
+then the pseudo observations are calculated under the completely independent censoring
+assumption. This function allows survival objects with entry and exit times, thus
+multi-state models, recurrent events, and delayed entry/left truncation. With
+delayed entry, the pseudo observation approach theoretically works under the assumption
+that the entry time is independent of covariates.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>leaveOneOut.survival</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>times</span>, <span class='va'>mr</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>pseudo_infjack</span><span class='op'>(</span>
+  <span class='va'>formula</span>,
+  <span class='va'>time</span>,
+  cause <span class='op'>=</span> <span class='fl'>1</span>,
+  <span class='va'>data</span>,
+  type <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"cuminc"</span>, <span class='st'>"survival"</span>, <span class='st'>"rmean"</span><span class='op'>)</span>,
+  formula.censoring <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ipcw.method <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>A survfit object, with a single event (no competing risks)</p></td>
+      <th>formula</th>
+      <td><p>A formula specifying the outcome model. The left hand side must be a
+<a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a> object specifying a right censored survival,
+competing risks, counting process, or multistate outcome. The status
+indicator, normally 0=alive, 1=dead.
+Other choices are TRUE/FALSE (TRUE = death) or 1/2 (2=death). For competing
+risks and multi state models, the event variable will be a factor,
+whose first level is treated as
+censoring. The right hand side is the usual linear combination of
+covariates.</p></td>
     </tr>
     <tr>
-      <th>times</th>
-      <td><p>Compute values at observed times up to and including this time</p></td>
+      <th>time</th>
+      <td><p>Numeric constant specifying the time at which the cumulative
+incidence or survival probability effect estimates are desired.</p></td>
     </tr>
     <tr>
-      <th>mr</th>
-      <td><p>Model response, the result of a call to Surv, or a matrix with two columns: "time" (observed follow up time) and "status" (0 = censored, 1 = event)</p></td>
+      <th>cause</th>
+      <td><p>Numeric or character constant specifying the cause indicator of
+interest.</p></td>
+    </tr>
+    <tr>
+      <th>data</th>
+      <td><p>Data frame in which all variables of formula can be interpreted.</p></td>
+    </tr>
+    <tr>
+      <th>type</th>
+      <td><p>One of "survival", "cuminc", or "rmean"</p></td>
+    </tr>
+    <tr>
+      <th>formula.censoring</th>
+      <td><p>A optional right-sided formula specifying which variables to
+stratify on. All variables in this formula must be categorical.</p></td>
+    </tr>
+    <tr>
+      <th>ipcw.method</th>
+      <td><p>Not used with this method</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A vector of jackknifed values of survival at time times</p>
+    <p>A vector of pseudo observations</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><a href='https://rdrr.io/pkg/survival/man/survfit.html'>survfit</a></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='va'>sfit.surv</span> <span class='op'>&lt;-</span> <span class='fu'>survival</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/survfit.html'>survfit</a></span><span class='op'>(</span><span class='fu'>survival</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span><span class='op'>(</span><span class='va'>time</span>, <span class='va'>status</span><span class='op'>)</span> <span class='op'>~</span> <span class='fl'>1</span>, data <span class='op'>=</span> <span class='va'>colon</span><span class='op'>)</span>
-<span class='va'>mrs</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/with.html'>with</a></span><span class='op'>(</span><span class='va'>colon</span>, <span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span><span class='op'>(</span><span class='va'>time</span>, <span class='va'>status</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>jackvals</span> <span class='op'>&lt;-</span> <span class='fu'>leaveOneOut.survival</span><span class='op'>(</span><span class='va'>sfit.surv</span>, <span class='fl'>1000</span>, <span class='va'>mrs</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='va'>POi</span> <span class='op'>&lt;-</span> <span class='fu'>pseudo_infjack</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/pkg/survival/man/Surv.html'>Surv</a></span><span class='op'>(</span><span class='va'>time</span>, <span class='va'>status</span><span class='op'>)</span> <span class='op'>~</span> <span class='fl'>1</span>, <span class='fl'>1500</span>, cause <span class='op'>=</span> <span class='fl'>1</span>,
+  data <span class='op'>=</span> <span class='va'>colon</span>, type <span class='op'>=</span> <span class='st'>"survival"</span>, formula.censoring <span class='op'>=</span> <span class='op'>~</span> <span class='va'>sex</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>POi</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] 0.5801007</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

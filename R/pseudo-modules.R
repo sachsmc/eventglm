@@ -332,3 +332,115 @@ pseudo_coxph <- function(formula, time, cause = 1, data,
 
 }
 
+
+
+#' Compute infinitesimal jackknife pseudo observations
+#'
+#' Assuming that the censoring depends on covariates with a finite set of levels,
+#' the pseudo observations are calculated with the infinitesimal jackknife approach
+#' stratified on those covariates. If no covariates are specified in the censoring model,
+#' then the pseudo observations are calculated under the completely independent censoring
+#' assumption. This function allows survival objects with entry and exit times, thus
+#' multi-state models, recurrent events, and delayed entry/left truncation. With
+#' delayed entry, the pseudo observation approach theoretically works under the assumption
+#' that the entry time is independent of covariates.
+#'
+#' @param formula A formula specifying the outcome model. The left hand side must be a
+#'   \link[survival]{Surv} object specifying a right censored survival,
+#'   competing risks, counting process, or multistate outcome. The status
+#'   indicator, normally 0=alive, 1=dead.
+#'   Other choices are TRUE/FALSE (TRUE = death) or 1/2 (2=death). For competing
+#'   risks and multi state models, the event variable will be a factor,
+#'   whose first level is treated as
+#'   censoring. The right hand side is the usual linear combination of
+#'   covariates.
+#' @param time Numeric constant specifying the time at which the cumulative
+#'   incidence or survival probability effect estimates are desired.
+#' @param cause Numeric or character constant specifying the cause indicator of
+#'   interest.
+#' @param data Data frame in which all variables of formula can be interpreted.
+#' @param type One of "survival", "cuminc", or "rmean"
+#' @param formula.censoring A optional right-sided formula specifying which variables to
+#'   stratify on. All variables in this formula must be categorical.
+#' @param ipcw.method Not used with this method
+#'
+#' @return A vector of pseudo observations
+#' @seealso \link[survival]{survfit}
+#' @export
+#' @examples
+#' POi <- pseudo_infjack(Surv(time, status) ~ 1, 1500, cause = 1,
+#'   data = colon, type = "survival", formula.censoring = ~ sex)
+#'
+#' mean(POi)
+#'
+
+pseudo_infjack <- function(formula, time, cause = 1, data,
+                         type = c("cuminc", "survival", "rmean"),
+                         formula.censoring = NULL, ipcw.method = NULL){
+
+  if(!is.null(formula.censoring)) {
+    mfout <- model.frame(formula.censoring, data = data)
+    if(!is.null(mfout$na.action)){
+      stop("Missing data not allowed for covariates in the censoring model")
+    }
+  } else {
+    formula.censoring <- ~ 1
+  }
+
+  formula.censoring2 <- as.formula(paste(". ~ ", formula.censoring[-1], collapse = " "))
+
+  marginal.estimate2 <- survival::survfit(update.formula(formula, formula.censoring2),
+                                          data = data, influence = TRUE)
+
+
+  ## S(t) + (n)[S(t) -S_{-i}(t)]
+
+  if(is.null(marginal.estimate2$strata)) {
+
+    tdex <- sapply(time, function(x) max(which(marginal.estimate2$time <= x)))
+    pstate <- marginal.estimate2$surv[tdex]
+    ## S(t) + (n)[S(t) -S_{-i}(t)]
+    POi <- matrix(pstate, nrow = marginal.estimate2$n, ncol = length(time), byrow = TRUE) +
+      (marginal.estimate2$n) *
+      (marginal.estimate2$influence.surv[, tdex + 1])
+
+
+
+
+  } else {
+
+  icur <- matrix(NA, nrow = sum(marginal.estimate2$n), ncol = length(time))
+  iord <- rep(NA, sum(marginal.estimate2$n))
+  j <- 1
+  i1 <- 1
+  for(i in 1:length(marginal.estimate2$strata)) {
+
+    thistime <- marginal.estimate2$time[i1:(i1 + marginal.estimate2$strata[i] - 1)]
+    tdex <- sapply(time, function(x) max(which(thistime <= x)))
+    pstate <- marginal.estimate2$surv[tdex]
+
+
+    dl <- marginal.estimate2$influence.surv[[i]]
+    icur[j:(j+length(dl[,tdex]) - 1),] <- matrix(pstate, nrow = marginal.estimate2$n[i],
+                                            ncol = length(time), byrow = TRUE) +
+      dl[,tdex] * marginal.estimate2$n[i]
+
+    iord[j:(j+length(dl[,tdex]) - 1)] <- as.numeric(rownames(dl))
+
+    j <- j + length(dl[, tdex])
+    i1 <- marginal.estimate2$strata[i] + 1
+
+  }
+
+  POi <- icur[order(iord), ]
+
+  }
+
+  if(type == "cuminc") {
+    1 - POi
+  } else {
+    POi
+  }
+
+}
+

@@ -239,3 +239,67 @@ test_that("Glm features work", {
 
 })
 
+
+
+test_that("Left truncation and infjack", {
+
+  library(survival)
+  mdata <- tmerge(myeloid[!is.na(myeloid$crtime),1:2], myeloid[!is.na(myeloid$crtime),],
+                  id=id, death= event(futime, death),
+                  cr = event(crtime)
+                  )
+
+  mdata <- mdata[mdata$cr == 0,]
+
+  sfit <- survfit(Surv(tstart, tstop, death) ~ trt, data = mdata,
+                  influence = 1)
+
+  sfitm <- summary(sfit, times = c(750))
+
+  tinf <- cumincglm(Surv(tstart, tstop, death) ~ trt, data = mdata,
+                    time = 750, model.censoring = "infjack", survival = TRUE)
+
+  expect_true(abs(diff(sfitm$surv) - tinf$coefficients[2]) < .005)
+
+
+  cuminctest <- cumincglm(Surv(time, status) ~ rx, 1500, cause = 1,
+                          data = colon, survival = TRUE,
+                          model.censoring = "stratified",
+                          formula.censoring = ~ sex)
+
+  cuminctest2 <- cumincglm(Surv(time, status) ~ rx, 1500, cause = 1,
+                          data = colon, survival = TRUE,
+                          model.censoring = "infjack",
+                          formula.censoring = ~ sex)
+
+
+  expect_true(mean(abs(cuminctest$coefficients - cuminctest2$coefficients)) < .01)
+
+
+  cuminctest <- cumincglm(Surv(time, status) ~ rx, 1500, cause = 1,
+                          data = colon, survival = TRUE,
+                          model.censoring = "independent")
+
+  cuminctest2 <- cumincglm(Surv(time, status) ~ rx, 1500, cause = 1,
+                           data = colon, survival = TRUE,
+                           model.censoring = "infjack",
+                           formula.censoring = ~ 1)
+
+
+  expect_true(mean(abs(cuminctest$coefficients - cuminctest2$coefficients)) < .005)
+
+
+  cuminctest <- cumincglm(Surv(time, status) ~ rx, 1500, cause = 1,
+                          data = colon, survival = FALSE,
+                          model.censoring = "independent")
+
+  cuminctest2 <- cumincglm(Surv(time, status) ~ rx, 1500, cause = 1,
+                           data = colon, survival = FALSE,
+                           model.censoring = "infjack",
+                           formula.censoring = ~ 1)
+
+
+  expect_true(mean(abs(cuminctest$coefficients - cuminctest2$coefficients)) < .005)
+
+})
+
