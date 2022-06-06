@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.4.0</span>
       </span>
     </div>
 
@@ -142,7 +142,7 @@
 <span class="co">#&gt;   POi</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x0000000012576ea0&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x00000000211559c0&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:eventglm&gt;</span></code></pre></div>
 <p>This function, and any pseudo observation module, must take the same named arguments (though they do not all have to be used), and return a vector of pseudo observations.</p>
 </div>
@@ -237,7 +237,7 @@
 <a href="#example-2-infinitesimal-jackknife" class="anchor"></a>Example 2: infinitesimal jackknife</h2>
 <p>When the survival package version 3.0 was released, it became possible to get the influence function values returned from some estimation functions. These efficient influence functions are used in the variance calculations, and they are related to pseudo observations. More information is available in the “pseudo.Rnw” vignette of the development version of survival. We can use this feature to create a custom function for infinitesimal jackknife pseudo observations:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pseudo_infjack</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">formula</span>, <span class="va">time</span>, <span class="va">cause</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">data</span>,
+<code class="sourceCode R"><span class="va">pseudo_infjack2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">formula</span>, <span class="va">time</span>, <span class="va">cause</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">data</span>,
                         <span class="va">type</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"cuminc"</span>, <span class="st">"survival"</span>, <span class="st">"rmean"</span><span class="op">)</span>,
                         <span class="va">formula.censoring</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">ipcw.method</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span>
   
@@ -259,7 +259,7 @@
 <p>Note that this computes pseudo observations for survival, rather than the cumulative incidence, so to compare we can use the survival = TRUE option. Now we try it out</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">fitinf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">age</span>, time <span class="op">=</span> <span class="fl">2500</span>, 
-                  model.censoring <span class="op">=</span> <span class="st">"infjack"</span>, 
+                  model.censoring <span class="op">=</span> <span class="st">"infjack2"</span>, 
                   data <span class="op">=</span> <span class="va">colon</span><span class="op">)</span>
 
 <span class="va">fitdefsurv</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cumincglm.html">cumincglm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">time</span>, <span class="va">status</span><span class="op">)</span> <span class="op">~</span> <span class="va">rx</span> <span class="op">+</span> <span class="va">sex</span> <span class="op">+</span> <span class="va">age</span>, time <span class="op">=</span> <span class="fl">2500</span>, 
@@ -278,27 +278,27 @@
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">0.4891736</td>
+<td align="right">0.5108264</td>
 <td align="right">0.5108945</td>
 </tr>
 <tr class="even">
 <td align="left">rxLev</td>
-<td align="right">-0.0292609</td>
+<td align="right">0.0292609</td>
 <td align="right">0.0292873</td>
 </tr>
 <tr class="odd">
 <td align="left">rxLev+5FU</td>
-<td align="right">-0.1326361</td>
+<td align="right">0.1326361</td>
 <td align="right">0.1326516</td>
 </tr>
 <tr class="even">
 <td align="left">sex</td>
-<td align="right">-0.0102568</td>
+<td align="right">0.0102568</td>
 <td align="right">0.0102263</td>
 </tr>
 <tr class="odd">
 <td align="left">age</td>
-<td align="right">0.0010036</td>
+<td align="right">-0.0010036</td>
 <td align="right">-0.0010047</td>
 </tr>
 </tbody>

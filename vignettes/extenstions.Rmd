@@ -98,7 +98,7 @@ fit1 <- cumincglm(Surv(time, status) ~ rx + sex + age, time = 2500,
 When the survival package version 3.0 was released, it became possible to get the influence function values returned from some estimation functions. These efficient influence functions are used in the variance calculations, and they are related to pseudo observations. More information is available in the "pseudo.Rnw" vignette of the development version of survival. We can use this feature to create a custom function for infinitesimal jackknife pseudo observations: 
 
 ```{r}
-pseudo_infjack <- function(formula, time, cause = 1, data,
+pseudo_infjack2 <- function(formula, time, cause = 1, data,
                         type = c("cuminc", "survival", "rmean"),
                         formula.censoring = NULL, ipcw.method = NULL) {
   
@@ -124,7 +124,7 @@ Note that this computes pseudo observations for survival, rather than the cumula
 
 ```{r}
 fitinf <- cumincglm(Surv(time, status) ~ rx + sex + age, time = 2500, 
-                  model.censoring = "infjack", 
+                  model.censoring = "infjack2", 
                   data = colon)
 
 fitdefsurv <- cumincglm(Surv(time, status) ~ rx + sex + age, time = 2500, 
