@@ -255,6 +255,13 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
         }
 
 
+
+      if(inherits(attr(mf, "na.action"), "omit")) {
+
+        thisid <- thisid[-attr(mf, "na.action")]
+
+      }
+
       idord <- order(thisid)
       newdatasrt <- newdata[idord,]
       thisidsrt <- thisid[idord]
@@ -524,6 +531,11 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
         thisid <- 1:nrow(newdata)
       }
 
+      if(inherits(attr(mf, "na.action"), "omit")) {
+
+        thisid <- thisid[-attr(mf, "na.action")]
+
+      }
 
       idord <- order(thisid)
       newdatasrt <- newdata[idord,]

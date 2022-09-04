@@ -159,6 +159,29 @@ test_that("Multiple times work", {
 
 })
 
+test_that("Missing data", {
+
+  cuminctest <- cumincglm(Surv(etime, event) ~ hgb + creat + sex,
+                   time = c(50, 100, 200), cause = "pcm", link = "identity", data = mgus2)
+
+  expect_lt(cuminctest$df.residual, nrow(mgus2) * 3)
+
+  cuminctest <- cumincglm(Surv(etime, event) ~ hgb + creat + sex,
+                          time = c(50), cause = "pcm", link = "identity", data = mgus2)
+
+  expect_lt(cuminctest$df.residual, nrow(mgus2))
+
+  mgus2$idtest <- 1:nrow(mgus2)
+
+  rmeantest <- rmeanglm(Surv(etime, event) ~ hgb + creat + sex,
+                          time = c(50), cause = "pcm", link = "identity", data = mgus2,
+                        id = idtest)
+  expect_lt(rmeantest$df.residual, nrow(mgus2))
+
+
+})
+
+
 
 test_that("Clustered data works", {
 
