@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eventglm</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.4.2</span>
       </span>
     </div>
 
@@ -106,10 +106,6 @@
 <span><span class="co">#&gt; Call:</span></span>
 <span><span class="co">#&gt; cumincglm(formula = Surv(time, status) ~ rx, time = 2500, data = colon)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Deviance Residuals: </span></span>
-<span><span class="co">#&gt;     Min       1Q   Median       3Q      Max  </span></span>
-<span><span class="co">#&gt; -0.5875  -0.4902  -0.3467   0.4863   2.1103  </span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
 <span><span class="co">#&gt; (Intercept)  0.54345    0.02946  18.449  &lt; 2e-16 ***</span></span>
@@ -135,72 +131,72 @@
 <h2 id="stata-code-and-results">Stata code and results<a class="anchor" aria-label="anchor" href="#stata-code-and-results"></a>
 </h2>
 <p>This uses the <code>st0202_1</code> package, available from here: <a href="https://www.stata-journal.com/article.html?article=st0202_1" class="external-link uri">https://www.stata-journal.com/article.html?article=st0202_1</a></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode stata"><code class="sourceCode stata"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>. import delimited <span class="st">"colon.csv"</span>, <span class="kw">clear</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>(18 vars, 929 <span class="kw">obs</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>. </span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>. <span class="kw">stset</span> time, failure(status==1)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>     failure event:  status == 1</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="kw">obs</span>. time interval:  (0, time]</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a> <span class="kw">exit</span> <span class="kw">on</span> <span class="kw">or</span> before:  failure</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>------------------------------------------------------------------------------</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        929  <span class="kw">total</span> observations</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>          0  exclusions</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>------------------------------------------------------------------------------</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        929  observations remaining, representing</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        452  failures <span class="kw">in</span> single-record/single-failure <span class="kw">data</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  1,551,389  <span class="kw">total</span> analysis time <span class="fu">at</span> risk and under observation</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>                                                <span class="fu">at</span> risk from t =         0</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                                     earliest observed entry t =         0</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                                          <span class="fu">last</span> observed <span class="kw">exit</span> t =     3,329</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>. </span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>. <span class="co">// requires st0202_1 install (search stpci)</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>. stpci, <span class="fu">at</span>(2500)</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>Pseudo-observations <span class="kw">for</span> the cumulative incidence <span class="kw">function</span>.</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>Competing risks: (<span class="kw">none</span>).</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>Computing pseudo-observations (progress dots indicate <span class="kw">percent</span> completed).</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5 </span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>..................................................    50</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>..................................................   100</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>Generated <span class="kw">variable</span>: pseudo.</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>. <span class="kw">tabulate</span> rx, <span class="kw">gen</span>(rxdum)</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>         rx |      Freq.     Percent        Cum.</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>------------+-----------------------------------</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        Lev |        310       33.37       33.37</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    Lev+5FU |        304       32.72       66.09</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        Obs |        315       33.91      100.00</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>------------+-----------------------------------</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>      Total |        929      100.00</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>. <span class="kw">glm</span> pseudo rxdum1 rxdum2, <span class="kw">vce</span>(<span class="kw">robust</span>)</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>Iteration 0:   <span class="fu">log</span> pseudolikelihood =  -708.7556  </span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>Generalized linear models                         Number <span class="kw">of</span> <span class="kw">obs</span>   =        929</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>Optimization     : ML                             Residual df     =        926</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>                                                  Scale parameter =    .270145</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>Deviance         =   250.154308                   (1/df) Deviance =    .270145</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>Pearson          =   250.154308                   (1/df) Pearson  =    .270145</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>Variance <span class="kw">function</span>: <span class="kw">V</span>(u) = 1                       [Gaussian]</span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>Link <span class="kw">function</span>    : g(u) = u                       [Identity]</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>                                                  AIC             =   1.532305</span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>Log pseudolikelihood = -708.7556003               BIC             =   -6078.23</span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>------------------------------------------------------------------------------</span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>             |               Robust</span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>      pseudo |      Coef.   Std. Err.      z    P&gt;|z|     [95% Conf. Interval]</span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>-------------+----------------------------------------------------------------</span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>      rxdum1 |   -.029075   .0416186    -0.70   0.485    -.1106459    .0524959</span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>      rxdum2 |  -.1317578   .0417443    -3.16   0.002    -.2135752   -.0499404</span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>       <span class="dt">_cons</span> |   .5434514     .02938    18.50   0.000     .4858676    .6010352</span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>------------------------------------------------------------------------------</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode stata"><code class="sourceCode stata"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>. import delimited <span class="st">"colon.csv"</span>, <span class="kw">clear</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>(18 vars, 929 <span class="kw">obs</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>. </span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>. <span class="kw">stset</span> time, failure(status==1)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>     failure event:  status == 1</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="kw">obs</span>. time interval:  (0, time]</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a> <span class="kw">exit</span> <span class="kw">on</span> <span class="kw">or</span> before:  failure</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>------------------------------------------------------------------------------</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>        929  <span class="kw">total</span> observations</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>          0  exclusions</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>------------------------------------------------------------------------------</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>        929  observations remaining, representing</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>        452  failures <span class="kw">in</span> single-record/single-failure <span class="kw">data</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  1,551,389  <span class="kw">total</span> analysis time <span class="fu">at</span> risk and under observation</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>                                                <span class="fu">at</span> risk from t =         0</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>                                     earliest observed entry t =         0</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>                                          <span class="fu">last</span> observed <span class="kw">exit</span> t =     3,329</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>. </span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>. <span class="co">// requires st0202_1 install (search stpci)</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>. stpci, <span class="fu">at</span>(2500)</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>Pseudo-observations <span class="kw">for</span> the cumulative incidence <span class="kw">function</span>.</span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>Competing risks: (<span class="kw">none</span>).</span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>Computing pseudo-observations (progress dots indicate <span class="kw">percent</span> completed).</span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>----+--- 1 ---+--- 2 ---+--- 3 ---+--- 4 ---+--- 5 </span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>..................................................    50</span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a>..................................................   100</span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>Generated <span class="kw">variable</span>: pseudo.</span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a>. <span class="kw">tabulate</span> rx, <span class="kw">gen</span>(rxdum)</span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a>         rx |      Freq.     Percent        Cum.</span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>------------+-----------------------------------</span>
+<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>        Lev |        310       33.37       33.37</span>
+<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a>    Lev+5FU |        304       32.72       66.09</span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a>        Obs |        315       33.91      100.00</span>
+<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a>------------+-----------------------------------</span>
+<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a>      Total |        929      100.00</span>
+<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a>. <span class="kw">glm</span> pseudo rxdum1 rxdum2, <span class="kw">vce</span>(<span class="kw">robust</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a>Iteration 0:   <span class="fu">log</span> pseudolikelihood =  -708.7556  </span>
+<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a>Generalized linear models                         Number <span class="kw">of</span> <span class="kw">obs</span>   =        929</span>
+<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a>Optimization     : ML                             Residual df     =        926</span>
+<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a>                                                  Scale parameter =    .270145</span>
+<span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a>Deviance         =   250.154308                   (1/df) Deviance =    .270145</span>
+<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a>Pearson          =   250.154308                   (1/df) Pearson  =    .270145</span>
+<span id="cb2-52"><a href="#cb2-52" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a>Variance <span class="kw">function</span>: <span class="kw">V</span>(u) = 1                       [Gaussian]</span>
+<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a>Link <span class="kw">function</span>    : g(u) = u                       [Identity]</span>
+<span id="cb2-55"><a href="#cb2-55" tabindex="-1"></a></span>
+<span id="cb2-56"><a href="#cb2-56" tabindex="-1"></a>                                                  AIC             =   1.532305</span>
+<span id="cb2-57"><a href="#cb2-57" tabindex="-1"></a>Log pseudolikelihood = -708.7556003               BIC             =   -6078.23</span>
+<span id="cb2-58"><a href="#cb2-58" tabindex="-1"></a></span>
+<span id="cb2-59"><a href="#cb2-59" tabindex="-1"></a>------------------------------------------------------------------------------</span>
+<span id="cb2-60"><a href="#cb2-60" tabindex="-1"></a>             |               Robust</span>
+<span id="cb2-61"><a href="#cb2-61" tabindex="-1"></a>      pseudo |      Coef.   Std. Err.      z    P&gt;|z|     [95% Conf. Interval]</span>
+<span id="cb2-62"><a href="#cb2-62" tabindex="-1"></a>-------------+----------------------------------------------------------------</span>
+<span id="cb2-63"><a href="#cb2-63" tabindex="-1"></a>      rxdum1 |   -.029075   .0416186    -0.70   0.485    -.1106459    .0524959</span>
+<span id="cb2-64"><a href="#cb2-64" tabindex="-1"></a>      rxdum2 |  -.1317578   .0417443    -3.16   0.002    -.2135752   -.0499404</span>
+<span id="cb2-65"><a href="#cb2-65" tabindex="-1"></a>       <span class="dt">_cons</span> |   .5434514     .02938    18.50   0.000     .4858676    .6010352</span>
+<span id="cb2-66"><a href="#cb2-66" tabindex="-1"></a>------------------------------------------------------------------------------</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="sas-code-and-results">SAS code and results<a class="anchor" aria-label="anchor" href="#sas-code-and-results"></a>
@@ -439,7 +435,7 @@ rxlevplus
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
