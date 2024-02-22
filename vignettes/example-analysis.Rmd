@@ -360,14 +360,17 @@ They are pretty close to those computed using the Pohar Perme estimator reported
 
 # Case cohort sampling
 
-@parner2020cumulative describe how to fit regression models with pseudo-observations that account for case-cohort sampling. The basic idea is weighted estimating equations, which we can implement easily with the `weights` argument that gets passed to `glm.fit`. First let's create a case-cohort sample of the `colon2` dataset by sampling the cancer deaths (`status == 1`) with probability 0.8, and a random subcohort with probability 0.1.
+@parner2020cumulative describe how to fit regression models with pseudo-observations that account for case-cohort sampling. This is sometimes done when survival times are observed for the full sample, but one or more of the covariates are costly to measure. Then the covariates are measured only on everyone who experienced an event, plus a random subsample of the remaining individuals. 
+
+The basic idea is weighted estimating equations, which we can implement easily with the `weights` argument that gets passed to `glm.fit`. First let's create a case-cohort sample of the `colon2` dataset by sampling the cancer deaths (`status == 1`) with probability 0.8, and a random subcohort with probability 0.1. The individuals who are not sampled have their covariates set to missing.
 
 ```{r}
 colon2$status2 <- factor(ifelse(colon2$status == 4, 0, colon2$status), 
                          labels = c("censored", "cancer death", "other death"))
 subc <- rbinom(nrow(colon2), size = 1, p = .2)
 samp.ind <- subc + (1 - subc) * (colon2$status == 1) * rbinom(nrow(colon2), size = 1, p = .9)
-colon.cc <- colon2[as.logical(samp.ind), ]
+colon.cc <- colon2
+colon.cc[!as.logical(samp.ind), c("age", "sex", "subsite")] <- NA
 colon.cc$samp.wt <- 1 / ifelse(colon.cc$status == 1, .2 + .8 * .9, .2)
 ```
 
@@ -380,7 +383,14 @@ cfit.cc <- cumincglm(Surv(surv_mm, status2) ~ age + sex + factor(subsite),
 cfit.full <- cumincglm(Surv(surv_mm, status2) ~ age + sex + factor(subsite), 
                      cause = "cancer death", time = 5 * 12, data = colon2)
 knitr::kable(cbind(casecohort = coefficients(cfit.cc), 
-      fullsamp = coefficients(cfit.full)), digits = 2)
+      fullsamp = coefficients(cfit.full)), digits = 3)
+```
+
+This works because the pseudo observations are computed using the full sample, which you can see from the `rawPO` element of the returned objects: 
+
+```{r}
+cfit.cc$rawPO |> mean()
+cfit.full$rawPO |> mean()
 ```
 
 

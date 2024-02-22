@@ -317,6 +317,7 @@ cumincglm <- function(formula, time, cause = 1, link = "identity",
     fit.lin$type <- if(survival) "survival" else "cuminc"
     fit.lin$ipcw.weights <- ipcw.weights
     fit.lin$competing <- length(unique(mr[, "status"])) > 2
+    fit.lin$rawPO <- POi
 
     class(fit.lin) <- c("pseudoglm", class(fit.lin))
 
@@ -593,6 +594,7 @@ rmeanglm <- function(formula, time, cause = 1, link = "identity",
     fit.lin$type <- "rmean"
     fit.lin$ipcw.weights <- ipcw.weights
     fit.lin$competing <- length(unique(mr[, "status"])) > 2
+    fit.lin$rawPO <- POi
 
     class(fit.lin) <- c("pseudoglm", class(fit.lin))
 

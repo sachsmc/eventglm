@@ -1,4 +1,11 @@
 
+# eventglm 1.4.2
+
+Bug fixes: 
+
+* Fixed case-cohort sampling example thanks @tagteam
+
+
 # eventglm 1.4.1
 
 Bug fixes: 
