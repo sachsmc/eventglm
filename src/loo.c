@@ -155,7 +155,12 @@ void loo_comprisk2(double *Y,
                      because k was in the risk set at
                      time[t]
                      */
+
+                  if(Y[t] == 1) {
+                    na = D[t] - status[k];
+                  } else {
                     na = (D[t]-status[k])/(Y[t]-1);
+                  }
 
                 }
                 else{
@@ -231,7 +236,12 @@ void loo_comprisk(double *Y,
                      because k was in the risk set at
                      time[t]
                      */
-                    na = (D[t]-status[k])/(Y[t]-1);
+                    if(Y[t] == 1) {
+                      na = D[t] - status[k];
+                    } else {
+                      na = (D[t]-status[k])/(Y[t]-1);
+                    }
+
 
                 }
                 else{

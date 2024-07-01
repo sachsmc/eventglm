@@ -326,3 +326,28 @@ test_that("Left truncation and infjack", {
 
 })
 
+
+test_that("extension after last time", {
+
+  set.seed(12) # it does not always, but quite occasionally happen, so I cherry-picked a seed. set.seed(11) does not reproduce the error, so it might work a second look.
+  library(eventglm)
+
+  arm <- sample(c('A', 'B'), 1000, replace=T)
+  ev <- sample(c('Event', 'Cen', 'Comrisk'), 1000, replace=T) #competing-risk
+  ttev <- rweibull(1000, 1, 1)  # time to event
+  ttev <- ifelse(arm=='A' & ev=="Event", pmin(ttev, 2), ttev) # cens everyone of arm A and event "Event" as 2
+  ttev <- ifelse(arm=='A' & ev!='Event', pmin(ttev, 1.8), ttev) # cens everyone else of arm A at 1.8. to ensure that 2 is last observed time for arm A and that is the event of interest.
+
+  dt <- data.frame(arm=arm, ev=factor(ev, levels=c('Cen', 'Event', 'Comrisk')), ttev=ttev)
+
+  expect_no_error(
+    {
+      prev.err <- rmeanglm(Surv(ttev,ev, type='mstate')~arm, time = 6, cause = 'Event', model.censoring = 'stratified',
+           formula.censoring = ~ arm,
+           data=dt) # Error in stats::glm.fit(X, Y, weights = weights, family = quasi(link = link,  : NA/NaN/Inf in 'y'
+    }
+  )
+
+
+
+})
