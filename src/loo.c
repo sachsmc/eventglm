@@ -22,7 +22,11 @@ void loo_surv2(double *Y,
 	   because individual k was at risk
 	   at time[t]
 	 */
-	na = D[t]/(Y[t]-1);
+	if(Y[t] == 1){
+	  na = D[t];
+	} else {
+	  na = D[t]/(Y[t]-1);
+	}
       }
       else{
 	if (obsT[k]==time[t]){
@@ -33,7 +37,12 @@ void loo_surv2(double *Y,
 	    because k was in the risk set at
 	    time[t]
 	  */
-	  na = (D[t]-status[k])/(Y[t]-1);
+	  if(Y[t] == 1) {
+	    na = (D[t]-status[k]);
+	  } else {
+	    na = (D[t]-status[k])/(Y[t]-1);
+	  }
+
 	}
 	else{
 	  /* do nothing */
@@ -71,7 +80,11 @@ void loo_surv(double *Y,
                  because individual k was at risk
                  at time[t]
                  */
-                na = D[t]/(Y[t]-1);
+                if(Y[t] == 1){
+                  na = D[t];
+                } else {
+                  na = D[t]/(Y[t]-1);
+                }
             }
             else{
                 if (obsT[k]==time[t]){
@@ -82,7 +95,11 @@ void loo_surv(double *Y,
                      because k was in the risk set at
                      time[t]
                      */
-                    na = (D[t]-status[k])/(Y[t]-1);
+                    if(Y[t] == 1){
+                      na = (D[t]-status[k]);
+                    } else {
+                      na = (D[t]-status[k])/(Y[t]-1);
+                    }
                 }
                 else{
                     /* do nothing */
@@ -120,11 +137,19 @@ void loo_comprisk2(double *Y,
         for (t=0; t<*NT;t++){
             if(t > 0) {
                 if(obsT[k] > time[t - 1]) {
+                  if(Y[t - 1] == 1) {
+                    na0 = D0[t - 1];
+                  } else {
                     na0 = D0[t - 1]/(Y[t - 1]-1);
+                  }
                 }
                 else {
                     if(obsT[k]==time[t-1]) {
+                      if(Y[t - 1]== 1) {
+                        na0 = (D0[t-1]-status0[k]);
+                      } else {
                         na0 = (D0[t-1]-status0[k])/(Y[t-1]-1);
+                      }
                     }
                     else {
                         na0 = D0[t-1]/Y[t-1];
@@ -141,7 +166,12 @@ void loo_comprisk2(double *Y,
                 /* decrease the number at risk
                  because k was in the risk set at time[t]
                  */
+
+              if(Y[t] == 1) {
+                na = D[t];
+              } else {
                 na = D[t]/(Y[t]-1);
+              }
 
 
 
@@ -201,11 +231,21 @@ void loo_comprisk(double *Y,
         for (t=0; t<=*Tdex;t++){
             if(t > 0) {
                 if(obsT[k] > time[t - 1]) {
+                  if(Y[t - 1] == 1) {
+                    na0 = D0[t - 1];
+                  } else {
                     na0 = D0[t - 1]/(Y[t - 1]-1);
+                  }
                 }
                 else {
                     if(obsT[k]==time[t-1]) {
+
+                      if(Y[t-1] == 1) {
+                        na0 = (D0[t-1]-status0[k]);
+                      } else {
                         na0 = (D0[t-1]-status0[k])/(Y[t-1]-1);
+                      }
+
                     }
                     else {
                         na0 = D0[t-1]/Y[t-1];
@@ -222,7 +262,12 @@ void loo_comprisk(double *Y,
                 /* decrease the number at risk
                  because k was in the risk set at time[t]
                  */
-                na = D[t]/(Y[t]-1);
+                if(Y[t] == 1) {
+                  na = D[t];
+                } else {
+                  na = D[t]/(Y[t]-1);
+                }
+
 
 
 

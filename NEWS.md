@@ -1,8 +1,8 @@
-# eventglm 1.4.3
+# eventglm 1.4.4
 
 Bug fixes: 
 
-* Handle case where last observation is an event leading to NaN (thanks @trinhdhk)
+* Handle cases where last observation is an event leading to NaN (thanks @trinhdhk)
 
 
 # eventglm 1.4.2

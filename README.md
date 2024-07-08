@@ -1,7 +1,4 @@
 [![CRAN Status](https://www.r-pkg.org/badges/version/eventglm)](https://cran.r-project.org/package=eventglm)
-[![Travis build status](https://travis-ci.com/sachsmc/eventglm.svg?branch=master)](https://travis-ci.com/sachsmc/eventglm)
-
-
 
 # eventglm: Regression Models for Event History Outcomes
 
