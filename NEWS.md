@@ -1,3 +1,9 @@
+# eventglm 1.4.5
+
+Bug fixes: 
+
+* Binder IPCW method was not being calculated correctly. It could have impacted the intercept (and hence predictions), but coefficient estimates have always been consistent. Now predictions and the intercept should also work correctly. (Thanks @alexpate30)
+
 # eventglm 1.4.4
 
 Bug fixes: 

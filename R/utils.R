@@ -162,16 +162,18 @@ calc_ipcw_pos <- function(mr, time, causen, type, ipcw.method, Gi) {
     Ii <- as.numeric(mr[, "time"] >= time | mr[, "status"] != 0)
 
     nn <- length(Vi)
-    theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
+    #theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
 
     XXi <- Vi * Ii / Gi
     if (ipcw.method == "binder") {
+      theta.n <- mean(Ii * Vi / Gi)
         POi <-
             theta.n + (nn - 1) * (theta.n - sapply(1:length(XXi), function(i)
                 mean(XXi[-i])))
 
 
     } else if (ipcw.method == "hajek") {
+      theta.n <- sum(Ii * Vi / Gi) / sum(Ii / Gi)
         POi <- nn * theta.n - (nn - 1) *
             (sapply(1:length(XXi), function(i)
                 sum(XXi[-i]) / sum(Ii[-i] / Gi[-i])))
