@@ -1,3 +1,11 @@
+template:
+  bootstrap: 5
+  bootswatch: lux
+  bslib:
+    pkgdown-nav-height: 100px
+
+url: https://sachsmc.github.io/eventglm
+
 destination: docs
 reference:
   - title: "Main functions"

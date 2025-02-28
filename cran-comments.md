@@ -1,1 +1,9 @@
-This is a resubmission that adds references to a soon-to-be published Journal of Statistical Software paper. The DOI in the CITATION is for a new JSS publication that will be registered after publication on CRAN.
+## R CMD check results
+
+0 errors | 0 warnings | 0 notes
+
+This is a resubmission that includes:
+
+* minor bugfixes and enhancements
+
+It has been checked on all major platforms under release and devel

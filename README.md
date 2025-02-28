@@ -13,6 +13,7 @@ This package is in stable development. The interface is unlikely to have major c
 
 ```r
 install.packages("eventglm")
+## or
 remotes::install_github("sachsmc/eventglm")
 ```
 
